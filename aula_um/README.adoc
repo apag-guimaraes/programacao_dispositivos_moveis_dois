@@ -15,22 +15,22 @@
 
 Para verificar ou instalar o OpenJDK, acesse os links disponibilizados a seguir:
 
-- OPENJDK. How to download and install prebuilt OpenJDK packages. Disponível em: https://openjdk.java.net/install/.
-- ORACLE. Como posso definir ou alterar a variável do sistema PATH? Disponível em: https://www.java.com/pt_BR/download/help/path.xml.
+- OPENJDK. How to download and install prebuilt OpenJDK packages. Disponível em: https://openjdk.java.net/install/. Acesso em: 30 de jan. 2023.
+- ORACLE. Como posso definir ou alterar a variável do sistema PATH? Disponível em: https://www.java.com/pt_BR/download/help/path.xml. Acesso em: 30 de jan. 2023.
 
 == Instalação da IDE
 
 Antes de instalar a IDE, por favor, verifique se o OpenJDK foi devidamente instalado, pois o Android Studio necessita do JDK para funcionar. Para a instalação do Android Studio, acesse o seguinte link:
 
-- GOOGLE DEVELOPERS. Instalar o Android Studio. Disponível em: https://developer.android.com/studio/install?hl=pt-br.
+- GOOGLE DEVELOPERS. Instalar o Android Studio. Disponível em: https://developer.android.com/studio/install?hl=pt-br. Acesso em: 30 de jan. 2023.
 
-Para maiores informações sobre as novidades no Android Studio, acesse: o canal Android Developers. What's new in Android Studio. Disponível em: https://www.youtube.com/watch?v=bVt14IBv4NA&list=RDCMUCVHFbqXqoYvEWM1Ddxl0QDg&index=2
+Para maiores informações sobre as novidades no Android Studio, acesse: o canal Android Developers. What's new in Android Studio. Disponível em: https://www.youtube.com/watch?v=bVt14IBv4NA&list=RDCMUCVHFbqXqoYvEWM1Ddxl0QDg&index=2. Acesso em: 30 de jan. 2023.
 
 == Uso do Emulador
 
 Após desenvolver um aplicativo, você pode testá-lo em seu próprio celular, mas caso não tenha um celular com sistema Android, você pode usar um emulador. Para criar um emulador na IDE, acesse o link disponibilizado: 
 
-- GOOGLE DEVELOPERS. Criar e gerenciar dispositivos virtuais. Disponível em: https://developer.android.com/studio/run/managing-avds?hl=pt-br.
+- GOOGLE DEVELOPERS. Criar e gerenciar dispositivos virtuais. Disponível em: https://developer.android.com/studio/run/managing-avds?hl=pt-br. Acesso em: 30 de jan. 2023.
 
 == Web Service
 
@@ -38,7 +38,7 @@ Web Service pode ser definida como um recurso no qual permite as comunicações 
 
 "Um serviço da Web é um sistema de software projetado para oferecer suporte à interação máquina a máquina interoperável em uma rede. Possui uma interface descrita em um formato processável por máquina (especificamente WSDL). Outros sistemas interagem com o serviço da Web de uma maneira prescrita por sua descrição usando mensagens SOAP, normalmente transmitidas usando HTTP com uma serialização XML em conjunto com outros padrões relacionados à Web (WORLD WIDE WEB)."
 
-- Referência do texto entre aspas: WORLD WIDE WEB (W3C). Arquitetura de serviços da Web. Disponível em: https://www.w3.org/TR/ws-arch/#whatis. 
+- Referência do texto entre aspas: WORLD WIDE WEB (W3C). Arquitetura de serviços da Web. Disponível em: https://www.w3.org/TR/ws-arch/#whatis. Acesso em: 30 de jan. 2023.
 
 == Esquematização
 
@@ -48,9 +48,9 @@ Figura 1
 
 image::api.png[]
 
-- Referência da figura 1: RED HAT. O que é uma API? Disponível em: https://www.redhat.com/pt-br/topics/api/what-are-application-programming-interfaces.
+- Referência da figura 1: RED HAT. O que é uma API? Disponível em: https://www.redhat.com/pt-br/topics/api/what-are-application-programming-interfaces. Acesso em: 30 de jan. 2023.
 
-Mais detalhes sobre WebService: POLO, Gabriel. O que é um web service? Disponível em: https://gabrielpolo.medium.com/o-que-%C3%A9-um-webservice-c5104d847a85
+Mais detalhes sobre WebService: POLO, Gabriel. O que é um web service? Disponível em: https://gabrielpolo.medium.com/o-que-%C3%A9-um-webservice-c5104d847a85. Acesso em: 30 de jan. 2023.
 
 == Consumo / Envio de Dados: Arquivos JSON
 
@@ -60,7 +60,7 @@ link:codigo/json_objeto[Exemplo de objeto no JSON]
 
 link:codigo/json_array[Exemplo de vetores no JSON]
 
-Mais detalhes sobre JSON: JSON org. Introdução ao JSON. Disponível em: https://www.json.org/json-pt.html.
+Mais detalhes sobre JSON: JSON org. Introdução ao JSON. Disponível em: https://www.json.org/json-pt.html. Acesso em: 30 de jan. 2023.
 
 Exemplos práticos
 
@@ -104,7 +104,7 @@ link:codigo/exemplo_tres/Auxilia.java[Auxilia]
 
 link:codigo/exemplo_um/Conexao.java[Conexao]
 
-- Referências: As classes Conexao e Auxilia foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m).
+- Referências: As classes Conexao e Auxilia foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m). Acesso em: 30 de jan. 2023.
 
 
 
