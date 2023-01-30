@@ -13,7 +13,7 @@
 
 = Exemplos práticos
 
-Neste exemplo, será usado uma biblioteca que permite criar uma API REST falsa destinada à testes. Para maiores detalhes sobre o biblioteca, acesse o endereço: https://github.com/typicode/json-server.
+Neste exemplo, será usado uma biblioteca que permite criar uma API REST falsa destinada à testes. Para maiores detalhes sobre o biblioteca, acesse o endereço: https://github.com/typicode/json-server. Acesso em: 30 de jan. 2023.
 
 Conforme mostra no endereço supracitado para instalar o json-server, basta abrir o terminal e digitar o comando:
 npm install -g json-server
