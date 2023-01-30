@@ -1,0 +1,120 @@
+//caminho padrão para imagens
+:imagesdir: images
+:figure-caption: Figura
+:doctype: book
+
+//gera apresentacao
+//pode se baixar os arquivos e add no diretório
+:revealjsdir: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0
+
+//GERAR ARQUIVOS
+//make slides
+//make ebook
+
+== Verificação / Instalação do OpenJDK
+
+Para verificar ou instalar o OpenJDK, acesse os links disponibilizados a seguir:
+
+- OPENJDK. How to download and install prebuilt OpenJDK packages. Disponível em: https://openjdk.java.net/install/.
+- ORACLE. Como posso definir ou alterar a variável do sistema PATH? Disponível em: https://www.java.com/pt_BR/download/help/path.xml.
+
+== Instalação da IDE
+
+Antes de instalar a IDE, por favor, verifique se o OpenJDK foi devidamente instalado, pois o Android Studio necessita do JDK para funcionar. Para a instalação do Android Studio, acesse o seguinte link:
+
+- GOOGLE DEVELOPERS. Instalar o Android Studio. Disponível em: https://developer.android.com/studio/install?hl=pt-br.
+
+Para maiores informações sobre as novidades no Android Studio, acesse: o canal Android Developers. What's new in Android Studio. Disponível em: https://www.youtube.com/watch?v=bVt14IBv4NA&list=RDCMUCVHFbqXqoYvEWM1Ddxl0QDg&index=2
+
+== Uso do Emulador
+
+Após desenvolver um aplicativo, você pode testá-lo em seu próprio celular, mas caso não tenha um celular com sistema Android, você pode usar um emulador. Para criar um emulador na IDE, acesse o link disponibilizado: 
+
+- GOOGLE DEVELOPERS. Criar e gerenciar dispositivos virtuais. Disponível em: https://developer.android.com/studio/run/managing-avds?hl=pt-br.
+
+== Web Service
+
+Web Service pode ser definida como um recurso no qual permite as comunicações entre os programas (que podem ser de plataformas diferentes) geralmente acontecem através do protocolo HTTP.
+
+"Um serviço da Web é um sistema de software projetado para oferecer suporte à interação máquina a máquina interoperável em uma rede. Possui uma interface descrita em um formato processável por máquina (especificamente WSDL). Outros sistemas interagem com o serviço da Web de uma maneira prescrita por sua descrição usando mensagens SOAP, normalmente transmitidas usando HTTP com uma serialização XML em conjunto com outros padrões relacionados à Web (WORLD WIDE WEB)."
+
+- Referência do texto entre aspas: WORLD WIDE WEB (W3C). Arquitetura de serviços da Web. Disponível em: https://www.w3.org/TR/ws-arch/#whatis. 
+
+== Esquematização
+
+A figura 1 mostra uma esquematização das interações entre os componentes. Observe que as aplicações clientes se comunicam com a parte servidora através das APIs (camadas de interfaces). Dessa forma, estas partes se comunicam sem saber os detalhes de implementação de cada uma.
+
+Figura 1
+
+image::api.png[]
+
+- Referência da figura 1: RED HAT. O que é uma API? Disponível em: https://www.redhat.com/pt-br/topics/api/what-are-application-programming-interfaces.
+
+Mais detalhes sobre WebService: POLO, Gabriel. O que é um web service? Disponível em: https://gabrielpolo.medium.com/o-que-%C3%A9-um-webservice-c5104d847a85
+
+== Consumo / Envio de Dados: Arquivos JSON
+
+Através do WebService é possível a troca de mensagens entre aplicações, o formato JSON permite uma comunicação mais leve do que a formatação XML. O JSON usa apenas textos podendo representar um objeto ou uma coleção de objetos. 
+
+link:codigo/json_objeto[Exemplo de objeto no JSON]
+
+link:codigo/json_array[Exemplo de vetores no JSON]
+
+Mais detalhes sobre JSON: JSON org. Introdução ao JSON. Disponível em: https://www.json.org/json-pt.html.
+
+Exemplos práticos
+
+- Consumo/envio JSON sem biblioteca (exemplo um)
+
+link:codigo/exemplo_um/activity_main.xml[activity_main]
+
+link:codigo/exemplo_um/MainActivity.java[MainActivity]
+
+link:codigo/exemplo_um/Estudante.java[Estudante]
+
+link:codigo/exemplo_um/activity_segunda.xml[activity_segunda]
+
+link:codigo/exemplo_um/SegundaActivity.java[SegundaActivity]
+
+No exemplo anterior foi usado o JSON de forma nativa. Existe uma opção mais fácil para criar e consumir o arquivo usando outras bibliotecas. Veja o exemplo do mesmo projeto, porém usando a biblioteca Gson.
+
+- Consumo/envio JSON com biblioteca (exemplo dois)
+
+link:codigo/exemplo_dois/MainActivity.java[MainActivity]
+
+link:codigo/exemplo_dois/SegundaActivity.java[SegundaActivity]
+
+Classe TypenToken: classe genérica presente na lib GSON que possibilita obter um tipo de dado em tempo de execução e recuperá-lo. Para mais detalhes da classe acesse a documentação do Java, disponível em: https://www.javadoc.io/doc/com.google.code.gson/gson/2.6.2/com/google/gson/reflect/TypeToken.html.
+
+- Consumo/envio JSON com biblioteca remotamente (exemplo três)
+
+Neste exemplo, será consumido o JSON retornado da seguinte URL: https://jsonplaceholder.typicode.com/posts/. Antes de implementar a classe MainActivity, primeiro será criado a classe POJO derivada do arquivo JSON. Neste material será usado a biblioteca criada por joelittlejohn, disponível em:  http://www.jsonschema2pojo.org/. Esse site permite fazer a conversão de JSON para classe POJO para ser usada com a biblioteca GSON. A figura 2 mostra o site.
+
+image::json_pojo.png[]
+
+Após a criação da class POJO, pode-se dar continuidade no projeto. Os códigos estão disponibilizados a seguir:
+
+link:codigo/exemplo_tres/activity_main.xml[activity_main]
+
+link:codigo/exemplo_tres/MainActivity.java[MainActivity]
+
+link:codigo/exemplo_tres/Item.java[Item]
+
+link:codigo/exemplo_tres/Auxilia.java[Auxilia]
+
+link:codigo/exemplo_um/Conexao.java[Conexao]
+
+- Referências: As classes Conexao e Auxilia foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m).
+
+
+
+
+
+
+
+
+
+
+
+
+
