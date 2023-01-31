@@ -56,9 +56,9 @@ Mais detalhes sobre WebService: POLO, Gabriel. O que é um web service? Disponí
 
 Através do WebService é possível a troca de mensagens entre aplicações, o formato JSON permite uma comunicação mais leve do que a formatação XML. O JSON usa apenas textos podendo representar um objeto ou uma coleção de objetos. 
 
-link:codigos/json_objeto[Exemplo de objeto no JSON]
+link:codigos/json_objeto.txt[Exemplo de objeto no JSON]
 
-link:codigos/json_array[Exemplo de vetores no JSON]
+link:codigos/json_array.txt[Exemplo de vetores no JSON]
 
 Mais detalhes sobre JSON: JSON org. Introdução ao JSON. Disponível em: https://www.json.org/json-pt.html. Acesso em: 30 de jan. 2023.
 
