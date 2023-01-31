@@ -56,9 +56,9 @@ Mais detalhes sobre WebService: POLO, Gabriel. O que é um web service? Disponí
 
 Através do WebService é possível a troca de mensagens entre aplicações, o formato JSON permite uma comunicação mais leve do que a formatação XML. O JSON usa apenas textos podendo representar um objeto ou uma coleção de objetos. 
 
-link:codigo/json_objeto[Exemplo de objeto no JSON]
+link:codigos/json_objeto[Exemplo de objeto no JSON]
 
-link:codigo/json_array[Exemplo de vetores no JSON]
+link:codigos/json_array[Exemplo de vetores no JSON]
 
 Mais detalhes sobre JSON: JSON org. Introdução ao JSON. Disponível em: https://www.json.org/json-pt.html. Acesso em: 30 de jan. 2023.
 
@@ -66,23 +66,23 @@ Exemplos práticos
 
 - Consumo/envio JSON sem biblioteca (exemplo um)
 
-link:codigo/exemplo_um/activity_main.xml[activity_main]
+link:codigos/exemplo_um/activity_main.xml[activity_main]
 
-link:codigo/exemplo_um/MainActivity.java[MainActivity]
+link:codigos/exemplo_um/MainActivity.java[MainActivity]
 
-link:codigo/exemplo_um/Estudante.java[Estudante]
+link:codigos/exemplo_um/Estudante.java[Estudante]
 
-link:codigo/exemplo_um/activity_segunda.xml[activity_segunda]
+link:codigos/exemplo_um/activity_segunda.xml[activity_segunda]
 
-link:codigo/exemplo_um/SegundaActivity.java[SegundaActivity]
+link:codigos/exemplo_um/SegundaActivity.java[SegundaActivity]
 
 No exemplo anterior foi usado o JSON de forma nativa. Existe uma opção mais fácil para criar e consumir o arquivo usando outras bibliotecas. Veja o exemplo do mesmo projeto, porém usando a biblioteca Gson.
 
 - Consumo/envio JSON com biblioteca (exemplo dois)
 
-link:codigo/exemplo_dois/MainActivity.java[MainActivity]
+link:codigos/exemplo_dois/MainActivity.java[MainActivity]
 
-link:codigo/exemplo_dois/SegundaActivity.java[SegundaActivity]
+link:codigos/exemplo_dois/SegundaActivity.java[SegundaActivity]
 
 Classe TypenToken: classe genérica presente na lib GSON que possibilita obter um tipo de dado em tempo de execução e recuperá-lo. Para mais detalhes da classe acesse a documentação do Java, disponível em: https://www.javadoc.io/doc/com.google.code.gson/gson/2.6.2/com/google/gson/reflect/TypeToken.html.
 
@@ -94,15 +94,15 @@ image::json_pojo.png[]
 
 Após a criação da class POJO, pode-se dar continuidade no projeto. Os códigos estão disponibilizados a seguir:
 
-link:codigo/exemplo_tres/activity_main.xml[activity_main]
+link:codigos/exemplo_tres/activity_main.xml[activity_main]
 
-link:codigo/exemplo_tres/MainActivity.java[MainActivity]
+link:codigos/exemplo_tres/MainActivity.java[MainActivity]
 
-link:codigo/exemplo_tres/Item.java[Item]
+link:codigos/exemplo_tres/Item.java[Item]
 
-link:codigo/exemplo_tres/Auxilia.java[Auxilia]
+link:codigos/exemplo_tres/Auxilia.java[Auxilia]
 
-link:codigo/exemplo_um/Conexao.java[Conexao]
+link:codigos/exemplo_um/Conexao.java[Conexao]
 
 - Referências: As classes Conexao e Auxilia foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m). Acesso em: 30 de jan. 2023.
 
