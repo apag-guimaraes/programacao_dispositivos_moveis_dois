@@ -86,25 +86,6 @@ link:codigos/exemplo_dois/SegundaActivity.java[SegundaActivity]
 
 Classe TypenToken: classe genérica presente na lib GSON que possibilita obter um tipo de dado em tempo de execução e recuperá-lo. Para mais detalhes da classe acesse a documentação do Java, disponível em: https://www.javadoc.io/doc/com.google.code.gson/gson/2.6.2/com/google/gson/reflect/TypeToken.html.
 
-- Consumo/envio JSON com biblioteca remotamente (exemplo três)
-
-Neste exemplo, será consumido o JSON retornado da seguinte URL: https://jsonplaceholder.typicode.com/posts/. Antes de implementar a classe MainActivity, primeiro será criado a classe POJO derivada do arquivo JSON. Neste material será usado a biblioteca criada por joelittlejohn, disponível em:  http://www.jsonschema2pojo.org/. Esse site permite fazer a conversão de JSON para classe POJO para ser usada com a biblioteca GSON. A figura 2 mostra o site.
-
-image::json_pojo.png[]
-
-Após a criação da class POJO, pode-se dar continuidade no projeto. Os códigos estão disponibilizados a seguir:
-
-link:codigos/exemplo_tres/activity_main.xml[activity_main]
-
-link:codigos/exemplo_tres/MainActivity.java[MainActivity]
-
-link:codigos/exemplo_tres/Item.java[Item]
-
-link:codigos/exemplo_tres/Auxilia.java[Auxilia]
-
-link:codigos/exemplo_um/Conexao.java[Conexao]
-
-- Referências: As classes Conexao e Auxilia foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m). Acesso em: 30 de jan. 2023.
 
 
 
