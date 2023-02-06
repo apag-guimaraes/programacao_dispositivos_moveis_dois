@@ -11,7 +11,17 @@
 //make slides
 //make ebook
 
-= Exemplos práticos
+== Consumo/envio JSON com biblioteca remotamente (exemplo três)
+
+Inicialmente cria-se um novo projeto no Android Studio. No arquivo build.gradle (Module:app) deve ser adicionado a linha implementation ‘com.google.code.gson:gson:2.8.6'. No arquivo AndroidManifest.xml deve ser adicionado a linha <uses-permission android:name="android.permission.INTERNET"/>.
+
+Neste exemplo, será consumido o JSON retornado da seguinte URL: https://jsonplaceholder.typicode.com/posts/. Antes de implementar a classe MainActivity, primeiro será criado a classe POJO derivada do arquivo JSON. Neste material será usado a biblioteca criada por joelittlejohn, disponível em: http://www.jsonschema2pojo.org/. Esse site permite fazer a conversão de JSON para classe POJO para ser usada com a biblioteca GSON. A figura 1 mostra o site.
+
+
+
+Para saber mais detalhes sobre as anotações @Expose e @SerializedName, acesse o link: https://stackoverflow.com/questions/34752200/gson-expose-vs-serializedname. Pergunta realizada pelo usuário <https://stackoverflow.com/users/867591/ahmed-faisal> em 12 de jan. 2016 e respondida pelo usuário <https://stackoverflow.com/users/8942811/bek> em 7 de set. 2018.
+
+ - Exemplos práticos
 
 Neste exemplo, será usado uma biblioteca que permite criar uma API REST falsa destinada à testes. Para maiores detalhes sobre o biblioteca, acesse o endereço: https://github.com/typicode/json-server. Acesso em: 30 de jan. 2023.
 
