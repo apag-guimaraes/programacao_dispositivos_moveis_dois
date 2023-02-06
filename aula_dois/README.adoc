@@ -19,7 +19,7 @@ Neste exemplo, será consumido o JSON retornado da seguinte URL: https://jsonpla
 
 image::json_pojo.png[]
 
-Para saber mais detalhes sobre as anotações @Expose e @SerializedName, acesse o link: https://stackoverflow.com/questions/34752200/gson-expose-vs-serializedname. Pergunta realizada pelo usuário <https://stackoverflow.com/users/867591/ahmed-faisal> em 12 de jan. 2016 e respondida pelo usuário <https://stackoverflow.com/users/8942811/bek> em 7 de set. 2018.
+- Para saber mais detalhes sobre as anotações @Expose e @SerializedName, acesse o link do site Stack Overflow: https://stackoverflow.com/questions/34752200/gson-expose-vs-serializedname. Pergunta realizada pelo usuário <https://stackoverflow.com/users/867591/ahmed-faisal> em 12 de jan. 2016 e respondida pelo usuário <https://stackoverflow.com/users/8942811/bek> em 7 de set. 2018.  Acesso em: 6 de fev. 2023.
 
 Após a criação da class POJO, pode-se dar continuidade no projeto. Os códigos estão disponibilizados a seguir:
 
