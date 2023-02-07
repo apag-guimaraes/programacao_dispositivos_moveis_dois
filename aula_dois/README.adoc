@@ -23,13 +23,13 @@ image::json_pojo.png[]
 
 Após a criação da class POJO, pode-se dar continuidade no projeto. Os códigos estão disponibilizados a seguir:
 
-link:codigos/exemplo_tres/activity_main.xml[activity_main]
+link:codigos/exemplo_um/activity_main.xml[activity_main]
 
-link:codigos/exemplo_tres/MainActivity.java[MainActivity]
+link:codigos/exemplo_um/MainActivity.java[MainActivity]
 
-link:codigos/exemplo_tres/Item.java[Item]
+link:codigos/exemplo_um/Item.java[Item]
 
-link:codigos/exemplo_tres/Auxilia.java[Auxilia]
+link:codigos/exemplo_um/Auxilia.java[Auxilia]
 
 link:codigos/exemplo_um/Conexao.java[Conexao]
 
@@ -45,7 +45,7 @@ npm install -g json-server
 
 Atenção: É necessário ter o node.js instalado no computador para biblitoca funcionar. Em seguida, crie um arquivo com extensão.json, por exemplo db.json, banco.json, dados.json, etc.
 
-link:codigo/aula_dois/exemplo_um/db.json[dados json]
+link:codigos/aula_dois/exemplo_um/db.json[dados json]
 
 Após salvar o arquivo abre o terminal e vamos ligar o servidor usando o comando:
 json-server db.json
