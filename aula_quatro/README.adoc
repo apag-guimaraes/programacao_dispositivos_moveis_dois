@@ -80,12 +80,17 @@ Exemplos práticos (personalizando marcadores):
 }
 
 Para mais detalhes sobre SDK MAPS:
+
 - GOOGLE DEVELOPERS. Marker. Disponível em: https://developers.google.com/maps/documentation/android-sdk/marker?hl=pt-br. Acesso em: 10 fev. 2023.
+
 - GOOGLE DEVELOPERS. CameraPosition. Disponível em: <https://developers.google.com/android/reference/com/google/android/gms/maps/model/CameraPosition. Acessado em: 10 fev. 2023.
+
 - GOOGLE DEVELOPERS. LatLngBounds. Disponível em: https://developers.google.com/maps/documentation/android-sdk/reference/com/google/android/libraries/maps/model/LatLngBounds. Acessado em: 10 fev. 2023.
+
 - GOOGLE DEVELOPERS: Location. Disponível em: https://developers.google.com/maps/documentation/android-sdk/location?hl=pt-br. Acesso em: 10 fev. 2023.
 
 Exemplos práticos disponíveis na documentação sobre Google Maps (destacando: limitação de mapa, configurações de zoom, posição da câmera e localização de usuário): 
+
 - GOOGLEMAPS/ANDROID-SAMPLES. Disponível em: https://github.com/googlemaps/android-samples.Acessado em: 10 fev. 2023.
 
 
