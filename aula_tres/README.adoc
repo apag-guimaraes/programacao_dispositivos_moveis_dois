@@ -49,14 +49,11 @@ Exemplos práticos:
 - No arquivo build.gradle, adicione uma dependência:
 dependencies 
 
-{
-
-    ...
+{...
 
     implementation "com.airbnb.android:lottie:4.2.2"  //obter a lib
 
-    ...
-}
+    ...}
 
 - Clique com o botão direito do mouse na pasta res e adicione um diretório chamado raw. Coloque o arquivo json baixado neste diretório.
 
