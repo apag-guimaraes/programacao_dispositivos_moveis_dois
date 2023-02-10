@@ -1,1 +1,45 @@
+:revealjsdir: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0
+:revealjs_slideNumber: true
+:source-highlighter: highlightjs
+:icons: font
+:allow-uri-read:
+:imagesdir: /images
+:stylesheet: adoc-golo.css
+:numbered:
+ifndef::env-github[:toc: left]
+:toc-title: Sumário
+:toclevels: 5
 
+ifdef::env-github[:outfilesuffix: .adoc]
+
+ifdef::env-github,env-browser[]
+// Exibe ícones para os blocos como NOTE e IMPORTANT no GitHub
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+
+:chapter-label:
+:description: Elaboração de material didático multimídia com AsciiDoc, git e GitHub
+:listing-caption: Listagem
+:figure-caption: Figura
+
+= Google Maps
+
+Com o SDK do Google Maps é possível adicionar mapa em seu projeto, usar recursos de localização, pontos de latitude e longitude, personalização de marcadores e outros.
+
+Para criar um projeto no AndroidStudio usando os recursos do SDK do Google Maps é necessário fazer algumas configurações na IDE e também na Google Cloud.
+
+Para mais informações:
+
+- Visão geral do SDK do Maps para Android. Disponível em: https://developers.google.com/maps/documentation/android-sdk/overview?hl=pt-br&section=tools. Acessado em: 10 fev. 2023.
+- GOOGLEMAPS/ANDROID-SAMPLES. Disponível em: https://github.com/googlemaps/android-samples.Acessado em: 10 fev. 2023.
+- O que é latitude e longitude? Disponível em: http://coral.ufsm.br/cartografia/index.php?option=com_content&view=article&id=43&Itemid=39#:~:text=A%20latitude%20%C3%A9%20a%20dist%C3%A2ncia,medida%20ao%20longo%20do%20Equador. Acessado em: 10 fev. 2023.
+- GOOGLE DEVELOPERS. CameraPosition. Disponível em: <https://developers.google.com/android/reference/com/google/android/gms/maps/model/CameraPosition. Acessado em: 10 fev. 2023.
+- GOOGLE DEVELOPERS. LatLngBounds. Disponível em: https://developers.google.com/maps/documentation/android-sdk/reference/com/google/android/libraries/maps/model/LatLngBounds. Acessado em: 10 fev. 2023.
+
+ifdef::env-github[image:https://youtu.be/l3bw8Senjmg[Passos iniciais: marcadores]]
+
+ifdef::env-github[image:https://youtu.be/FFm9NmSfjw0[Personalizações: marcadores]]
