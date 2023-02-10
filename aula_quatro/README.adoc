@@ -50,6 +50,8 @@ Personalizações: marcadores
 video::FFm9NmSfjw0[youtube, width=640, height=480]
 endif::[]
 
-
+.Autenticação baseada em chave no GitHub a partir do Linux
+video::j7lX9ff9rC8[youtube, width=640, height=480]
+endif::[]
 
 
