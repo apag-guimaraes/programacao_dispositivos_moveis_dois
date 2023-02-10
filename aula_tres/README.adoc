@@ -33,3 +33,50 @@ Exemplos práticos (Elementos do Navigation Drawer):
 - link:codigos/main.xml[main]
 - link:codigos/mobile_navigation.xml[mobile_navigation]
 - link:codigos/nav_header_main.xml[nav_header_main]
+
+= Animação Usando Arquivos JSON
+
+Já vimos nos tópicos anteriores que o arquivo JSON facilita a troca de dados entre aplicativos, mas seria possível aplicá-lo em outras situações? Por exemplo: em animações? Sim, atualmente o JSON é usado também para essa finalidade, um exemplo disto é a biblioteca Lottie que renderiza animações exportadas do software Adobe After Effects.
+
+Para saber mais detalhes sobre a biblioteca, acesse o projeto disponível no GitHub no seguinte endereço: https://github.com/airbnb/lottie-android
+
+Exemplos práticos:
+
+- Crie um projeto na IDE;
+
+- Escolha uma Activity vazia;
+
+- No arquivo build.gradle, adicione uma dependência:
+dependencies {
+
+    ...
+
+    implementation "com.airbnb.android:lottie:4.2.2"  //obter a lib
+
+    ...
+
+}
+- Clique com o botão direito do mouse na pasta res e adicione um diretório chamado raw. Coloque o arquivo json baixado neste diretório.
+
+- No arquivo activity_main.xml, acrescente a tag:
+<com.airbnb.lottie.LottieAnimationView
+
+   android:id="@+id/animation_view"
+
+   android:layout_width="wrap_content"
+
+   android:layout_height="wrap_content"
+
+   app:lottie_rawRes="@raw/cube"    //onde fica o arquivo json
+
+   app:lottie_autoPlay="true"   //iniciar a animação
+
+   app:lottie_loop="true"   //animação continua indefinidamente
+
+   />
+   - Pronto, basta executar seu app.
+   
+   Referências do exemplo acima:
+    - AIRBNB. Gettting Started. Disponível em: https://airbnb.io/lottie/#/android. Acessado em: 10 fev. 2023.
+    - LOTTIEFILES. Disponível em: https://lottiefiles.com/. Acessado em: 10 fev. 2023.
+
