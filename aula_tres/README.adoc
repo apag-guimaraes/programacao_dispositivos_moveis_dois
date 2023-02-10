@@ -56,6 +56,7 @@ dependencies {
     ...
 
 }
+
 - Clique com o botão direito do mouse na pasta res e adicione um diretório chamado raw. Coloque o arquivo json baixado neste diretório.
 
 - No arquivo activity_main.xml, acrescente a tag:
@@ -74,9 +75,11 @@ dependencies {
    app:lottie_loop="true"   //animação continua indefinidamente
 
    />
-   - Pronto, basta executar seu app.
+   
+   - Pronto, basta executar o app.
    
    Referências do exemplo acima:
-    - AIRBNB. Gettting Started. Disponível em: https://airbnb.io/lottie/#/android. Acessado em: 10 fev. 2023.
-    - LOTTIEFILES. Disponível em: https://lottiefiles.com/. Acessado em: 10 fev. 2023.
+   - AIRBNB. Gettting Started. Disponível em: https://airbnb.io/lottie/#/android. Acessado em: 10 fev. 2023.
+   - LOTTIEFILES. Disponível em: https://lottiefiles.com/. Acessado em: 10 fev. 2023.
+
 
