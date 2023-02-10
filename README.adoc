@@ -19,4 +19,4 @@ Material de apoio com fins didáticos voltado para o aprendizado em programaçã
 
 2. link:aula_dois/[HTTPS / Uso da lib GSON / Consumo JSON remotamente / Converter JSON em classes POJO]
 
-3. link:aula_tres/[Navigation Drawer]
+3. link:aula_tres/[Navigation Drawer / Animação com JSON]
