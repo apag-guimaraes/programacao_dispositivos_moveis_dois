@@ -1,30 +1,29 @@
+//caminho padrão para imagens
+:imagesdir: images
+:figure-caption: Figura
+:doctype: book
+
+//gera apresentacao
+//pode se baixar os arquivos e add no diretório
 :revealjsdir: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0
-:revealjs_slideNumber: true
+
+//GERAR ARQUIVOS
+//make slides
+//make ebook
+
+//Estilo do Sumário
+:toc2: 
+//após os : insere o texto que deseja ser visível
+:toc-title: Sumário
+:figure-caption: Figura
+//numerar titulos
+:numbered:
 :source-highlighter: highlightjs
 :icons: font
-:allow-uri-read:
-:imagesdir: /images
-:stylesheet: adoc-golo.css
-:numbered:
-ifndef::env-github[:toc: left]
-:toc-title: Sumário
-:toclevels: 5
-
-ifdef::env-github[:outfilesuffix: .adoc]
-
-ifdef::env-github,env-browser[]
-// Exibe ícones para os blocos como NOTE e IMPORTANT no GitHub
-:caution-caption: :fire:
-:important-caption: :exclamation:
-:note-caption: :paperclip:
-:tip-caption: :bulb:
-:warning-caption: :warning:
-endif::[]
-
 :chapter-label:
-:description: Elaboração de material didático multimídia com AsciiDoc, git e GitHub
-:listing-caption: Listagem
-:figure-caption: Figura
+:doctype: book
+:lang: pt-BR
+//3+| mesclar linha tabela
 
 = Google Maps
 
@@ -54,4 +53,5 @@ endif::[]
 video::j7lX9ff9rC8[youtube, width=640, height=480]
 endif::[]
 
+video::v_vQvUifMm0[youtube,width=640,height=480]
 
