@@ -41,10 +41,14 @@ Para mais informações:
 - GOOGLE DEVELOPERS. LatLngBounds. Disponível em: https://developers.google.com/maps/documentation/android-sdk/reference/com/google/android/libraries/maps/model/LatLngBounds. Acessado em: 10 fev. 2023.
 
 Passos iniciais: marcadores
+
 video::l3bw8Senjmg[youtube, width=640, height=480]
+endif::[]
 
 Personalizações: marcadores
-video::https://youtu.be/FFm9NmSfjw0[youtube, width=640, height=480]
+
+video::FFm9NmSfjw0[youtube, width=640, height=480]
+endif::[]
 
 
 
