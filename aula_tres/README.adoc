@@ -1,1 +1,24 @@
+//caminho padrão para imagens
 
+:figure-caption: Figura
+:doctype: book
+
+//gera apresentacao
+//pode se baixar os arquivos e add no diretório
+:revealjsdir: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0
+
+//GERAR ARQUIVOS
+//make slides
+//make ebook
+
+= Navigation Drawer
+
+O Navigation Drawer é um componente que permite construir um menu lateral que desliza no sentido esquerda para a direita. É possível criar um Navigation Drawer do zero, mas atualmente,  é disponível o template pronto do Navigation Drawer no Android Studio. Dessa forma, o trabalho fica compreendido em entender a função de vários elementos que o compõe.
+
+Para mais detalhes:
+
+- GOOGLE MATERIAL DESIGN. Navigation Drawer. Disponível em: https://material.io/components/navigation-drawer. Acessado em: 10 fev. 2023.
+
+- Android Developers. Disponível em: https://www.youtube.com/watch?v=DkT0vS14Um0. Acessado em: 10 fev. 2023.
+
+Exemplos práticos (Elementos do Navigation Drawer):
