@@ -47,7 +47,8 @@ Exemplos práticos:
 - Escolha uma Activity vazia;
 
 - No arquivo build.gradle, adicione uma dependência:
-dependencies {
+dependencies 
+{
 
     ...
 
@@ -77,5 +78,7 @@ dependencies {
    
    - Pronto, basta executar o app.
    
-
+Referências do exemplo acima:
+- AIRBNB. Getting Started. Disponível em: https://airbnb.io/lottie/#/android. Acessado em: 10 fev. 2023.
+- LOTTIEFILES. Disponível em: https://lottiefiles.com/.Acessado em: 10 fev. 2023.
 
