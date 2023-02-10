@@ -13,7 +13,7 @@
 
 = Navigation Drawer
 
-O Navigation Drawer é um componente que permite construir um menu lateral que desliza no sentido esquerda para a direita. É possível criar um Navigation Drawer do zero, mas atualmente,  é disponível o template pronto do Navigation Drawer no Android Studio. Dessa forma, o trabalho fica compreendido em entender a função de vários elementos que o compõe.
+O Navigation Drawer é um componente que permite construir um menu lateral que desliza no sentido esquerda para a direita. É possível criar um Navigation Drawer do zero, mas atualmente, é disponibilizado o template pronto do Navigation Drawer quando você cria um projeto no Android Studio. Dessa forma, o trabalho fica compreendido em entender a função de vários elementos que o compõe que pode ser visto logo a seguir nos Exemplos práticos.
 
 Para mais detalhes:
 
@@ -22,3 +22,14 @@ Para mais detalhes:
 - Android Developers. Disponível em: https://www.youtube.com/watch?v=DkT0vS14Um0. Acessado em: 10 fev. 2023.
 
 Exemplos práticos (Elementos do Navigation Drawer):
+
+- link:codigos/BiscoitoFragment.java[BiscoitoFragment]
+- link:codigos/fragment_biscoito.xml[fragment_biscoito]
+- link:codigos/MainActivity.java[MainActivity]
+- link:codigos/activity_main.xml[activity_main]
+- link:codigos/activitiy_main_drawer.xml[activitiy_main_drawer]
+- link:codigos/app_bar_main.xml[app_bar_main]
+- link:codigos/content_main.xml[content_main]
+- link:codigos/main.xml[main]
+- link:codigos/mobile_navigation.xml[mobile_navigation]
+- link:codigos/nav_header_main.xml[nav_header_main]
