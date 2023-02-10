@@ -54,7 +54,6 @@ dependencies {
     implementation "com.airbnb.android:lottie:4.2.2"  //obter a lib
 
     ...
-
 }
 
 - Clique com o botão direito do mouse na pasta res e adicione um diretório chamado raw. Coloque o arquivo json baixado neste diretório.
@@ -78,8 +77,5 @@ dependencies {
    
    - Pronto, basta executar o app.
    
-   Referências do exemplo acima:
-   - AIRBNB. Gettting Started. Disponível em: https://airbnb.io/lottie/#/android. Acessado em: 10 fev. 2023.
-   - LOTTIEFILES. Disponível em: https://lottiefiles.com/. Acessado em: 10 fev. 2023.
 
 
