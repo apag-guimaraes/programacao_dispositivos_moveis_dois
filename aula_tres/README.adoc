@@ -19,7 +19,7 @@ Para mais detalhes:
 
 - GOOGLE MATERIAL DESIGN. Navigation Drawer. Disponível em: https://material.io/components/navigation-drawer. Acessado em: 10 fev. 2023.
 
-- Android Developers. Disponível em: https://www.youtube.com/watch?v=DkT0vS14Um0. Acessado em: 10 fev. 2023.
+video::v=DkT0vS14Um0[youtube,width=640,height=480]
 
 Exemplos práticos (Elementos do Navigation Drawer):
 
