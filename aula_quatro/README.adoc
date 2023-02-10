@@ -40,6 +40,12 @@ Para mais informações:
 - GOOGLE DEVELOPERS. CameraPosition. Disponível em: <https://developers.google.com/android/reference/com/google/android/gms/maps/model/CameraPosition. Acessado em: 10 fev. 2023.
 - GOOGLE DEVELOPERS. LatLngBounds. Disponível em: https://developers.google.com/maps/documentation/android-sdk/reference/com/google/android/libraries/maps/model/LatLngBounds. Acessado em: 10 fev. 2023.
 
-ifdef::env-github[image:https://youtu.be/l3bw8Senjmg[Passos iniciais: marcadores]]
+Passos iniciais: marcadores
+video::l3bw8Senjmg[youtube, width=640, height=480]
 
-ifdef::env-github[image:https://youtu.be/FFm9NmSfjw0[Personalizações: marcadores]]
+Personalizações: marcadores
+video::https://youtu.be/FFm9NmSfjw0[youtube, width=640, height=480]
+
+
+
+
