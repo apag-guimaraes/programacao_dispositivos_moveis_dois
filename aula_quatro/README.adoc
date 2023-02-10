@@ -34,10 +34,6 @@ Para criar um projeto no AndroidStudio usando os recursos do SDK do Google Maps 
 Para mais informações:
 
 - Visão geral do SDK do Maps para Android. Disponível em: https://developers.google.com/maps/documentation/android-sdk/overview?hl=pt-br&section=tools. Acessado em: 10 fev. 2023.
-- GOOGLEMAPS/ANDROID-SAMPLES. Disponível em: https://github.com/googlemaps/android-samples.Acessado em: 10 fev. 2023.
-- O que é latitude e longitude? Disponível em: http://coral.ufsm.br/cartografia/index.php?option=com_content&view=article&id=43&Itemid=39#:~:text=A%20latitude%20%C3%A9%20a%20dist%C3%A2ncia,medida%20ao%20longo%20do%20Equador. Acessado em: 10 fev. 2023.
-- GOOGLE DEVELOPERS. CameraPosition. Disponível em: <https://developers.google.com/android/reference/com/google/android/gms/maps/model/CameraPosition. Acessado em: 10 fev. 2023.
-- GOOGLE DEVELOPERS. LatLngBounds. Disponível em: https://developers.google.com/maps/documentation/android-sdk/reference/com/google/android/libraries/maps/model/LatLngBounds. Acessado em: 10 fev. 2023.
 
 Passos iniciais: marcadores
 
@@ -46,6 +42,53 @@ video::l3bw8Senjmg[youtube, width=640, height=480]
 Personalizações: marcadores
 
 video::FFm9NmSfjw0[youtube, width=640, height=480]
+
+Exemplos práticos (personalizando marcadores):
+
+ - crie um projeto na IDE;
+
+- escolha o Google Maps Activity;
+
+- Na classe MainActivity.java no método OnMapReady faça as seguintes adições:
+@Override
+
+    public void onMapReady(GoogleMap googleMap) {
+
+        mMap = googleMap;
+
+        LatLng sydney = new LatLng(-34, 151);
+
+        mMap.addMarker(new MarkerOptions()   //adiciona um marcador
+
+                .position(sydney)                                  //especifica a posição 
+
+                .title("Marker in Sydney")			//define o título no marcador
+
+                .draggable(true)					//torna o marcador arrastável
+
+                .snippet("Hello")					//texto adicional ao marcador
+
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))   //muda a cor do marcador
+
+                .rotation(90.F));   //gira o marcador
+
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));   
+
+    }
+
+}
+
+Para mais detalhes sobre SDK MAPS:
+- GOOGLE DEVELOPERS. Marker. Disponível em: https://developers.google.com/maps/documentation/android-sdk/marker?hl=pt-br. Acesso em: 10 fev. 2023.
+- GOOGLE DEVELOPERS. CameraPosition. Disponível em: <https://developers.google.com/android/reference/com/google/android/gms/maps/model/CameraPosition. Acessado em: 10 fev. 2023.
+- GOOGLE DEVELOPERS. LatLngBounds. Disponível em: https://developers.google.com/maps/documentation/android-sdk/reference/com/google/android/libraries/maps/model/LatLngBounds. Acessado em: 10 fev. 2023.
+- GOOGLE DEVELOPERS: Location. Disponível em: https://developers.google.com/maps/documentation/android-sdk/location?hl=pt-br. Acesso em: 10 fev. 2023.
+
+Exemplos práticos disponíveis na documentação sobre Google Maps (destacando: limitação de mapa, configurações de zoom, posição da câmera e localização de usuário): 
+- GOOGLEMAPS/ANDROID-SAMPLES. Disponível em: https://github.com/googlemaps/android-samples.Acessado em: 10 fev. 2023.
+
+
 
 
 
