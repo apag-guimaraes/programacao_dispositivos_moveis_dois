@@ -42,16 +42,9 @@ Para mais informações:
 Passos iniciais: marcadores
 
 video::l3bw8Senjmg[youtube, width=640, height=480]
-endif::[]
 
 Personalizações: marcadores
 
 video::FFm9NmSfjw0[youtube, width=640, height=480]
-endif::[]
 
-.Autenticação baseada em chave no GitHub a partir do Linux
-video::j7lX9ff9rC8[youtube, width=640, height=480]
-endif::[]
-
-video::v_vQvUifMm0[youtube,width=640,height=480]
 
