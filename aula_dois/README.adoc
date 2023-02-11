@@ -23,15 +23,15 @@ image::json_pojo.png[]
 
 Após a criação da class POJO, pode-se dar continuidade no projeto. Os códigos estão disponibilizados a seguir:
 
-link:codigos/exemplo_um/activity_main.xml[activity_main]
+link:codigos/aula_dois/exemplo_um/activity_main.xml[activity_main]
 
-link:codigos/exemplo_um/MainActivity.java[MainActivity]
+link:codigos/aula_dois/exemplo_um/MainActivity.java[MainActivity]
 
-link:codigos/exemplo_um/Item.java[Item]
+link:codigos/aula_dois/exemplo_um/Item.java[Item]
 
-link:codigos/exemplo_um/Auxilia.java[Auxilia]
+link:codigos/aula_dois/exemplo_um/Auxilia.java[Auxilia]
 
-link:codigos/exemplo_um/Conexao.java[Conexao]
+link:codigos/aula_dois/exemplo_um/Conexao.java[Conexao]
 
 - Referências: As classes Conexao e Auxilia foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m). Acesso em: 30 de jan. 2023.
 
