@@ -1,0 +1,6 @@
+= Service
+
+Recurso usado para operações que são executadas em segundo plano. Não oferece interface gráfica para interação com o usuário. Geralmente são indicadas
+para operações longas. Um exemplo clássico de uso: uma música sendo reproduzida mesmo quando você está usando outro aplicativo.
+
+video::ROk-YrZKYCg[]
