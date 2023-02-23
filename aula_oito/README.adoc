@@ -5,3 +5,7 @@ Uma opção para efetuar operações baseadas em tempo.
 Exemplos práticos:
 
 - link:um/activity_main.xml[activity_main]
+
+- link:um/MainActivity.java[MainActivity]
+
+- link:um/MyBroadcastReceiver.java[activity_main]
