@@ -33,3 +33,7 @@ Exemplos práticos:
 
 - link:um/MainActivity.java[MainActivity]
 
+Exemplos práticos:
+
+- link:dois/activity_main.xml[activity_main]
+
