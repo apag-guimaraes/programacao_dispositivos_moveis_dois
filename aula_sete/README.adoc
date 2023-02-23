@@ -32,3 +32,13 @@ Exemplos práticos:
 Observe que neste exemplo, a notificação mostra uma mensagem. Quando o usuário clicar na notificação, será chamada uma outra Activity que apresenta a mensagem "Olá". Esta atividade não pertence ao fluxo normal do aplicativo, por isso foi usada a flag Intent.FLAG_ACTIVITY_NEW_TASK ou
 
 Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+Exemplos práticos:
+
+- link:tres/activity_main.xml[activity_main]
+
+- link:tres/MainActivity.java[MainActivity]
+
+- link:tres/activity_segunda.xml[activity_segunda]
+
+- link:tres/SegundaActivity.java[SegundaActivity]
