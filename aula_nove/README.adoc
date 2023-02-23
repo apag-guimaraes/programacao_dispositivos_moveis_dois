@@ -9,4 +9,6 @@ A figura 1 mostra o ciclo de vida do Service
 
 image:service.png[]
 
+- Referência da figura 1: GOOGLE DEVELOPERS. Visão geral dos serviços. Disponível em: https://developer.android.com/guide/components/services. Acesso: 23 fev. 2023.
+
 
