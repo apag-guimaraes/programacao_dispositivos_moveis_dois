@@ -7,6 +7,6 @@ video::ROk-YrZKYCg[youtube, width=640, height=480]
 
 A figura 1 mostra o ciclo de vida do Service
 
-image:service.png[width=100,height=100]
+image:service.png[]
 
 
