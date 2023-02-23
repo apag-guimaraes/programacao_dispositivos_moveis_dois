@@ -27,3 +27,5 @@ Material de apoio com fins didáticos voltado para o aprendizado em programaçã
 
 6. link:aula_seis[Broadcast Receiver]
 
+7. link:aula_sete[Notificações]
+
