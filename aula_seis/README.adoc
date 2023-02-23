@@ -37,3 +37,17 @@ Exemplos práticos:
 
 - link:dois/activity_main.xml[activity_main]
 
+- link:dois/MainActivity.java[MainActivity]
+
+- link:dois/activity_segunda.xml[activity_segunda] 
+
+- link:dois/SegundaActivity.java[SegundaActivity]
+
+- link:dois/MyBroadcast.java[MyBroadcast]
+
+- link:dois/AndroidManifest.xml[AndroidManifest]
+
+
+Atenção: No exemplo 1, como foi uma transmissão de uma ação personalizada, a configuração foi feita de forma programática (dentro da classe MainActivity). No exemplo 2, a definição foi feita no arquivo.xml.
+
+
