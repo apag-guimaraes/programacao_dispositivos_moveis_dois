@@ -12,7 +12,7 @@ Exemplos práticos:
 
 - link:um/MyBroadcastReceiver.java[MyBroadcastReceiver]
 
-- No arquivo AndroidManifest.xml, deve-se acrescentar a tag <receiver android:name=".MyBroadcast"/>
+- No arquivo AndroidManifest.xml, deve-se acrescentar a tag <receiver android:name=".MyBroadcastReceiver"/>
 
 O objetivo do método disparar é criar um AlarmManager no qual dispara um BroadcastReceiver depois de um determinado tempo definido.
 
@@ -29,3 +29,5 @@ Exemplos práticos:
 - link:dois/MainActivity.java[MainActivity]
 
 - link:dois/MyBroadcastReceiver.java[MyBroadcastReceiver]
+
+- No arquivo AndroidManifest.xml, deve-se acrescentar a tag <receiver android:name=".MyBroadcastReceiver"/>
