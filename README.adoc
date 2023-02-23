@@ -29,3 +29,5 @@ Material de apoio com fins didáticos voltado para o aprendizado em programaçã
 
 7. link:aula_sete[Notificações]
 
+8. link:aula_oito[Alarm Manager]
+
