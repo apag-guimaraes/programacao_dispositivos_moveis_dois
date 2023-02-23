@@ -45,4 +45,4 @@ Exemplos práticos:
 
 - link:um/activity_segunda.xml[activity_segunda]
 
--link:um/SegundaActivity.java[SegundaActivity]
+- link:um/SegundaActivity.java[SegundaActivity]
