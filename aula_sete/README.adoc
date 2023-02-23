@@ -39,6 +39,8 @@ Exemplos práticos:
 
 - link:tres/MainActivity.java[MainActivity]
 
-- link:tres/activity_segunda.xml[activity_segunda]
+Exemplos práticos:
 
-- link:tres/SegundaActivity.java[SegundaActivity]
+- link:quatro/activity_main.xml[activity_main]
+
+- link:quatro/MainActivity.java[MainActivity]
