@@ -18,3 +18,9 @@ Exemplos práticos:
 Antes de criar e emitir uma notificação, é necessário criar um canal. Conforme Google Developers (2020), "Antes de entregar a notificação no Android 8.0 e versões mais recentes, você precisa registrar o canal de notificação do seu app no sistema, transmitindo uma instância de NotificationChannel para createNotificationChannel()."
 
 - Referência do texto entre aspas: GOOGLE DEVELOPERS. Criar uma notificação. Disponível em: https://developer.android.com/training/notify-user/build-notification?hl=pt-br. Acesso em: 23 de fev. 2023.
+
+Exemplos práticos:
+
+- link:dois/activity_main.xml[activity_main]
+
+- link:dois/MainActivity.java[MainActivity]
