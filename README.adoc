@@ -23,3 +23,7 @@ Material de apoio com fins didáticos voltado para o aprendizado em programaçã
 
 4. link:aula_quatro/[Google Maps]
 
+5. link:aula_cinco/[Permissões]
+
+6. link:aula_seis[Broadcast Receiver]
+
