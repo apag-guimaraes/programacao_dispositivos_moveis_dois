@@ -1,0 +1,28 @@
+= Permissões
+
+Um aplicativo no sistema Android pode usar alguns recursos disponíveis como: 
+
+- câmera;
+
+- galeria de fotos;
+
+- arquivos;
+
+- localização do dispositivo e outros.
+
+Para alguns recursos é necessário solicitar acesso ao usuário, isto é feito através das permissões. As permissões são declaradas no arquivo 
+Android Manifest.xml e algumas são solicitadas em tempo de execução.
+
+Como consta na documentação oficial (Google Developers), existem 3 tipos de permissões:
+
+- permissões em tempo de instalação: "Quando você declara as permissões no momento da instalação, o sistema automaticamente concede-as quando o usuário 
+instala o app.";
+
+- permissões de execução: "[...] conhecidas como permissões perigosas [...] você precisa solicitar permissões de execução no app antes de acessar os dados
+restritos ou realizar ações restritas." 	
+
+- permissões especiais: "Somente a plataforma e os OEMs podem definir permissões especiais."
+
+Referência do texto entre aspas: GOOGLE DEVELOPERS. Permissões no Android. Disponível em: 
+https://developer.android.com/guide/topics/permissions/overview?hl=pt-br>. Acesso em: 23 de fev. 2023.
+
