@@ -1,4 +1,4 @@
-= Noticações
+= Notificações
 
 De acordo com o que consta na documentação oficial, Google Developers (2021), "Uma notificação é uma mensagem que o Android exibe fora da IU do app para
 fornecer ao usuário lembretes, comunicados de outras pessoas ou outras informações oportunas do seu app."
