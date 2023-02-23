@@ -46,3 +46,5 @@ Exemplos práticos:
 - link:um/activity_segunda.xml[activity_segunda]
 
 - link:um/SegundaActivity.java[SegundaActivity]
+
+Análise da classe PermissionUtils.java, disponível no seguinte endereço: https://github.com/googlemaps/android-samples/blob/main/ApiDemos/java/app/src/gms/java/com/example/mapdemo/PermissionUtils.java. 
