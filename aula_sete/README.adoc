@@ -25,6 +25,10 @@ Exemplos práticos:
 
 - link:dois/MainActivity.java[MainActivity]
 
+- link:dois/activity_segunda.xml[activity_segunda]
+
+- link:dois/SegundaActivity.java[SegundaActivity]
+
 Observe que neste exemplo, a notificação mostra uma mensagem. Quando o usuário clicar na notificação, será chamada uma outra Activity que apresenta a mensagem "Olá". Esta atividade não pertence ao fluxo normal do aplicativo, por isso foi usada a flag Intent.FLAG_ACTIVITY_NEW_TASK ou
 
 Intent.FLAG_ACTIVITY_CLEAR_TASK
