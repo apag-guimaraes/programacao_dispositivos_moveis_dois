@@ -40,3 +40,9 @@ Exemplos práticos:
 - No arquivo AndroidManifest.xml, deve ser acrescentado a tag <uses-permission android:name="android.permission.CAMERA" />.
 
 - link:um/activity_main.xml[activity_main]
+
+- link:um/MainActivity.java[MainActivity]
+
+- link:um/activity_segunda.xml[activity_segunda]
+
+-link:um/SegundaActivity.java[SegundaActivity]
