@@ -11,4 +11,10 @@ image:service.png[]
 
 - Referência da figura 1: GOOGLE DEVELOPERS. Visão geral dos serviços. Disponível em: https://developer.android.com/guide/components/services. Acesso: 23 fev. 2023.
 
+Exemplos práticos:
+
+- link:um/activity_main.xml[activity_main]
+
+
+
 
