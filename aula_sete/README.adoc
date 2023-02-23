@@ -1,0 +1,16 @@
+= Noticações
+
+De acordo com o que consta na documentação oficial, Google Developers (2021), "Uma notificação é uma mensagem que o Android exibe fora da IU do app para
+fornecer ao usuário lembretes, comunicados de outras pessoas ou outras informações oportunas do seu app."
+
+- Referência do texto entre aspas: GOOGLE DEVELOPERS. Visão geral de notificações. Disponível em: 
+https://developer.android.com/guide/topics/ui/notifiers/notifications?hl=pt-br. Acesso em: 23 de fev. 2023.
+
+As notificações podem ser simples, expandidas, ter a capacidade de responder ao toque do usuário. Um ponto importante em relação às notificações, 
+é que é necessário criar um canal antes de exibi-las.
+
+Exemplos práticos:
+
+- link:um/activity_main.xml[activity_main]
+
+- link:um/
