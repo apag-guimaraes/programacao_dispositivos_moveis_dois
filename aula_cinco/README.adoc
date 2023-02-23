@@ -26,3 +26,17 @@ restritos ou realizar ações restritas."
 Referência do texto entre aspas: GOOGLE DEVELOPERS. Permissões no Android. Disponível em: 
 https://developer.android.com/guide/topics/permissions/overview?hl=pt-br>. Acesso em: 23 de fev. 2023.
 
+Permissões no Android
+video::zCAx4WZ98rs[youtube, width=640, height=480]
+
+Solicitar permissões
+video::x38dYUm7tCY[youtube, width=640, height=480]
+
+Permissões em Tempo de Execução
+video::C8lUdPVSzDk[youtube, width=640, height=480]
+
+Exemplos práticos:
+
+- No arquivo AndroidManifest.xml, deve ser acrescentado a tag <uses-permission android:name="android.permission.CAMERA" />.
+
+- link:um/activity_main.xml[activity_main]
