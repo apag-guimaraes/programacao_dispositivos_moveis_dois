@@ -2,6 +2,8 @@
 
 Uma opção para efetuar operações baseadas em tempo.
 
+Para mais detalhes: GOOGLE DEVELOPERS. Disponível em: https://developer.android.com/training/scheduling/alarms?hl=pt-br#java. Acesso em: 23 fev. 2023.
+
 Exemplos práticos:
 
 - link:um/activity_main.xml[activity_main]
@@ -9,3 +11,21 @@ Exemplos práticos:
 - link:um/MainActivity.java[MainActivity]
 
 - link:um/MyBroadcastReceiver.java[MyBroadcastReceiver]
+
+- No arquivo AndroidManifest.xml, deve-se acrescentar a tag <receiver android:name=".MyBroadcast"/>
+
+O objetivo do método disparar é criar um AlarmManager no qual dispara um BroadcastReceiver depois de um determinado tempo definido.
+
+Para que o alarme repita em dois em dois minutos, basta trocar o método alarmManager.set() para alarmManager.setRepeating(). 
+
+Veja o exemplo:
+
+alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),1000 * 2, pendingIntent);
+
+Exemplos práticos:
+
+- link:dois/activity_main.xml[activity_main]
+
+- link:dois/MainActivity.java[MainActivity]
+
+- link:dois/MyBroadcastReceiver.java[MyBroadcastReceiver]
