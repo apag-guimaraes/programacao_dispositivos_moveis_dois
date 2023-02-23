@@ -17,6 +17,9 @@ Exemplos práticos:
 
 - link:um/Service1.java[Service1]
 
+- link:um/MainActivity.java[MainActivity]
+
+- lNo arquivo AndroidManifest.xml, acrescentar a tag  <service android:name=".Service1"/>
 
 
 
