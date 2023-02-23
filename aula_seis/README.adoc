@@ -11,7 +11,7 @@ o sistema a direciona automaticamente para apps que se inscreveram para receber 
 Para ocorrer a transmissão da mensagem, é necessário vinculá-la ao um objeto Intent. Através do método setAction é definido o evento que aconteceu. 
 Por meio do método putExtra é possível passar mais dados na transmissão da mensagem.
 
-Referência do texto entre aspas: GOOGLE DEVELOPERS. Visão geral de transmissões.Disponível em: 
+- Referência do texto entre aspas: GOOGLE DEVELOPERS. Visão geral de transmissões.Disponível em: 
 https://developer.android.com/guide/components/broadcasts#java. Acesso em: 22 de fev. 2023. 
 
 Broadcast Receiver
@@ -27,5 +27,7 @@ Existem duas maneiras de definir um BroadcastReceiver:
 Para saber mais sobre as ações de transmissões existentes no Android, acesse na sua máquina a pasta do SDK. Por exemplo, na minha máquina o acesso ao 
 arquivo foi: Sdk/platforms/android-31/data/broadcast_actions.txt. 
 
+Exemplos práticos:
 
+- link:um/activity_main.xml[activity_main]
 
