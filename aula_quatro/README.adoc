@@ -91,7 +91,7 @@ Para mais detalhes sobre SDK MAPS:
 
 Exemplos práticos disponíveis na documentação sobre Google Maps (destacando: limitação de mapa, configurações de zoom, posição da câmera e localização de usuário): 
 
-- GOOGLEMAPS/ANDROID-SAMPLES. Disponível em: https://github.com/googlemaps/android-samples.Acessado em: 10 fev. 2023.
+- GOOGLEMAPS/ANDROID-SAMPLES. Disponível em: https://github.com/googlemaps/android-samples. Acessado em: 10 fev. 2023.
 
 
 
