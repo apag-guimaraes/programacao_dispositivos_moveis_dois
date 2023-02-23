@@ -43,4 +43,6 @@ Exemplos práticos:
 
 - link:quatro/activity_main.xml[activity_main]
 
+- link:quatro/notification_layout.xml[notification_layout]
+
 - link:quatro/MainActivity.java[MainActivity]
