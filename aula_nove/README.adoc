@@ -5,7 +5,7 @@ para operações longas. Um exemplo clássico de uso: uma música sendo reproduz
 
 video::ROk-YrZKYCg[youtube, width=640, height=480]
 
-A figura 1 mostra o ciclo de vida do Service
+A figura 1 mostra o ciclo de vida do service
 
 image:service.png[]
 
