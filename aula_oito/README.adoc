@@ -8,4 +8,4 @@ Exemplos práticos:
 
 - link:um/MainActivity.java[MainActivity]
 
-- link:um/MyBroadcastReceiver.java[activity_main]
+- link:um/MyBroadcastReceiver.java[MyBroadcastReceiver]
