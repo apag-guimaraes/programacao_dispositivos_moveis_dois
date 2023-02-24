@@ -23,5 +23,5 @@ https://stackoverflow.com/users/4951663/mohit-suthar e respondida pelo https://s
 
 Exemplos práticos (criar um provedor de conteúdo em seu app):
 
-- link:dois/DadosProvider.java[Contato]
+- link:dois/DadosProvider.java[DadosProvider]
 
