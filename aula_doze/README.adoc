@@ -78,4 +78,29 @@ Exemplos práticos:
 
 - link:sete/MainActivity.java[MainActivity]
 
+== Video View
+
+Recurso que oferece controle de vídeo como: play, pause e stop.
+
+Para mais detalhes: GOOGLE DEVELOPERS. VideoView. Disponível em: https://developer.android.com/reference/android/widget/VideoView. Acesso em: 24 fev. 2023.
+
+== Text To Speech
+
+Recurso que converte o texto disponível em seu app em voz.
+
+Para mais detalhes: GOOGLE DEVELOPERS. TextToSpeech. Disponível em: https://developer.android.com/reference/android/speech/tts/TextToSpeech e 
+ANDROID DEVELOPERS BLOG. An introduction to Text-To-Speech in Android. Disponível em: https://android-developers.googleblog.com/2009/09/introduction-to-text-to-speech-in.html.
+
+Exemplos práticos:
+
+- link:oito/activity_main.xml[activity_main]
+
+- link:oito/MainActivity.java[MainActivity]
+
+
+
+
+
+
+
 
