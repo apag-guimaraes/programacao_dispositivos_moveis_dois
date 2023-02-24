@@ -48,3 +48,13 @@ Exemplos práticos:
 
 - link:quatro/MainActivity.java[MainActivity]
 
+== SMS
+
+Recurso que permite acessar o aplicativo de SMS que já vem instalado no dispositivo móvel.
+
+Exemplos práticos (Baseado no conteúdo: How to get the package name of sms app(default) in Android before KitKat version? Disponível em: <https://stackoverflow.com/questions/29471386/how-to-get-the-package-name-of-sms-appdefault-in-android-before-kitkat-version?noredirect=1&lq=1&gt;. Pergunta realizada pelo usuário: https://stackoverflow.com/users/3986081/malleswar-chinta e respondida pelo usuário: https://stackoverflow.com/users/3020568/deniz.):
+
+- link:cinco/activity_main.xml[activity_main]
+
+- link:cinco/MainActivity.java[MainActivity]
+
