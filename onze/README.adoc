@@ -1,0 +1,19 @@
+= Content Provider
+
+Recurso que possibilita compartilhar dados privados entre aplicativos. 
+
+Para mais detalhes: GOOGLE DEVELOPERS. Fundamentos do provedor de conteúdo. Disponível em: 
+https://developer.android.com/guide/topics/providers/content-provider-basics?hl=pt-br. Acesso em: 24 fev. 2023.
+
+Content Provider
+
+video::fNVMqACYPnQ[youtube, width=640, height=480]
+
+Exemplos práticos (Baseado em: Stack overflow. Android: não estou obtendo nenhum contato da lista de contatos. 2018. Disponível em: 
+https://stackoverflow.com/questions/53956496/android-not-getting-any-contacts-from-contact-list. Pergunta feita pelo usuário 
+https://stackoverflow.com/users/4951663/mohit-suthar e respondida pelo https://stackoverflow.com/users/4390987/%e0%a5%90-rakesh-kumar.):
+
+- link:um/Contato.java[Contato]
+
+
+
