@@ -58,3 +58,12 @@ Exemplos práticos (Baseado no conteúdo: How to get the package name of sms app
 
 - link:cinco/MainActivity.java[MainActivity]
 
+== WhatsApp
+
+Recurso que permite acessar o aplicativo WhatsApp instalado no dispositivo móvel.
+
+Exemplos práticos(Baseado no conteúdo: https://faq.whatsapp.com/android/im-an-android-developer-how-can-i-integrate-whatsapp-with-my-app/?lang=en):
+
+- link:seis/activity_main.xml[activity_main]
+
+- link:seis/MainActivity.java[MainActivity]
