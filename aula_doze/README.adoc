@@ -36,3 +36,15 @@ Exemplos práticos:
 
 - link:tres/MainActivity.java[MainActivity]
 
+== Time Picker Dialog
+
+Recurso que permite manipular dados das horas.
+
+Para mais detalhes: GOOGLE DEVELOPERS. TimePickerDialog. Disponível em: https://developer.android.com/reference/android/widget/TimePickerDialog. Acesso em: 24 fev. 2023.
+
+Exemplos práticos:
+
+- link:quatro/activity_main.xml[activity_main]
+
+- link:quatro/MainActivity.java[MainActivity]
+
