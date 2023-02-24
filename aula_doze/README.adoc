@@ -106,8 +106,15 @@ Playing a video in VideoView in Anroid. Disponível em:<https://stackoverflow.co
 
 == Android Accessibility Suite / Android Studio Profiles / Novidades
 
-Video::[]
+video::Ce7q_cu8mvo[youtube, width=640, height=480]
 
+video::uTCQ8rAdPGE[youtube, width=640, height=480]
+
+video::6hTC-fcVPtk[youtube, width=640, height=480]
+
+video::xvnsa-1R1Q[youtube, width=640, height=480]
+
+video:PfwHq8w9GBc[youtube, width=640, height=480]
 
 
 
