@@ -7,7 +7,19 @@ thread secundária é necessário para atualizar uma view da interface gráfica,
 Para mais detalhes sobre handler: GOOGLE DEVELOPERS. Handler. Disponível em: https://developer.android.com/reference/android/os/Handler. Acesso em:
 24 fev. 2023.
 
-Exemplos práticos:
+Exemplos práticos (usando POST):
 
 - link:um/activity_main.xml[activity_main]
+
+- link:um/MainActivity.java[MainActivity]
+
+Exemplos práticos (usando MSG):
+
+- link:dois/activity_main.xml[activity_main]
+
+- link:dois/MainActivity.java[MainActivity]
+
+
+
+
 
