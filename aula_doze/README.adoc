@@ -91,12 +91,17 @@ Recurso que converte o texto disponível em seu app em voz.
 Para mais detalhes: GOOGLE DEVELOPERS. TextToSpeech. Disponível em: https://developer.android.com/reference/android/speech/tts/TextToSpeech e 
 ANDROID DEVELOPERS BLOG. An introduction to Text-To-Speech in Android. Disponível em: https://android-developers.googleblog.com/2009/09/introduction-to-text-to-speech-in.html.
 
-Exemplos práticos:
+Exemplos práticos(Exemplo adaptado das seguintes fontes: Text to speech (TTS) - Android. Disponível em:<https://stackoverflow.com/questions/3058919/text-to-speechtts-android, pergunta realizada pelo usuário https://stackoverflow.com/users/366916/bharathi e respondida pelo usuário https://stackoverflow.com/users/3166375/sifat-ifty. e Playing a video in VideoView in Anroid. Disponível em:<https://stackoverflow.com/questions/3263736/playing-a-video-in-videoview-in-android&gt;, pergunta realizada pelo usuário https://stackoverflow.com/users/2355649/muhammad-maqsoodur-rehman e respondida pelo usuário https://stackoverflow.com/users/3681880/suragch.):
 
 - link:oito/activity_main.xml[activity_main]
 
 - link:oito/MainActivity.java[MainActivity]
 
+- link:oito/activity_segunda.xml[activity_segunda]
+
+- link:oito/SegundaActivity.java[SegundaActivity]
+
+- criar uma pasta chamada raw no projeto, o vídeo deve estar armazenado dentro desta pasta.
 
 
 
