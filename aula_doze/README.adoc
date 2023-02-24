@@ -16,10 +16,23 @@ Exemplos práticos:
 
 Recurso que permite manipular dados do calendário.
 
-Para mais detalhes: GOOGLE DEVELOPERS. DatePickerDailog. Disponível em: https://developer.android.com/reference/android/widget/DatePickerDialog. Acesso em: 24 fev. 2023.
+Para mais detalhes: GOOGLE DEVELOPERS. DatePickerDialog. Disponível em: https://developer.android.com/reference/android/widget/DatePickerDialog. Acesso em: 24 fev. 2023.
 
 Exemplos práticos:
 
 - link:dois/activity_main.xml[activity_main]
 
 - link:dois/MainActivity.java[MainActivity]
+
+== Time Picker
+
+Recurso que permite manipular dados das horas.
+
+Para mais detalhes: GOOGLE DEVELOPERS. TimePicker. Disponível em: https://developer.android.com/reference/android/widget/TimePicker. Acesso em: 24 fev. 2023.
+
+Exemplos práticos:
+
+- link:tres/activity_main.xml[activity_main]
+
+- link:tres/MainActivity.java[MainActivity]
+
