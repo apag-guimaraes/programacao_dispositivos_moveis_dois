@@ -15,5 +15,13 @@ https://stackoverflow.com/users/4951663/mohit-suthar e respondida pelo https://s
 
 - link:um/Contato.java[Contato]
 
+- link:um/MainActivity.java[MainActivity]
+
+- No arquivo AndroidManifest.xml, deve-se acrescentar a tag <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+Exemplos práticos (criar um provedor de conteúdo em seu app):
+
+- link:dois/DadosProvider.java[Contato]
+
 
 
