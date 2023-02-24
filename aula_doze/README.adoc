@@ -67,3 +67,15 @@ Exemplos práticos(Baseado no conteúdo: https://faq.whatsapp.com/android/im-an-
 - link:seis/activity_main.xml[activity_main]
 
 - link:seis/MainActivity.java[MainActivity]
+
+== Gmail
+
+Recurso que permite acessar o aplicativo Gmail instalado no dispositivo móvel.
+
+Exemplos práticos:
+
+- link:sete/activity_main.xml[activity_main]
+
+- link:sete/MainActivity.java[MainActivity]
+
+
