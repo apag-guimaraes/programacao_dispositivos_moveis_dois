@@ -1,0 +1,14 @@
+== Outros Recursos
+
+= Date Picker
+
+Recurso que permite manipular dados do calendário.
+
+Para mais detalhes: GOOGLE DEVELOPERS. DatePicker. Dispoível em: https://developer.android.com/reference/android/widget/DatePicker. Acesso em: 24 fev. 2023.
+
+Exemplos práticos:
+
+- link:um/activity_main.xml[activity_main]
+
+- link:um/MainActivity.java[MainActivity]
+
