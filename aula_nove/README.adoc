@@ -21,5 +21,16 @@ Exemplos práticos:
 
 - No arquivo AndroidManifest.xml, acrescentar a tag  <service android:name=".Service1"/>
 
+Exemplos práticos:
+
+- link:dois/activity_main.xml[activity_main]
+
+- link:dois/Service2.java[Service2]
+
+- link:dois/MainActivity.java[MainActivity]
+
+- No arquivo AndroidManifest.xml, acrescentar a tag  <service android:name=".Service2"/>
+
+
 
 
