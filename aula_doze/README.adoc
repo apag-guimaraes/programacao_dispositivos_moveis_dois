@@ -104,6 +104,10 @@ Playing a video in VideoView in Anroid. Disponível em:<https://stackoverflow.co
 
 - criar uma pasta chamada raw no projeto, o vídeo deve estar armazenado dentro desta pasta.
 
+== Android Accessibility Suite / Android Studio Profiles / Novidades
+
+Video::[]
+
 
 
 
