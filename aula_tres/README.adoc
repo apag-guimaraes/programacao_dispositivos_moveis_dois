@@ -79,5 +79,5 @@ dependencies
 Referências do exemplo acima:
 
 - AIRBNB. Getting Started. Disponível em: https://airbnb.io/lottie/#/android. Acessado em: 10 fev. 2023.
-- LOTTIEFILES. Disponível em: https://lottiefiles.com/.Acessado em: 10 fev. 2023.
+- LOTTIEFILES. Disponível em: https://lottiefiles.com/. Acessado em: 10 fev. 2023.
 
