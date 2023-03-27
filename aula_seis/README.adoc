@@ -39,9 +39,9 @@ Exemplos práticos:
 
 - link:dois/MainActivity.java[MainActivity]
 
-- link:dois/activity_segunda.xml[activity_segunda] 
+- link:dois/activity_2.xml[activity_segunda] 
 
-- link:dois/SegundaActivity.java[SegundaActivity]
+- link:dois/Activity2.java[Activity2]
 
 - link:dois/MyBroadcast.java[MyBroadcast]
 
