@@ -50,11 +50,9 @@ Para obter os dados do Firestore basta acessar QueryDocumentSnapshot document : 
                     if (task.isSuccessful()) {
                         List<String> lista = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            String titulo = document.getString("titulo");
-                            int nota = Objects.requireNonNull(document.getLong("nota")).intValue();
-
-                            lista.add(titulo + " - " + nota);
-
+                            String nome = document.getString("nome do campo");
+                            int idade = Objects.requireNonNull(document.getLong("nome do campo")).intValue();
+                         
                             Log.d("Dado",document.getId() + " => " + document.getData());
                         }
                        
