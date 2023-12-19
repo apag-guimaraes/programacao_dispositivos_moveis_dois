@@ -70,6 +70,9 @@ Para mais detalhes sobre o Firestore acesse a documentação oficial: https://fi
 
 Exemplo prático:
 
+
+link:codigos/activity_main.xml[activity_main]
+
 link:codigos/MainActivity.java[MainActivity]
 
 link:codigos/Filme.java[Estudante]
