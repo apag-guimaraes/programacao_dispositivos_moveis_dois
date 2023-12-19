@@ -1,4 +1,4 @@
-//Solução feita pelo acadêmico Luan Luz
+//Solução feita pelo estudante Luan Luz
 
 import java.util.HashMap;
 import java.util.Map;
