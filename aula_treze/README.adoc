@@ -26,7 +26,7 @@ FirebaseFirestore db = db = FirebaseFirestore.getInstance();
 
 DatabaseReference refBd = FirebaseDatabase.getInstance().getReference();
 
-== Salvar/listar dados no banco
+== Salvar / listar dados no banco
 
 Para salvar os dados no Firestore, você precisa criar uma coleção e os dados serão salvos na estrutura de um Map.
 
