@@ -62,3 +62,15 @@ Para obter os dados do Firestore basta acessar QueryDocumentSnapshot document : 
                         Log.d("Erro", "Erro ao obter dados: ", task.getException());
                     }
                 });
+
+Para mais detalhes sobre leitura e gravação de dados no Realtime Database acesse a documentação oficial: https://firebase.google.com/docs/database/android/read-and-write?hl=pt-br#java_2.
+
+Para mais detalhes sobre o Firestore acesse a documentação oficial: https://firebase.google.com/docs/firestore/quickstart?hl=pt-br.
+
+
+Exemplo prático:
+
+link:codigos/MainActivity.java[MainActivity]
+
+link:codigos/Filme.java[Estudante]
+
