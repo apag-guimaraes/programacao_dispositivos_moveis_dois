@@ -56,33 +56,396 @@ Mais detalhes sobre WebService: POLO, Gabriel. O que é um web service? Disponí
 
 Através do WebService é possível a troca de mensagens entre aplicações, o formato JSON permite uma comunicação mais leve do que a formatação XML. O JSON usa apenas textos podendo representar um objeto ou uma coleção de objetos. 
 
-link:codigos/json_objeto.txt[Exemplo de objeto no JSON]
+Exemplo de objeto no JSON
+[source,xml]
+{
+	nome: "Paulo,
+	curso: "Sistema para Internet",
+	idade: 33
+}
 
-link:codigos/json_array.txt[Exemplo de vetores no JSON]
+Exemplo de vetores no JSON
+[source,xml]
+[
+{
+	nome: "Paulo,
+	curso: "Sistema para Internet",
+	idade: 33
+},
+
+{
+	nome: "Paula,
+	curso: "Informática",
+	idade: 35
+},
+
+{
+	nome: "Ana,
+	curso: "Agronomia",
+	idade: 25
+}
+]
 
 Mais detalhes sobre JSON: JSON org. Introdução ao JSON. Disponível em: https://www.json.org/json-pt.html. Acesso em: 30 de jan. 2023.
 
 Exemplos práticos
 
-- Consumo/envio JSON sem biblioteca (exemplo um)
+Consumo/envio JSON sem biblioteca (exemplo um)
 
-link:codigos/exemplo_um/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".MainActivity" >
+    <EditText
+        android:id="@+id/editTextNome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Digite seu Nome" />
+    <EditText
+        android:id="@+id/editTextDisciplina"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Digite o nome da Disciplina" />
+    <EditText
+        android:id="@+id/editTextNota"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Digite a Nota" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+            <Button
+                android:id="@+id/buttonAdicionar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:onClick="criarLista"
+                android:layout_weight="1"
+                android:text="A" />
+            <Button
+                android:id="@+id/buttonGerar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:onClick="gerarJson"
+                android:layout_weight="1"
+                android:text="G" />
+            <Button
+                android:id="@+id/buttonConsumir"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:onClick="abrirTela"
+                android:layout_weight="1"
+                android:text="C" />
+        </TableRow>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/textViewResultado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Resultado" />
+</LinearLayout>
 
-link:codigos/exemplo_um/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
+public class MainActivity extends AppCompatActivity {
+    private EditText editTextNome,editTextDisciplina,editTextNota;
+    private Button buttonAdicionar,buttonGerar,buttonConsumir;
+    private List<Estudante> lista;
+    private TextView textViewResultado;
+    private String retorno;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextNome = findViewById(R.id.editTextNome);
+        editTextDisciplina = findViewById(R.id.editTextDisciplina);
+        editTextNota = findViewById(R.id.editTextNota);
+        buttonAdicionar = findViewById(R.id.buttonAdicionar);
+        buttonGerar = findViewById(R.id.buttonGerar);
+        buttonConsumir = findViewById(R.id.buttonConsumir);
+        textViewResultado = findViewById(R.id.textViewResultado);
+        lista = new ArrayList<>();
+    }
+    public  void criarLista(View v){
+        lista.add(new Estudante(editTextNome.getText().toString(),
+                editTextDisciplina.getText().toString(),
+                Integer.parseInt(editTextNota.getText().toString())));
+        Toast.makeText(getApplicationContext(), "Intem inserido", Toast.LENGTH_SHORT).show();
+    }
+    public  String criarJson(){
+        JSONArray jsonArray = new JSONArray();
+        for (int i=0;i<lista.size();i++){
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("nomeEstudante",lista.get(i).getNome());
+                jsonObject.put("disciplinaEstudante",lista.get(i).getDisciplina());
+                jsonObject.put("notaEstudante",lista.get(i).getNota());
+                jsonArray.put(jsonObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return "{estudantes:"+jsonArray.toString()+"}";
+    }
+    public void gerarJson(View v){
+        retorno = criarJson();
+        textViewResultado.setText(retorno);
+    }
+    public void abrirTela(View v){
+        Intent intent = new Intent(getApplicationContext(),SegundaActivity.class);
+        intent.putExtra("dados",retorno);
+        startActivity(intent);
+    }
+}
 
-link:codigos/exemplo_um/Estudante.java[Estudante]
+- Estudante.java
+[source,java]
+public class Estudante {
+    private  String nome,disciplina;
+    private  int nota;
+    public Estudante(String nome, String disciplina, int nota) {
+        this.nome = nome;
+        this.disciplina = disciplina;
+        this.nota = nota;
+    }
+    public Estudante() {
+    }
+    public String getNome() {
+        return nome;
+    }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+    public String getDisciplina() {
+        return disciplina;
+    }
+    public void setDisciplina(String disciplina) {
+        this.disciplina = disciplina;
+    }
+    public int getNota() {
+        return nota;
+    }
+    public void setNota(int nota) {
+        this.nota = nota;
+    }
+    @Override
+    public String toString() {
+        return "Estudante{" +
+                "nome='" + nome + '\'' +
+                '}';
+    }
+}
 
-link:codigos/exemplo_um/activity_segunda.xml[activity_segunda]
+- activity_segunda.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    tools:context=".SegundaActivity">
+    <ListView
+        android:id="@+id/listViewDados"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp" />
+</LinearLayout>
 
-link:codigos/exemplo_um/SegundaActivity.java[SegundaActivity]
+- SegundaActivity.java
+[source,java]
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
+public class SegundaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+    private  String dadosJSON;
+    private ListView listView;
+    private List<Estudante>lista;
+    private ArrayAdapter<Estudante>adapter;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_segunda);
+        dadosJSON = getIntent().getStringExtra("dados");
+        listView = findViewById(R.id.listViewDados);
+        lista = consumirJSON();
+        adapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,lista);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(this);
+    }
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        AlertDialog alertDialog1 = new AlertDialog.Builder(SegundaActivity.this).create();
+        alertDialog1.setTitle("Dados Estudante");
+        alertDialog1.setMessage("Nome : "+lista.get(position).getNome() +"\nDisciplina : "+
+                lista.get(position).getDisciplina()+
+                "\nNota : "+lista.get(position).getNota());
+        alertDialog1.show();
+    }
+    private List<Estudante> consumirJSON() {
+        List<Estudante> listaEstudantes = new ArrayList<>();
+        try {
+            JSONObject jsonObject = new JSONObject(dadosJSON);
+            JSONArray jsonArray = jsonObject.getJSONArray("estudantes");
+            for ( int i=0;i<jsonArray.length();i++){
+                JSONObject object =jsonArray.getJSONObject(i);
+                Estudante estudante = new Estudante();
+                estudante.setNome(object.getString("nomeEstudante"));
+                estudante.setDisciplina(object.getString("disciplinaEstudante"));
+                estudante.setNota(object.getInt("notaEstudante"));
+                listaEstudantes.add(estudante);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return listaEstudantes;
+    }
+}
 
 No exemplo anterior foi usado o JSON de forma nativa. Existe uma opção mais fácil para criar e consumir o arquivo usando outras bibliotecas. Veja o exemplo do mesmo projeto, porém usando a biblioteca Gson.
 
-- Consumo/envio JSON com biblioteca (exemplo dois)
+Consumo/envio JSON com biblioteca (exemplo dois)
 
-link:codigos/exemplo_dois/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import com.google.gson.Gson;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.List;
+public class MainActivity extends AppCompatActivity {
+    private EditText editTextNome, editTextDisciplina,
+            editTextNota;
+    private Button buttonAdd, buttonGerar, buttonConsumir;
+    private List<Estudante> lista;
+    private TextView textViewResultado;
+    private String retorno;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextNome = findViewById(R.id.editTextNome);
+        editTextDisciplina = findViewById(R.id.editTextDisciplina);
+        editTextNota = findViewById(R.id.editTextNota);
+        textViewResultado = findViewById(R.id.textViewResultado);
+        buttonAdd = findViewById(R.id.buttonAdd);
+        buttonGerar = findViewById(R.id.buttonGerar);
+        buttonConsumir = findViewById(R.id.buttonConsumir);
+        lista = new ArrayList<>();
+    }//onCreate
+    public void criarLista(View v){
+        lista.add(new Estudante(editTextNome.getText().toString(),
+               editTextDisciplina.getText().toString(),
+                Integer.parseInt(editTextNota.getText().toString())));
+        Toast.makeText(getApplicationContext(),"item inserido",Toast.LENGTH_SHORT).show();
+    }//
+    public String criarJSON(List<Estudante> dados){
+        Gson gson = new Gson();	//cria o objeto para acessar os recursos da biblioteca
+        String stringJson = gson.toJson(dados);    //observe que é necessário apenas um método para converter a lista de objetos em uma String
+        return stringJson;
+    }//method
+    public void gerarJSON(View v){
+        retorno = criarJSON(lista);
+        textViewResultado.setText(retorno);
+    }//method
+    public void abrirTela(View v){
+        Intent it = new Intent(getApplicationContext(),SegundaActivity.class);
+        it.putExtra("dados",retorno);
+        startActivity(it);
+    }//method
+}//class
 
-link:codigos/exemplo_dois/SegundaActivity.java[SegundaActivity]
+- SegundaActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.json.JSONArray;
+import org.json.JSONException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+public class SegundaActivity extends AppCompatActivity {
+    private String dadosJSON;
+    private ListView listView;
+    private List<Estudante> lista;
+    private ArrayAdapter<Estudante> adapter;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_segunda);
+        dadosJSON = getIntent().getStringExtra("dados");
+        Toast.makeText(getApplicationContext(),dadosJSON,Toast.LENGTH_LONG).show();
+        listView = findViewById(R.id.listaViewDados);
+        lista = consumirJSON();
+        adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,
+                lista);
+        listView.setAdapter(adapter);
+    }//onCreate
+    private List<Estudante> consumirJSON(){
+        String resultado = "";
+        List<Estudante> listaEstudantes = null;
+        if(dadosJSON!=null){
+            Gson gson = new Gson();  //cria o objeto para acessar os recursos da biblioteca
+            Type type = new TypeToken<List<Estudante>>(){}.getType();  //classe genérica que possibilita obter os dados no mesmo tipo que foi definido em tempo de execução   
+             listaEstudantes = gson.fromJson(dadosJSON, type);  //converse o arquivo JSON em uma lista de estudantes.
+            Toast.makeText(getApplicationContext(),listaEstudantes.toString(),
+                       Toast.LENGTH_LONG).show();
+        }//if
+        return listaEstudantes;
+    }//method
+}//class
 
 Classe TypenToken: classe genérica presente na lib GSON que possibilita obter um tipo de dado em tempo de execução e recuperá-lo. Para mais detalhes da classe acesse a documentação do Java, disponível em: https://www.javadoc.io/doc/com.google.code.gson/gson/2.6.2/com/google/gson/reflect/TypeToken.html.
 
