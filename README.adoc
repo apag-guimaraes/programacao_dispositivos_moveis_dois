@@ -21,22 +21,24 @@ Material de apoio com fins didáticos voltado para o aprendizado em programaçã
 
 3. link:aula_tres/[Navigation Drawer / Animação com JSON]
 
-4. link:aula_quatro/[Google Maps]
+4. link: aula_quatro/[Padrão MVVM]
 
-5. link:aula_cinco/[Permissões]
+5. link:aula_cinco/[Google Maps]
 
-6. link:aula_seis[Broadcast Receiver]
+6. link:aula_seis/[Permissões]
 
-7. link:aula_sete[Notificações]
+7. link:aula_sete[Broadcast Receiver]
 
-8. link:aula_oito[Alarm Manager]
+8. link:aula_oito[Notificações]
 
-9. link:aula_nove[Service]
+9. link:aula_nove[Alarm Manager]
 
-10. link:aula_dez[Handler]
+10. link:aula_dez[Service]
 
-11. link:aula_onze[Content Provider]
+11. link:aula_onze[Handler]
 
-12. link:aula_doze[Outros Recursos]
+12. link:aula_doze[Content Provider]
 
-13. link:aula_treze[Salvar/listar dados no Firebase]
+13. link:aula_treze[Outros Recursos]
+
+14. link:aula_quatorze[Salvar/listar dados no Firebase]
