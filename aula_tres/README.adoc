@@ -13,26 +13,316 @@
 
 = Navigation Drawer
 
-O Navigation Drawer é um componente que permite construir um menu lateral que desliza no sentido esquerda para a direita. É possível criar um Navigation Drawer do zero, mas atualmente, é disponibilizado o template pronto do Navigation Drawer quando você cria um projeto no Android Studio. Dessa forma, o trabalho fica compreendido em entender a função de vários elementos que o compõe que pode ser visto logo a seguir nos Exemplos práticos.
+O Navigation Drawer é um componente que permite construir um menu lateral que desliza no sentido esquerda para a direita. É possível criar um Navigation Drawer do zero, mas atualmente, é disponibilizado o template pronto do Navigation Drawer quando você cria um projeto no Android Studio. Dessa forma, o trabalho fica compreendido em entender as funções de vários elementos que o compõe. Isto pode ser visto logo a seguir nos exemplos práticos.
 
 Para mais detalhes:
 
 - GOOGLE MATERIAL DESIGN. Navigation Drawer. Disponível em: https://material.io/components/navigation-drawer. Acessado em: 10 fev. 2023.
 
-video::DkT0vS14Um0[youtube,width=640,height=480]
-
 Exemplos práticos (Elementos do Navigation Drawer):
 
-- link:codigos/BiscoitoFragment.java[BiscoitoFragment]
-- link:codigos/fragment_biscoito.xml[fragment_biscoito]
-- link:codigos/MainActivity.java[MainActivity]
-- link:codigos/activity_main.xml[activity_main]
-- link:codigos/activitiy_main_drawer.xml[activitiy_main_drawer]
-- link:codigos/app_bar_main.xml[app_bar_main]
-- link:codigos/content_main.xml[content_main]
-- link:codigos/main.xml[main]
-- link:codigos/mobile_navigation.xml[mobile_navigation]
-- link:codigos/nav_header_main.xml[nav_header_main]
+- BiscoitoFragment.java
+[source,java]
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import com.example.appnavigation.R;
+public class BiscoitoFragment extends Fragment {
+   private ImageView imageViewBiscoito;
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_biscoito,
+                container, false);
+        root.findViewById(R.id.imageViewBiscoito);
+        return root;
+    }
+}
+- fragment_biscoito.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="10dp"
+    android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageViewBiscoito"
+        android:scaleType="fitCenter"
+        android:src="@drawable/cookie"/>
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import android.view.MenuItem;
+import android.view.View;
+import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import com.google.android.material.navigation.NavigationView;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import android.view.Menu;
+import android.widget.Toast;
+public class MainActivity extends AppCompatActivity {
+    private AppBarConfiguration mAppBarConfiguration;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                    //    .setAction("Action", null).show();
+                Intent i = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("mailto: "+
+                                "estudante@gmail.com"));
+                startActivity(i);
+            }
+        });
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_bolo, R.id.nav_biscoito, R.id.nav_maca
+               )
+                .setDrawerLayout(drawer)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_configuracao:
+                Toast.makeText(getApplicationContext(),"Configuração",
+                        Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.action_contato:
+                Toast.makeText(getApplicationContext(),"Contato",
+                        Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                || super.onSupportNavigateUp();
+    }
+}
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
+    <include
+        layout="@layout/app_bar_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_main_drawer" />
+</androidx.drawerlayout.widget.DrawerLayout>
+
+- activitiy_main_drawer.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_bolo"
+            android:icon="@drawable/birthday"
+            android:title="@string/menu_bolo" />
+        <item
+            android:id="@+id/nav_biscoito"
+            android:icon="@drawable/cookie"
+            android:title="@string/menu_biscoito" />
+    </group>
+    <item android:title="Sobremesas">
+        <menu>
+            <item
+                android:id="@+id/nav_maca"
+                android:icon="@drawable/apple"
+                android:title="@string/menu_maca" />
+        </menu>
+    </item>
+</menu>
+
+- app_bar_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+    </com.google.android.material.appbar.AppBarLayout>
+    <include layout="@layout/content_main" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@android:drawable/ic_dialog_email" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+- content_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/app_bar_main">
+    <fragment
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/mobile_navigation" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_configuracao"
+        android:orderInCategory="100"
+        android:title="@string/menu_configuracao"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_contato"
+        android:orderInCategory="100"
+        android:title="@string/menu_contato"
+        app:showAsAction="never" />
+</menu>
+
+- mobile_navigation.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_bolo">
+ <fragment
+        android:id="@+id/nav_bolo"
+        android:name="com.example.appnavigation.ui.bolo.BoloFragment"
+        android:label="@string/menu_bolo"
+        tools:layout="@layout/fragment_bolo" />
+    <fragment
+        android:id="@+id/nav_biscoito"
+        android:name="com.example.appnavigation.ui.biscoito.BiscoitoFragment"
+        android:label="@string/menu_biscoito"
+        tools:layout="@layout/fragment_biscoito" />
+    <fragment
+        android:id="@+id/nav_maca"
+        android:name="com.example.appnavigation.ui.slideshow.SlideshowFragment"
+        android:label="@string/menu_maca"
+        tools:layout="@layout/fragment_slideshow" />
+</navigation>
+
+- nav_header_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/nav_header_height"
+    android:background="@drawable/side_nav_bar"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/nav_header_desc"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:src="@drawable/menu"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:text="@string/header_meus_lanches"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/header_lanches_android_com" />
+</LinearLayout>
 
 = Animação Usando Arquivos JSON
 
@@ -50,28 +340,20 @@ Exemplos práticos:
 dependencies 
 
 {...
-
     implementation "com.airbnb.android:lottie:4.2.2"  //obter a lib
-
     ...}
 
 - Clique com o botão direito do mouse na pasta res e adicione um diretório chamado raw. Coloque o arquivo json baixado neste diretório.
 
 - No arquivo activity_main.xml, acrescente a tag:
+[source,xml]
 <com.airbnb.lottie.LottieAnimationView
-
    android:id="@+id/animation_view"
-
    android:layout_width="wrap_content"
-
    android:layout_height="wrap_content"
-
    app:lottie_rawRes="@raw/cube"    //onde fica o arquivo json
-
    app:lottie_autoPlay="true"   //iniciar a animação
-
    app:lottie_loop="true"   //animação continua indefinidamente
-
    />
    
    - Pronto, basta executar o app.
