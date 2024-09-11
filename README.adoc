@@ -21,7 +21,7 @@ Material de apoio com fins didáticos voltado para o aprendizado em programaçã
 
 3. link:aula_tres/[Navigation Drawer / Animação com JSON]
 
-4. link: aula_quatro/[Padrão MVVM]
+4. link:aula_quatro/[Padrão MVVM]
 
 5. link:aula_cinco/[Google Maps]
 
