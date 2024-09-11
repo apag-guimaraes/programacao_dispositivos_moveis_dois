@@ -23,18 +23,194 @@ image::json_pojo.png[]
 
 Após a criação da class POJO, pode-se dar continuidade no projeto. Os códigos estão disponibilizados a seguir:
 
-link:codigos/exemplo_um/main_activity.xml[activity_main]
+- main_activity.xml
+[source,xml]
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:orientation="vertical"
+   android:layout_margin="10dp"
+   tools:context=".MainActivity">
+   <TextView
+       android:layout_width="match_parent"
+       android:id="@+id/dadosID"
+       android:dividerHeight="2dp"
+       android:layout_height="wrap_content">
+ </TextView>
+</LinearLayout>
 
-link:codigos/exemplo_um/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.util.List;
+public class MainActivity extends AppCompatActivity {
+    private TextView textViewID;
+    private final String URL = "https://jsonplaceholder.typicode.com/posts";
+    private StringBuilder builder = null;
+    private List<Item> dadosBaixados = null;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        textViewID = findViewById(R.id.textViewDados);
+        new obterDados().execute();
+    }//onCreate
+    private class obterDados extends AsyncTask<Void, Void, Void>{
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Conexao conexao = new Conexao();
+            InputStream inputStream = conexao.obterRespostaHTTP(URL);
+            Auxilia auxilia = new Auxilia();
+            String textoJSON = auxilia.converter(inputStream);
+            Log.i("JSON", "doInBackground: "+textoJSON);
+            Gson gson = new Gson();
+            builder = new StringBuilder();
+            if(textoJSON != null){
+                Type type = new TypeToken<List<Item>>(){}.getType();
+                dadosBaixados = gson.fromJson(textoJSON,type);
+                for (int i = 0; i < dadosBaixados.size(); i++){
+                    builder.append(dadosBaixados.get(i).getUserId()).append("\n");
+                }//for
+            }else{
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),"Não foi possível obter JSON", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }//if else
+            return null;
+        }//doInBackground
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(getApplicationContext(),"Download começando...", Toast.LENGTH_SHORT).show();
+        }
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            textViewID.setText(builder.toString());
+        }
+    }//inner class
+}//class
 
-link:codigos/exemplo_um/Item.java[Item]
+- Item.java
+[source,java]
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+public class Item {
+    @SerializedName("userId")
+    @Expose
+    private Integer userId;
+    @SerializedName("id")
+    @Expose
+    private Integer id;
+    @SerializedName("title")
+    @Expose
+    private String title;
+    @SerializedName("body")
+    @Expose
+    private String body;
+    public Integer getUserId() {
+        return userId;
+    }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+    public Integer getId() {
+        return id;
+    }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public String getBody() {
+        return body;
+    }
+    public void setBody(String body) {
+        this.body = body;
+    }
+    @Override
+    public String toString() {
+        return "Item{" +
+                "userId=" + userId +
+                ", id=" + id +
+                ", title='" + title + '\'' +
+                ", body='" + body + '\'' +
+                '}';
+    }
+}
 
-link:codigos/exemplo_um/Auxilia.java[Auxilia]
+- Auxilia.java
+[source,java]
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+public class Auxilia {
+    public String converter(InputStream inputStream){
+        InputStreamReader inputStreamReader=
+                new InputStreamReader(inputStream);
+        BufferedReader bufferedReader=new BufferedReader(inputStreamReader);
+        StringBuilder stringBuilder=new StringBuilder();
+        String conteudo="";
+        try {
+            while (((conteudo = bufferedReader.readLine())!=null)) {
+                stringBuilder.append(conteudo).append("\n");
 
-link:codigos/exemplo_um/Conexao.java[Conexao]
+            }//while
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return stringBuilder.toString();
+    }//while
+}
+
+- Conexao.java
+[source,java]
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.MalformedInputException;
+public class Conexao {
+    public InputStream obterRespostaHTTP(String end) {
+        try {
+            URL url =new URL(end);
+            HttpURLConnection conexao = (HttpURLConnection)
+                    url.openConnection();
+            conexao.setRequestMethod("GET");
+            return new BufferedInputStream(conexao.getInputStream());
+
+        }catch (MalformedInputException e){
+            e.printStackTrace();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+}//class
 
 - Referências: As classes Conexao e Auxilia foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m). Acesso em: 30 de jan. 2023.
-
 
  - Exemplos práticos (API JSON SERVER)
 
@@ -45,7 +221,20 @@ npm install -g json-server
 
 Atenção: É necessário ter o node.js instalado no computador para biblitoca funcionar. Em seguida, crie um arquivo com extensão.json, por exemplo db.json, banco.json, dados.json, etc.
 
-link:db.json[dados json]
+db.json
+[source,xml]
+{
+   "agenda" : [
+    { "id" : 1 , "nome" : "Ana" , "telefone" : "1111-1111"  },
+    { "id" : 2 , "nome" : "Helder" , "telefone" : "2222-2222"  },
+    { "id" : 3 , "nome" : "Fagno" , "telefone" : "3333-3333"  }
+  ],
+  "adicionais" : [
+    { "id" : 1 , "email" : "ana@ifto.edu.br"},
+    { "id" : 2 , "email" : "helder@ifto.edu.br"},
+    { "id" : 3 , "email" : "fagno@ifto.edu.br"}
+  ]
+  }
 
 Após salvar o arquivo abre o terminal e vamos ligar o servidor usando o comando:
 json-server db.json
