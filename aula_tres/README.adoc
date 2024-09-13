@@ -21,130 +21,9 @@ Para mais detalhes:
 
 Exemplos práticos (Elementos do Navigation Drawer):
 
-- BiscoitoFragment.java
-[source,java]
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-import androidx.annotation.Nullable;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-import com.example.appnavigation.R;
-public class BiscoitoFragment extends Fragment {
-   private ImageView imageViewBiscoito;
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_biscoito,
-                container, false);
-        root.findViewById(R.id.imageViewBiscoito);
-        return root;
-    }
-}
-- fragment_biscoito.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="10dp"
-    android:layout_height="match_parent">
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageViewBiscoito"
-        android:scaleType="fitCenter"
-        android:src="@drawable/cookie"/>
-</LinearLayout>
+Na pasta layout adicione:
 
-- MainActivity.java
-[source,java]
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import android.view.MenuItem;
-import android.view.View;
-import androidx.annotation.NonNull;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import com.google.android.material.navigation.NavigationView;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import android.view.Menu;
-import android.widget.Toast;
-public class MainActivity extends AppCompatActivity {
-    private AppBarConfiguration mAppBarConfiguration;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    //    .setAction("Action", null).show();
-                Intent i = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("mailto: "+
-                                "estudante@gmail.com"));
-                startActivity(i);
-            }
-        });
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_bolo, R.id.nav_biscoito, R.id.nav_maca
-               )
-                .setDrawerLayout(drawer)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_configuracao:
-                Toast.makeText(getApplicationContext(),"Configuração",
-                        Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.action_contato:
-                Toast.makeText(getApplicationContext(),"Contato",
-                        Toast.LENGTH_SHORT).show();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
-                || super.onSupportNavigateUp();
-    }
-}
-
-- activity_main.xml
+- activty_main.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -156,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
     <include
+        android:id="@+id/app_bar_main"
         layout="@layout/app_bar_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -169,32 +49,6 @@ public class MainActivity extends AppCompatActivity {
         app:menu="@menu/activity_main_drawer" />
 </androidx.drawerlayout.widget.DrawerLayout>
 
-- activitiy_main_drawer.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="navigation_view">
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_bolo"
-            android:icon="@drawable/birthday"
-            android:title="@string/menu_bolo" />
-        <item
-            android:id="@+id/nav_biscoito"
-            android:icon="@drawable/cookie"
-            android:title="@string/menu_biscoito" />
-    </group>
-    <item android:title="Sobremesas">
-        <menu>
-            <item
-                android:id="@+id/nav_maca"
-                android:icon="@drawable/apple"
-                android:title="@string/menu_maca" />
-        </menu>
-    </item>
-</menu>
-
 - app_bar_main.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
@@ -207,13 +61,13 @@ public class MainActivity extends AppCompatActivity {
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/Theme.ExemploNavigationDrawer_01.AppBarOverlay">
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:popupTheme="@style/Theme.ExemploNavigationDrawer_01.PopupOverlay" />
     </com.google.android.material.appbar.AppBarLayout>
     <include layout="@layout/content_main" />
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -221,8 +75,9 @@ public class MainActivity extends AppCompatActivity {
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="16dp"
+        app:srcCompat="@android:drawable/ic_menu_agenda" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 - content_main.xml
@@ -236,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_main">
     <fragment
-        android:id="@+id/nav_host_fragment"
+        android:id="@+id/nav_host_fragment_content_main"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -246,48 +101,6 @@ public class MainActivity extends AppCompatActivity {
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/mobile_navigation" />
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-- main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_configuracao"
-        android:orderInCategory="100"
-        android:title="@string/menu_configuracao"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_contato"
-        android:orderInCategory="100"
-        android:title="@string/menu_contato"
-        app:showAsAction="never" />
-</menu>
-
-- mobile_navigation.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_bolo">
- <fragment
-        android:id="@+id/nav_bolo"
-        android:name="com.example.appnavigation.ui.bolo.BoloFragment"
-        android:label="@string/menu_bolo"
-        tools:layout="@layout/fragment_bolo" />
-    <fragment
-        android:id="@+id/nav_biscoito"
-        android:name="com.example.appnavigation.ui.biscoito.BiscoitoFragment"
-        android:label="@string/menu_biscoito"
-        tools:layout="@layout/fragment_biscoito" />
-    <fragment
-        android:id="@+id/nav_maca"
-        android:name="com.example.appnavigation.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_maca"
-        tools:layout="@layout/fragment_slideshow" />
-</navigation>
 
 - nav_header_main.xml
 [source,xml]
@@ -310,19 +123,384 @@ public class MainActivity extends AppCompatActivity {
         android:layout_height="wrap_content"
         android:contentDescription="@string/nav_header_desc"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:src="@drawable/menu"/>
+        app:srcCompat="@mipmap/ic_launcher_round" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="@string/header_meus_lanches"
+        android:text="@string/nav_header_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/header_lanches_android_com" />
+        android:text="@string/nav_header_subtitle" />
 </LinearLayout>
+
+- fragment_cake.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.coffee.CoffeeFragment">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/image_cake"
+        android:src="@drawable/ic_launcher_foreground"/>
+    <TextView
+        android:id="@+id/text_cake"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+         />
+</LinearLayout>
+
+- fragment_coffee.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.coffee.CoffeeFragment">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/image_coffee"
+        android:src="@drawable/ic_launcher_foreground"/>
+    <TextView
+        android:id="@+id/text_coffee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        />
+</LinearLayout>
+
+Na pasta menu adicione:
+
+- activity_main_drawer.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_cake"
+            android:icon="@drawable/coffee"
+            android:title="@string/menu_cake" />
+        <item
+            android:id="@+id/nav_coffee"
+            android:icon="@drawable/strawberry_cake"
+            android:title="@string/menu_coffee" />
+    </group>
+</menu>
+
+- main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_contact"
+        android:orderInCategory="100"
+        android:title="@string/contact"
+        app:showAsAction="never" />
+</menu>
+
+Na paste navigation adicione:
+
+- mobile_navigation.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_cake">
+    <fragment
+        android:id="@+id/nav_cake"
+        android:name="com.example.exemplonavigationdrawer_01.ui.cake.CakeFragment"
+        android:label="@string/menu_cake"
+        tools:layout="@layout/fragment_cake" />
+    <fragment
+        android:id="@+id/nav_coffee"
+        android:name="com.example.exemplonavigationdrawer_01.ui.coffee.CoffeeFragment"
+        android:label="@string/menu_coffee"
+        tools:layout="@layout/fragment_coffee" />
+</navigation>
+
+Outros arquivos a serem adicionados no projeto:
+
+- colors.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="yellow_200">#FFEB3B</color>
+    <color name="yellow_500">#FFC107</color>
+    <color name="yellow_700">#FF9800</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>
+
+- strings.xml
+[source,xml]
+<resources>
+    <string name="app_name">ExemploNavigationDrawer_01</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="menu_cake">Cake</string>
+    <string name="menu_coffee">Coffee</string>
+    <string name="contact">Contact</string>
+</resources>
+
+- dimens.xml
+[source,xml]
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing">8dp</dimen>
+    <dimen name="nav_header_height">176dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+</resources>
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Menu;
+import android.widget.Toast;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.navigation.NavigationView;
+import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import com.example.exemplonavigationdrawer_01.databinding.ActivityMainBinding;
+public class MainActivity extends AppCompatActivity {
+    private AppBarConfiguration mAppBarConfiguration;
+    private ActivityMainBinding binding;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.e("MainActivity","onCreate");
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        setSupportActionBar(binding.appBarMain.toolbar);
+        binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null)
+                        .setAnchorView(R.id.fab).show();
+            }
+        });
+        DrawerLayout drawer = binding.drawerLayout;
+        NavigationView navigationView = binding.navView;
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_cake, R.id.nav_coffee)
+                .setOpenableLayout(drawer)
+                .build();
+        navigationView.setItemIconTintList(null); //para os icones ficarem coloridos
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.action_settings){
+            Toast.makeText(getApplicationContext(),"Settings",
+                    Toast.LENGTH_SHORT).show();
+        }
+        if(item.getItemId() == R.id.action_contact){
+            Toast.makeText(getApplicationContext(),"Contact",
+                    Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                || super.onSupportNavigateUp();
+    }    
+}
+
+- CakeFragment.java
+[source,java]
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import com.example.exemplonavigationdrawer_01.databinding.FragmentCakeBinding;
+import com.example.exemplonavigationdrawer_01.ui.coffee.CoffeeViewModel;
+public class CakeFragment extends Fragment {
+    private FragmentCakeBinding binding;
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentCakeBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+        Log.i("CakeFragment","onCreateView");
+        return root;
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // super.onViewCreated(view, savedInstanceState);
+        CakeViewModel cakeViewModel =
+                new ViewModelProvider(this).get(CakeViewModel.class);
+        final TextView textView = binding.textCake;
+        cakeViewModel.getText().observe(getViewLifecycleOwner(),
+                textView::setText);
+        final ImageView imageView = binding.imageCake;
+        cakeViewModel.getInteger().observe(getViewLifecycleOwner(),imageView::setImageResource);
+        Log.i("CakeFragment","onViewCreated");
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+        Log.i("CakeFragment","onDestroyView");
+    }
+}
+
+- CakeViewModel.java
+[source,xml]
+import android.util.Log;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import com.example.exemplonavigationdrawer_01.R;
+public class CakeViewModel extends ViewModel {
+    private final MutableLiveData<String> mText;
+    private final MutableLiveData<Integer> mImage;
+    public CakeViewModel() {
+        mText = new MutableLiveData<>();
+        mText.setValue("This is cake fragment");
+        mImage = new MutableLiveData<>();
+        mImage.setValue(R.drawable.strawberry_cake);
+        Log.i("CakeViewModel","construtor");
+    }
+    public LiveData<String> getText() {
+        return mText;
+    }
+    public LiveData<Integer> getInteger() {
+        return mImage;
+    }
+}
+
+- CoffeeFragment.java
+[source,java]
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import com.example.exemplonavigationdrawer_01.databinding.FragmentCoffeeBinding;
+public class CoffeeFragment extends Fragment {
+    private FragmentCoffeeBinding binding;
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentCoffeeBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+        Log.e("CoffeeFragment","onCreateView");
+        return root;
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+       // super.onViewCreated(view, savedInstanceState);
+        CoffeeViewModel coffeeViewModel =
+                new ViewModelProvider(this).get(CoffeeViewModel.class);
+        final TextView textView = binding.textCoffee;
+        coffeeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        final ImageView imageView = binding.imageCoffee;
+        coffeeViewModel.getInteger().observe(getViewLifecycleOwner(),imageView::setImageResource);
+        Log.e("CoffeeFragment","onViewCreated");
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+        Log.e("CoffeeFragment","onDestroyView");
+    }
+}
+
+- CoffeeViewModel.java
+[source,java]
+import android.util.Log;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import com.example.exemplonavigationdrawer_01.R;
+public class CoffeeViewModel extends ViewModel {
+    private final MutableLiveData<String> mText;
+    private final MutableLiveData<Integer> mImage;
+    public CoffeeViewModel() {
+        mText = new MutableLiveData<>();
+        mText.setValue("This is coffee fragment");
+        mImage = new MutableLiveData<>();
+        mImage.setValue(R.drawable.coffee);
+        Log.i("CoffeeViewModel","construtor");
+    }
+    public LiveData<String> getText() {
+        return mText;
+    }
+    public LiveData<Integer> getInteger() {
+        return mImage;
+    }
+}
 
 = Animação Usando Arquivos JSON
 
