@@ -30,7 +30,9 @@
 Trata-se de um padrão de projeto de arquitetura, as camadas são divididas em Model, View e View-Model.
 
 Model: Responsável pela manipulação dos dados. Nesta parte compreendem as classes que representam as entidades e que realizam as persistências.
+
 View: Parte visual do projeto. A View relaciona-se com o ViewModel através do DataBinding e não conhece diretamente o Model.
+
 ViewModel: Camada intermediária entre a View e o Model. Não acessa a View diretamente, para isto é usado o DataBinding. O ViewModel pode ter acesso ao Model diretamente. O ViewModel pode usar um objeto LiveData (observadores) para acompanhar as mudanças nos dados do Model, dessa forma notificando a View quando algo mudou. Lembre-se que a atualização da View através do ViewModel é possível através do DataBinding. 
 
 Para mais detalhes sobre MVVM acesse o material: SOUTO, Thiago. Arquiteturas em Android: MVVM + Kotlin + Android Architecture Components (Databinding, Lifecycle, LiveData, Room). 2019. Disponível em: <https://medium.com/android-dev-br/arquiteturas-em-android-mvvm-kotlin-android-architecture-components-databinding-lifecycle-d5e7a9023cf3>.
