@@ -185,8 +185,9 @@ public class AlunoAdapter extends RecyclerView.Adapter<AlunoAdapter.AlunoViewHol
     @NonNull
     @Override
     public AlunoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemAlunoBinding binding = ItemAlunoBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new AlunoViewHolder(binding);
+        ItemAlunoBinding binding = ItemAlunoBinding.inflate(LayoutInflater.from(parent.getContext()), 
+        parent, false); //infla o layout
+        return new AlunoViewHolder(binding); //retorna a view do item da lista
     }
     @Override
     public void onBindViewHolder(@NonNull AlunoViewHolder holder, int position) {
@@ -208,8 +209,9 @@ public class AlunoAdapter extends RecyclerView.Adapter<AlunoAdapter.AlunoViewHol
             this.binding = binding;
         }
         public void bind(Aluno aluno) {
-            binding.setAluno(aluno);
+            binding.setAluno(aluno);//Define o objeto Aluno no binding, permitindo que os dados sejam exibidos na UI.
             binding.executePendingBindings();
+//solicita que o DataBinding execute qualquer atualização pendente imediatamente, garantindo que a UI reflita os dados mais recentes.
         }
     }
 }
