@@ -44,7 +44,7 @@ Responsabilidades de alguns componentes dentro do MVVM:
 
 O MVVM garante que a interface do usuário seja sempre atualizada de acordo com o ciclo de vida do componente.
 
-Exemplo prático:
+- Exemplo prático 01:
 
 Inicialmente no projeto criado habilite o DataBinding, no arquivo gradle a nível de app, acrescente as seguintes linhas:
 [source,xml]
@@ -254,8 +254,252 @@ public class BindingAdapters {
     }
 }
 
+- Exemplo prático 02:
 
-   
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>
+
+- fragment_bolo_list.xml
+[source,xml]
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
+
+- fragment_bolo_details.xml
+[source,xml]
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <TextView
+        android:id="@+id/receitaTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:padding="16dp"/>
+</LinearLayout>
+
+- Bolo.java (Model)
+[source,java]
+import android.os.Parcel;
+import android.os.Parcelable;
+public class Bolo implements Parcelable {
+    private String nome;
+    private String receita;
+    public Bolo(String nome, String receita) {
+        this.nome = nome;
+        this.receita = receita;
+    }
+    protected Bolo(Parcel in) {
+        nome = in.readString();
+        receita = in.readString();
+    }
+    public static final Creator<Bolo> CREATOR = new Creator<Bolo>() {
+        @Override
+        public Bolo createFromParcel(Parcel in) {
+            return new Bolo(in);
+        }
+        @Override
+        public Bolo[] newArray(int size) {
+            return new Bolo[size];
+        }
+    };
+    public String getNome() {
+        return nome;
+    }
+    public String getReceita() {
+        return receita;
+    }
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(nome);
+        dest.writeString(receita);
+    }
+    @Override
+    public String toString() {
+        return "Bolo{" +
+                "nome='" + nome + '\'' +
+                '}';
+    }
+}
+
+- BoloRepository.java (Model)
+[source,java]
+import java.util.ArrayList;
+import java.util.List;
+public class BoloRepository {
+    public List<Bolo> getBolos() {
+        List<Bolo> bolos = new ArrayList<>();
+        bolos.add(new Bolo("Bolo de Fubá",
+                "Receita: Fubá, leite, ovos..."));
+        bolos.add(new Bolo("Bolo de Chocolate",
+                "Receita: Chocolate, leite, ovos..."));
+        bolos.add(new Bolo("Bolo de Mandioca",
+                "Receita: Mandioca, leite, ovos..."));
+        return bolos;
+    }
+}
+
+- BoloViewModel.java (Controller)
+[source,java]
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import com.example.appmvvm_02.model.Bolo;
+import com.example.appmvvm_02.model.BoloRepository;
+import java.util.List;
+public class BoloViewModel extends ViewModel {
+    private final BoloRepository repository = new BoloRepository();
+    private final MutableLiveData<List<Bolo>> bolos = new MutableLiveData<>();
+    public BoloViewModel() {
+        loadBolos();
+    }
+    private void loadBolos() {
+        bolos.setValue(repository.getBolos());
+    }
+    public LiveData<List<Bolo>> getBolos() {
+        return bolos;
+    }
+}
+
+- BoloDetailFragment.java (View)
+[source,java]
+import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import com.example.appmvvm_02.R;
+public class BoloDetailFragment extends Fragment {
+    private static final String ARG_RECEITA = "receita";
+    public static BoloDetailFragment newInstance(String receita) {
+        BoloDetailFragment fragment = new BoloDetailFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_RECEITA, receita);
+        fragment.setArguments(args);
+        return fragment;
+    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_bolo_details, container, false);
+        return view;
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        TextView textViewReceita = view.findViewById(R.id.receitaTextView);
+        if (getArguments() != null) {
+            String receita = getArguments().getString(ARG_RECEITA);
+            textViewReceita.setText(receita);
+        }
+    }
+}
+
+- BoloListFragment.java (View)
+[source,java]
+import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import com.example.appmvvm_02.R;
+import com.example.appmvvm_02.controller.BoloViewModel;
+import com.example.appmvvm_02.model.Bolo;
+import java.util.List;
+public class BoloListFragment extends Fragment {
+    private BoloViewModel boloViewModel;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_bolo_list, container, false);
+        return view;
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ListView listView = view.findViewById(R.id.listView);
+        boloViewModel = new ViewModelProvider(this).get(BoloViewModel.class);
+        boloViewModel.getBolos().observe(getViewLifecycleOwner(), new Observer<List<Bolo>>() {
+            @Override
+            public void onChanged(List<Bolo> bolos) {
+                ArrayAdapter<Bolo> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, bolos);
+                listView.setAdapter(adapter);
+            }
+        });
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Bolo boloSelecionado = (Bolo) parent.getItemAtPosition(position);
+                // Aqui você pode usar um listener ou navegação para abrir o fragmento da receita
+                chamarFragment(boloSelecionado);
+            }
+        });
+    }
+    private void chamarFragment(Bolo bolo) {
+        BoloDetailFragment fragment = BoloDetailFragment.newInstance(bolo.getReceita());
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+}
+
+- MainActivity.java (View)
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import com.example.appmvvm_02.R;
+public class MainActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        if (savedInstanceState == null) {
+           chamarFragment();
+        }
+    }
+    private void chamarFragment(){
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container,
+                        new BoloListFragment())
+                .commit();
+    }
+}
+
+
+
+
 
 
 
