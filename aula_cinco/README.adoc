@@ -10,87 +10,99 @@ Um aplicativo no sistema Android pode usar alguns recursos disponíveis como:
 
 - localização do dispositivo e outros.
 
-= Google Maps
+Para alguns recursos é necessário solicitar acesso ao usuário, isto é feito através das permissões. As permissões são declaradas no arquivo 
+Android Manifest.xml e algumas são solicitadas em tempo de execução.
 
-Com o SDK do Google Maps é possível adicionar mapa em seu projeto, usar recursos de localização, pontos de latitude e longitude, personalização de marcadores e outros.
+Como consta na documentação oficial (Google Developers), existem 3 tipos de permissões:
 
-Para criar um projeto no AndroidStudio usando os recursos do SDK do Google Maps é necessário fazer algumas configurações na IDE e também na Google Cloud.
+- permissões em tempo de instalação: "Quando você declara as permissões no momento da instalação, o sistema automaticamente concede-as quando o usuário 
+instala o app.";
 
-Para mais informações:
+- permissões de execução: "[...] conhecidas como permissões perigosas [...] você precisa solicitar permissões de execução no app antes de acessar os dados
+restritos ou realizar ações restritas." 	
 
-- Visão geral do SDK do Maps para Android. Disponível em: https://developers.google.com/maps/documentation/android-sdk/overview?hl=pt-br&section=tools. Acessado em: 10 fev. 2023.
+- permissões especiais: "Somente a plataforma e os OEMs podem definir permissões especiais."
 
-Passos iniciais: marcadores
+Referência do texto entre aspas: GOOGLE DEVELOPERS. Permissões no Android. Disponível em: 
+https://developer.android.com/guide/topics/permissions/overview?hl=pt-br>. Acesso em: 23 de fev. 2023.
 
-video::l3bw8Senjmg[youtube, width=640, height=480]
+Permissões no Android
 
-Personalizações: marcadores
+video::zCAx4WZ98rs[youtube, width=640, height=480]
 
-video::FFm9NmSfjw0[youtube, width=640, height=480]
+Solicitar permissões
 
-Exemplos práticos (personalizando marcadores):
+video::x38dYUm7tCY[youtube, width=640, height=480]
 
- - crie um projeto na IDE;
+Permissões em Tempo de Execução
 
-- escolha o Google Maps Activity;
+video::C8lUdPVSzDk[youtube, width=640, height=480]
 
-- Na classe MainActivity.java no método OnMapReady faça as seguintes adições:
-@Override
+Exemplos práticos:
 
-    public void onMapReady(GoogleMap googleMap) {
+- No arquivo AndroidManifest.xml, deve ser acrescentado a tag <uses-permission android:name="android.permission.CAMERA" />.
 
-        mMap = googleMap;
+- link:um/activity_main.xml[activity_main]
 
-        LatLng sydney = new LatLng(-34, 151);
+- link:um/MainActivity.java[MainActivity]
 
-        mMap.addMarker(new MarkerOptions()   //adiciona um marcador
+- link:um/activity_segunda.xml[activity_segunda]
 
-                .position(sydney)                                  //especifica a posição 
+- link:um/SegundaActivity.java[SegundaActivity]
 
-                .title("Marker in Sydney")			//define o título no marcador
-
-                .draggable(true)					//torna o marcador arrastável
-
-                .snippet("Hello")					//texto adicional ao marcador
-
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))   //muda a cor do marcador
-
-                .rotation(90.F));   //gira o marcador
+Análise da classe PermissionUtils.java, disponível no seguinte endereço: https://github.com/googlemaps/android-samples/blob/main/ApiDemos/java/app/src/gms/java/com/example/mapdemo/PermissionUtils.java. 
 
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));   
+= Broadcast Receiver
 
-    }
+Segundo a Google Developers (2019), "Os apps para Android podem enviar ou receber mensagens de transmissão do sistema Android e de outros apps Android". 
+Para entender com mais facilidade os broadcasts, relembre os tratamentos de eventos presentes na linguagem Java. Evento é algo que acontece no sistema:
+pode ser sua reinicialização; o aparelho habilitado em modo avião; a bateria sendo carregada, a desabilitação da Wi-fi e assim por diante.
+Resumindo: algo acontece, uma classe transmite uma mensagem e outra ficará responsável em tratá-la.
 
-}
+Ainda, de acordo com a  Google Developers (2019), "Os apps podem se registrar para receber transmissões específicas. Quando uma transmissão é enviada,
+o sistema a direciona automaticamente para apps que se inscreveram para receber esse tipo específico de transmissão."
 
-Para mais detalhes sobre SDK MAPS:
+Para ocorrer a transmissão da mensagem, é necessário vinculá-la ao um objeto Intent. Através do método setAction é definido o evento que aconteceu. 
+Por meio do método putExtra é possível passar mais dados na transmissão da mensagem.
 
-- GOOGLE DEVELOPERS. Marker. Disponível em: https://developers.google.com/maps/documentation/android-sdk/marker?hl=pt-br. Acesso em: 10 fev. 2023.
+- Referência do texto entre aspas: GOOGLE DEVELOPERS. Visão geral de transmissões.Disponível em: 
+https://developer.android.com/guide/components/broadcasts#java. Acesso em: 22 de fev. 2023. 
 
-- GOOGLE DEVELOPERS. CameraPosition. Disponível em: <https://developers.google.com/android/reference/com/google/android/gms/maps/model/CameraPosition. Acessado em: 10 fev. 2023.
+Broadcast Receiver
 
-- GOOGLE DEVELOPERS. LatLngBounds. Disponível em: https://developers.google.com/maps/documentation/android-sdk/reference/com/google/android/libraries/maps/model/LatLngBounds. Acessado em: 10 fev. 2023.
+video::XXVsL3njoCQ[youtube, width=640, height=480]
 
-- GOOGLE DEVELOPERS: Location. Disponível em: https://developers.google.com/maps/documentation/android-sdk/location?hl=pt-br. Acesso em: 10 fev. 2023.
+Existem duas maneiras de definir um BroadcastReceiver:
 
-Exemplos práticos disponíveis na documentação sobre Google Maps (destacando: limitação de mapa, configurações de zoom, posição da câmera e localização de usuário): 
+- No arquivo AndroidManifest.xml;
 
-- GOOGLEMAPS/ANDROID-SAMPLES. Disponível em: https://github.com/googlemaps/android-samples. Acessado em: 10 fev. 2023.
+- Pelo contexto, cuja definição é feita por linha de código dentro de uma classe específica.
 
- 
+Para saber mais sobre as ações de transmissões existentes no Android, acesse na sua máquina a pasta do SDK. Por exemplo, na minha máquina o acesso ao 
+arquivo foi: Sdk/platforms/android-31/data/broadcast_actions.txt. 
+
+Exemplos práticos:
+
+- link:um/activity_main.xml[activity_main]
+
+- link:um/MainActivity.java[MainActivity]
+
+Exemplos práticos:
+
+- link:dois/activity_main.xml[activity_main]
+
+- link:dois/MainActivity.java[MainActivity]
+
+- link:dois/activity_2.xml[activity_2] 
+
+- link:dois/Activity2.java[Activity2]
+
+- link:dois/MyBroadcast.java[MyBroadcast]
+
+- link:dois/AndroidManifest.xml[AndroidManifest]
 
 
-
-
-
-
-
-
-
-
-
-
-
+Atenção: No exemplo 1, como foi uma transmissão de uma ação personalizada, a configuração foi feita de forma programática (dentro da classe MainActivity). No exemplo 2, a definição foi feita no arquivo.xml.
 
 
