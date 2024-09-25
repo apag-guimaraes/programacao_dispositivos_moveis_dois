@@ -1,30 +1,3 @@
-//caminho padrão para imagens
-:imagesdir: images
-:figure-caption: Figura
-:doctype: book
-
-//gera apresentacao
-//pode se baixar os arquivos e add no diretório
-:revealjsdir: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0
-
-//GERAR ARQUIVOS
-//make slides
-//make ebook
-
-//Estilo do Sumário
-:toc2: 
-//após os : insere o texto que deseja ser visível
-:toc-title: Sumário
-:figure-caption: Figura
-//numerar titulos
-:numbered:
-:source-highlighter: highlightjs
-:icons: font
-:chapter-label:
-:doctype: book
-:lang: pt-BR
-//3+| mesclar linha tabela
-
 = Google Maps
 
 Com o SDK do Google Maps é possível adicionar mapa em seu projeto, usar recursos de localização, pontos de latitude e longitude, personalização de marcadores e outros.
