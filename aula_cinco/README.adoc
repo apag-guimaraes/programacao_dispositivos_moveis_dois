@@ -1,4 +1,4 @@
-= Permissões
+= Google Maps
 
 Um aplicativo no sistema Android pode usar alguns recursos disponíveis como: 
 
