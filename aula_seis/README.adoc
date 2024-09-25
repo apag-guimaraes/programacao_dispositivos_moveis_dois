@@ -1,3 +1,58 @@
+= Permissões
+
+Um aplicativo no sistema Android pode usar alguns recursos disponíveis como: 
+
+- câmera;
+
+- galeria de fotos;
+
+- arquivos;
+
+- localização do dispositivo e outros.
+
+Para alguns recursos é necessário solicitar acesso ao usuário, isto é feito através das permissões. As permissões são declaradas no arquivo 
+Android Manifest.xml e algumas são solicitadas em tempo de execução.
+
+Como consta na documentação oficial (Google Developers), existem 3 tipos de permissões:
+
+- permissões em tempo de instalação: "Quando você declara as permissões no momento da instalação, o sistema automaticamente concede-as quando o usuário 
+instala o app.";
+
+- permissões de execução: "[...] conhecidas como permissões perigosas [...] você precisa solicitar permissões de execução no app antes de acessar os dados
+restritos ou realizar ações restritas." 	
+
+- permissões especiais: "Somente a plataforma e os OEMs podem definir permissões especiais."
+
+Referência do texto entre aspas: GOOGLE DEVELOPERS. Permissões no Android. Disponível em: 
+https://developer.android.com/guide/topics/permissions/overview?hl=pt-br>. Acesso em: 23 de fev. 2023.
+
+Permissões no Android
+
+video::zCAx4WZ98rs[youtube, width=640, height=480]
+
+Solicitar permissões
+
+video::x38dYUm7tCY[youtube, width=640, height=480]
+
+Permissões em Tempo de Execução
+
+video::C8lUdPVSzDk[youtube, width=640, height=480]
+
+Exemplos práticos:
+
+- No arquivo AndroidManifest.xml, deve ser acrescentado a tag <uses-permission android:name="android.permission.CAMERA" />.
+
+- link:um/activity_main.xml[activity_main]
+
+- link:um/MainActivity.java[MainActivity]
+
+- link:um/activity_segunda.xml[activity_segunda]
+
+- link:um/SegundaActivity.java[SegundaActivity]
+
+Análise da classe PermissionUtils.java, disponível no seguinte endereço: https://github.com/googlemaps/android-samples/blob/main/ApiDemos/java/app/src/gms/java/com/example/mapdemo/PermissionUtils.java. 
+
+
 = Broadcast Receiver
 
 Segundo a Google Developers (2019), "Os apps para Android podem enviar ou receber mensagens de transmissão do sistema Android e de outros apps Android". 
