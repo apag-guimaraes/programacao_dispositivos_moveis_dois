@@ -1,7 +1,14 @@
-//caminho padrão para imagens
-:imagesdir: images
-:figure-caption: Figura
-:doctype: book
+= Permissões
+
+Um aplicativo no sistema Android pode usar alguns recursos disponíveis como: 
+
+- câmera;
+
+- galeria de fotos;
+
+- arquivos;
+
+- localização do dispositivo e outros.
 
 = Google Maps
 
