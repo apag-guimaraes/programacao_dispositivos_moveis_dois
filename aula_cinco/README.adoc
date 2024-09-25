@@ -1,4 +1,4 @@
-= Google Maps
+== Google Maps
 
 Com o SDK do Google Maps é possível adicionar mapa em seu projeto, usar recursos de localização, pontos de latitude e longitude, personalização de marcadores e outros.
 
