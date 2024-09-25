@@ -1,14 +1,13 @@
 = Google Maps
 
-Um aplicativo no sistema Android pode usar alguns recursos disponíveis como: 
+Com o SDK do Google Maps é possível adicionar mapa em seu projeto, usar recursos de localização, pontos de latitude e longitude, personalização de marcadores e outros.
 
-- câmera;
+Para criar um projeto no AndroidStudio usando os recursos do SDK do Google Maps é necessário fazer algumas configurações na IDE e também na Google Cloud.
 
-- galeria de fotos;
+Para mais informações:
 
-- arquivos;
+- Visão geral do SDK do Maps para Android. Disponível em: https://developers.google.com/maps/documentation/android-sdk/overview?hl=pt-br&section=tools. Acessado em: 10 fev. 2023.
 
-- localização do dispositivo e outros.
 
 Para alguns recursos é necessário solicitar acesso ao usuário, isto é feito através das permissões. As permissões são declaradas no arquivo 
 Android Manifest.xml e algumas são solicitadas em tempo de execução.
