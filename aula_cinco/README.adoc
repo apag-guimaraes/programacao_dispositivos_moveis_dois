@@ -1,53 +1,94 @@
-= Permissões
+//caminho padrão para imagens
+:imagesdir: images
+:figure-caption: Figura
+:doctype: book
 
-Um aplicativo no sistema Android pode usar alguns recursos disponíveis como: 
+//gera apresentacao
+//pode se baixar os arquivos e add no diretório
+:revealjsdir: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0
 
-- câmera;
+//GERAR ARQUIVOS
+//make slides
+//make ebook
 
-- galeria de fotos;
+//Estilo do Sumário
+:toc2: 
+//após os : insere o texto que deseja ser visível
+:toc-title: Sumário
+:figure-caption: Figura
+//numerar titulos
+:numbered:
+:source-highlighter: highlightjs
+:icons: font
+:chapter-label:
+:doctype: book
+:lang: pt-BR
+//3+| mesclar linha tabela
 
-- arquivos;
+= Google Maps
 
-- localização do dispositivo e outros.
+Com o SDK do Google Maps é possível adicionar mapa em seu projeto, usar recursos de localização, pontos de latitude e longitude, personalização de marcadores e outros.
 
-Para alguns recursos é necessário solicitar acesso ao usuário, isto é feito através das permissões. As permissões são declaradas no arquivo 
-Android Manifest.xml e algumas são solicitadas em tempo de execução.
+Para criar um projeto no AndroidStudio usando os recursos do SDK do Google Maps é necessário fazer algumas configurações na IDE e também na Google Cloud.
 
-Como consta na documentação oficial (Google Developers), existem 3 tipos de permissões:
+Para mais informações:
 
-- permissões em tempo de instalação: "Quando você declara as permissões no momento da instalação, o sistema automaticamente concede-as quando o usuário 
-instala o app.";
+- Visão geral do SDK do Maps para Android. Disponível em: https://developers.google.com/maps/documentation/android-sdk/overview?hl=pt-br&section=tools. Acessado em: 10 fev. 2023.
 
-- permissões de execução: "[...] conhecidas como permissões perigosas [...] você precisa solicitar permissões de execução no app antes de acessar os dados
-restritos ou realizar ações restritas." 	
+Passos iniciais: marcadores
 
-- permissões especiais: "Somente a plataforma e os OEMs podem definir permissões especiais."
+video::l3bw8Senjmg[youtube, width=640, height=480]
 
-Referência do texto entre aspas: GOOGLE DEVELOPERS. Permissões no Android. Disponível em: 
-https://developer.android.com/guide/topics/permissions/overview?hl=pt-br>. Acesso em: 23 de fev. 2023.
+Personalizações: marcadores
 
-Permissões no Android
+video::FFm9NmSfjw0[youtube, width=640, height=480]
 
-video::zCAx4WZ98rs[youtube, width=640, height=480]
+Exemplos práticos (personalizando marcadores):
 
-Solicitar permissões
+- crie um projeto na IDE;
 
-video::x38dYUm7tCY[youtube, width=640, height=480]
+- escolha o Google Maps Activity;
 
-Permissões em Tempo de Execução
+- Na classe MainActivity.java no método OnMapReady faça as seguintes adições:
+@Override
 
-video::C8lUdPVSzDk[youtube, width=640, height=480]
+    public void onMapReady(GoogleMap googleMap) {
 
-Exemplos práticos:
+        mMap = googleMap;
 
-- No arquivo AndroidManifest.xml, deve ser acrescentado a tag <uses-permission android:name="android.permission.CAMERA" />.
+        LatLng sydney = new LatLng(-34, 151);
 
-- link:um/activity_main.xml[activity_main]
+        mMap.addMarker(new MarkerOptions()   //adiciona um marcador
 
-- link:um/MainActivity.java[MainActivity]
+                .position(sydney)                                  //especifica a posição 
 
-- link:um/activity_segunda.xml[activity_segunda]
+                .title("Marker in Sydney")			//define o título no marcador
 
-- link:um/SegundaActivity.java[SegundaActivity]
+                .draggable(true)					//torna o marcador arrastável
 
-Análise da classe PermissionUtils.java, disponível no seguinte endereço: https://github.com/googlemaps/android-samples/blob/main/ApiDemos/java/app/src/gms/java/com/example/mapdemo/PermissionUtils.java. 
+                .snippet("Hello")					//texto adicional ao marcador
+
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))   //muda a cor do marcador
+
+                .rotation(90.F));   //gira o marcador
+
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));   
+
+    }
+
+}
+
+Para mais detalhes sobre SDK MAPS:
+
+- GOOGLE DEVELOPERS. Marker. Disponível em: https://developers.google.com/maps/documentation/android-sdk/marker?hl=pt-br. Acesso em: 10 fev. 2023.
+
+- GOOGLE DEVELOPERS. CameraPosition. Disponível em: <https://developers.google.com/android/reference/com/google/android/gms/maps/model/CameraPosition. Acessado em: 10 fev. 2023.
+
+- GOOGLE DEVELOPERS. LatLngBounds. Disponível em: https://developers.google.com/maps/documentation/android-sdk/reference/com/google/android/libraries/maps/model/LatLngBounds. Acessado em: 10 fev. 2023.
+
+- GOOGLE DEVELOPERS: Location. Disponível em: https://developers.google.com/maps/documentation/android-sdk/location?hl=pt-br. Acesso em: 10 fev. 2023.
+
+Exemplos práticos disponíveis na documentação sobre Google Maps (destacando: limitação de mapa, configurações de zoom, posição da câmera e localização de usuário): 
+
+- GOOGLEMAPS/ANDROID-SAMPLES. Disponível em: https://github.com/googlemaps/android-samples. Acessado em: 10 fev. 2023.
