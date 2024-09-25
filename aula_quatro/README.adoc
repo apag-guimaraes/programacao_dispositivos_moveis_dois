@@ -256,6 +256,8 @@ public class BindingAdapters {
 
 - Exemplo prático 02:
 
+Neste exemplo não usado o componente DataBinding.
+
 - activity_main.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
