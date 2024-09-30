@@ -52,9 +52,10 @@ image::api.png[]
 
 Mais detalhes sobre WebService: POLO, Gabriel. O que é um web service? Disponível em: https://gabrielpolo.medium.com/o-que-%C3%A9-um-webservice-c5104d847a85. Acesso em: 30 de jan. 2023.
 
-= Exemplo de Web Service usando o modelo de design REST
+Exemplo de Web Service usando o modelo de design REST
 
 Endpoint (URL) do serviço para obter a lista de alunos: https://api.exemplo.com/alunos
+
 - Solicitação GET https://api.exemplo.com/alunos
 
 A resposta pode ser um arquivo JSON representando os dados dos alunos
