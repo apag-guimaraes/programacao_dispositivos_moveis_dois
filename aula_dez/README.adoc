@@ -1,24 +1,35 @@
-= Handler
+= Service
 
-Permite a troca de mensagens entre a pilha de execução principal e uma pilha de execução secundária. Lembre-se a função da thread principal é redenrizar 
-a interface gráfica. Se há a necessidade de fazer uma conexão remota, isto deve ficar a cargo da thread secundária, se um determinado valor presente na 
-thread secundária é necessário para atualizar uma view da interface gráfica, o handler pode ser essa ponte entre as duas threads.
+Recurso usado para operações que são executadas em segundo plano. Não oferece interface gráfica para interação com o usuário. Geralmente são indicadas
+para operações longas. Um exemplo clássico de uso: uma música sendo reproduzida mesmo quando você está usando outro aplicativo.
 
-Para mais detalhes sobre handler: GOOGLE DEVELOPERS. Handler. Disponível em: https://developer.android.com/reference/android/os/Handler. Acesso em:
-24 fev. 2023.
+video::ROk-YrZKYCg[youtube, width=640, height=480]
 
-Exemplos práticos (usando POST):
+A figura 1 mostra o ciclo de vida do service
+
+image:service.png[]
+
+- Referência da figura 1: GOOGLE DEVELOPERS. Visão geral dos serviços. Disponível em: https://developer.android.com/guide/components/services. Acesso: 23 fev. 2023.
+
+Exemplos práticos:
 
 - link:um/activity_main.xml[activity_main]
 
+- link:um/Service1.java[Service1]
+
 - link:um/MainActivity.java[MainActivity]
 
-Exemplos práticos (usando MSG):
+- No arquivo AndroidManifest.xml, acrescentar a tag  <service android:name=".Service1"/>
+
+Exemplos práticos:
 
 - link:dois/activity_main.xml[activity_main]
 
+- link:dois/Service2.java[Service2]
+
 - link:dois/MainActivity.java[MainActivity]
 
+- No arquivo AndroidManifest.xml, acrescentar a tag  <service android:name=".Service2"/>
 
 
 
