@@ -1,77 +1,118 @@
-//caminho padrão para imagens
-:imagesdir: images
-:figure-caption: Figura
-:doctype: book
+= Outros Recursos
 
-//gera apresentacao
-//pode se baixar os arquivos e add no diretório
-:revealjsdir: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0
+== Date Picker
 
-//GERAR ARQUIVOS
-//make slides
-//make ebook
+Recurso que permite manipular dados do calendário.
 
-== Configurações básicas
+Para mais detalhes: GOOGLE DEVELOPERS. DatePicker. Disponível em: https://developer.android.com/reference/android/widget/DatePicker. Acesso em: 24 fev. 2023.
 
-Inicialmente deve ser criado um projeto no Firebase console e depois adicioná-los em seu projeto no Android Studio. A documentação oficial explica esse processo passo a passo. Dessa forma, acesse: https://firebase.google.com/docs/android/setup?hl=pt-br.
+Exemplos práticos:
 
-== Conexão com o banco
+- link:um/activity_main.xml[activity_main]
 
-Após as configurações básicas, é necessário obter uma referância do banco de dados, isto vai depender do banco que será utilizado, pois o Firebase , possui vários banco: como o Firestore e o Realtime Database.
+- link:um/MainActivity.java[MainActivity]
 
-//código para obter a referência do Firestore
-FirebaseFirestore db = db = FirebaseFirestore.getInstance();
+== Date Picker Dialog
 
-//código para obter a referência do Realtime Database
+Recurso que permite manipular dados do calendário.
 
-DatabaseReference refBd = FirebaseDatabase.getInstance().getReference();
+Para mais detalhes: GOOGLE DEVELOPERS. DatePickerDialog. Disponível em: https://developer.android.com/reference/android/widget/DatePickerDialog. Acesso em: 24 fev. 2023.
 
-== Salvar / listar dados no banco
+Exemplos práticos:
 
-Para salvar os dados no Firestore, você precisa criar uma coleção e os dados serão salvos na estrutura de um Map.
+- link:dois/activity_main.xml[activity_main]
 
-//código para salvar dados no Firestore
+- link:dois/MainActivity.java[MainActivity]
 
-   db.collection("minha lista")
-                .add(lista.toMap())
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(this, "Sucesso", Toast.LENGTH_LONG).show();
-                    obterDados();
-                })
-                .addOnFailureListener(e -> {
-                    Log.w("Cadastro", "Erro", e);
-                });
+== Time Picker
 
-Para obter os dados do Firestore basta acessar QueryDocumentSnapshot document : task.getResult() e através do document acessar os campos dos objetos mapeados, por exemplo document.getString("nome do campo"), no caso de inteiro document.getLong("nome do campo"). Veja o código completo abaixo:
+Recurso que permite manipular dados das horas.
 
- db.collection("minha lista")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<String> lista = new ArrayList<>();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String nome = document.getString("nome do campo");
-                            int idade = Objects.requireNonNull(document.getLong("nome do campo")).intValue();
-                         
-                            Log.d("Dado",document.getId() + " => " + document.getData());
-                        }
-                       
-                    } else {
-                        Log.d("Erro", "Erro ao obter dados: ", task.getException());
-                    }
-                });
+Para mais detalhes: GOOGLE DEVELOPERS. TimePicker. Disponível em: https://developer.android.com/reference/android/widget/TimePicker. Acesso em: 24 fev. 2023.
 
-Para mais detalhes sobre leitura e gravação de dados no Realtime Database acesse a documentação oficial: https://firebase.google.com/docs/database/android/read-and-write?hl=pt-br#java_2.
+Exemplos práticos:
 
-Para mais detalhes sobre o Firestore acesse a documentação oficial: https://firebase.google.com/docs/firestore/quickstart?hl=pt-br.
+- link:tres/activity_main.xml[activity_main]
 
+- link:tres/MainActivity.java[MainActivity]
 
-Exemplo prático:
+== Time Picker Dialog
 
+Recurso que permite manipular dados das horas.
 
-link:codigos/activity_main.xml[activity_main]
+Para mais detalhes: GOOGLE DEVELOPERS. TimePickerDialog. Disponível em: https://developer.android.com/reference/android/widget/TimePickerDialog. Acesso em: 24 fev. 2023.
 
-link:codigos/MainActivity.java[MainActivity]
+Exemplos práticos:
 
-link:codigos/Filme.java[Estudante]
+- link:quatro/activity_main.xml[activity_main]
+
+- link:quatro/MainActivity.java[MainActivity]
+
+== SMS
+
+Recurso que permite acessar o aplicativo de SMS que já vem instalado no dispositivo móvel.
+
+Exemplos práticos (Baseado no conteúdo: How to get the package name of sms app(default) in Android before KitKat version? Disponível em: <https://stackoverflow.com/questions/29471386/how-to-get-the-package-name-of-sms-appdefault-in-android-before-kitkat-version?noredirect=1&lq=1&gt;. Pergunta realizada pelo usuário: https://stackoverflow.com/users/3986081/malleswar-chinta e respondida pelo usuário: https://stackoverflow.com/users/3020568/deniz.):
+
+- link:cinco/activity_main.xml[activity_main]
+
+- link:cinco/MainActivity.java[MainActivity]
+
+== WhatsApp
+
+Recurso que permite acessar o aplicativo WhatsApp instalado no dispositivo móvel.
+
+Exemplos práticos(Baseado no conteúdo: https://faq.whatsapp.com/android/im-an-android-developer-how-can-i-integrate-whatsapp-with-my-app/?lang=en):
+
+- link:seis/activity_main.xml[activity_main]
+
+- link:seis/MainActivity.java[MainActivity]
+
+== Gmail
+
+Recurso que permite acessar o aplicativo Gmail instalado no dispositivo móvel.
+
+Exemplos práticos:
+
+- link:sete/activity_main.xml[activity_main]
+
+- link:sete/MainActivity.java[MainActivity]
+
+== Video View
+
+Recurso que oferece controle de vídeo como: play, pause e stop.
+
+Para mais detalhes: GOOGLE DEVELOPERS. VideoView. Disponível em: https://developer.android.com/reference/android/widget/VideoView. Acesso em: 24 fev. 2023.
+
+== Text To Speech
+
+Recurso que converte o texto disponível em seu app em voz.
+
+Para mais detalhes: GOOGLE DEVELOPERS. TextToSpeech. Disponível em: https://developer.android.com/reference/android/speech/tts/TextToSpeech e 
+ANDROID DEVELOPERS BLOG. An introduction to Text-To-Speech in Android. Disponível em: https://android-developers.googleblog.com/2009/09/introduction-to-text-to-speech-in.html.
+
+Exemplos práticos(Exemplo adaptado das seguintes fontes: Text to speech (TTS) - Android. Disponível em:<https://stackoverflow.com/questions/3058919/text-to-speechtts-android, pergunta realizada pelo usuário https://stackoverflow.com/users/366916/bharathi e respondida pelo usuário https://stackoverflow.com/users/3166375/sifat-ifty.
+Playing a video in VideoView in Anroid. Disponível em:<https://stackoverflow.com/questions/3263736/playing-a-video-in-videoview-in-android&gt;, pergunta realizada pelo usuário https://stackoverflow.com/users/2355649/muhammad-maqsoodur-rehman e respondida pelo usuário https://stackoverflow.com/users/3681880/suragch.):
+
+- link:oito/activity_main.xml[activity_main]
+
+- link:oito/MainActivity.java[MainActivity]
+
+- link:oito/activity_segunda.xml[activity_segunda]
+
+- link:oito/SegundaActivity.java[SegundaActivity]
+
+- criar uma pasta chamada raw no projeto, o vídeo deve estar armazenado dentro desta pasta.
+
+== Android Accessibility Suite / Android Studio Profiles / Novidades
+
+video::Ce7q_cu8mvo[youtube, width=640, height=480]
+
+video::uTCQ8rAdPGE[youtube, width=640, height=480]
+
+video::6hTC-fcVPtk[youtube, width=640, height=480]
+
+video::-xvnsa-1R1Q[youtube, width=640, height=480]
+
+video::PfwHq8w9GBc[youtube, width=640, height=480]
 
