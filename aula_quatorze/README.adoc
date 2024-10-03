@@ -1,1 +1,78 @@
+//caminho padrão para imagens
+:imagesdir: images
+:figure-caption: Figura
+:doctype: book
+
+//gera apresentacao
+//pode se baixar os arquivos e add no diretório
+:revealjsdir: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0
+
+//GERAR ARQUIVOS
+//make slides
+//make ebook
+
+== Configurações básicas
+
+Inicialmente deve ser criado um projeto no Firebase console e depois adicioná-los em seu projeto no Android Studio. A documentação oficial explica esse processo passo a passo. Dessa forma, acesse: https://firebase.google.com/docs/android/setup?hl=pt-br.
+
+== Conexão com o banco
+
+Após as configurações básicas, é necessário obter uma referância do banco de dados, isto vai depender do banco que será utilizado, pois o Firebase , possui vários banco: como o Firestore e o Realtime Database.
+
+//código para obter a referência do Firestore
+FirebaseFirestore db = db = FirebaseFirestore.getInstance();
+
+//código para obter a referência do Realtime Database
+
+DatabaseReference refBd = FirebaseDatabase.getInstance().getReference();
+
+== Salvar / listar dados no banco
+
+Para salvar os dados no Firestore, você precisa criar uma coleção e os dados serão salvos na estrutura de um Map.
+
+//código para salvar dados no Firestore
+
+   db.collection("minha lista")
+                .add(lista.toMap())
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(this, "Sucesso", Toast.LENGTH_LONG).show();
+                    obterDados();
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Cadastro", "Erro", e);
+                });
+
+Para obter os dados do Firestore basta acessar QueryDocumentSnapshot document : task.getResult() e através do document acessar os campos dos objetos mapeados, por exemplo document.getString("nome do campo"), no caso de inteiro document.getLong("nome do campo"). Veja o código completo abaixo:
+
+ db.collection("minha lista")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<String> lista = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String nome = document.getString("nome do campo");
+                            int idade = Objects.requireNonNull(document.getLong("nome do campo")).intValue();
+                         
+                            Log.d("Dado",document.getId() + " => " + document.getData());
+                        }
+                       
+                    } else {
+                        Log.d("Erro", "Erro ao obter dados: ", task.getException());
+                    }
+                });
+
+Para mais detalhes sobre leitura e gravação de dados no Realtime Database acesse a documentação oficial: https://firebase.google.com/docs/database/android/read-and-write?hl=pt-br#java_2.
+
+Para mais detalhes sobre o Firestore acesse a documentação oficial: https://firebase.google.com/docs/firestore/quickstart?hl=pt-br.
+
+
+Exemplo prático:
+
+
+link:codigos/activity_main.xml[activity_main]
+
+link:codigos/MainActivity.java[MainActivity]
+
+link:codigos/Filme.java[Estudante]
+
 
