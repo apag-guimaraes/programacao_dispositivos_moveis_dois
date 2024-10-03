@@ -1,33 +1,5 @@
-= Alarm Manager
+= Notificações
 
-Uma opção para efetuar operações baseadas em tempo.
+São mensagens emitidas na tela do dispositivo móvel para informar o usuário sobre downloads, atualizações, eventos, etc. As notificações podem ser emitidos por aplicativos de terceiros instalados, do próprio sistema operacional, mensagens de operadoras, de promoções, chamadas de telefones não atendidas. Conforme consta na documentação oficial (Google Developers), "uma notificação é uma mensagem que o Android exibe fora da interface do seu app para fornecer ao usuário lembretes, comunicações de outras pessoas ou outros informações oportunas do seu app. Os usuários podem tocar na notificação para abrir seu ou realizar uma ação diretamente da notificação".
 
-Para mais detalhes: GOOGLE DEVELOPERS. Disponível em: https://developer.android.com/training/scheduling/alarms?hl=pt-br#java. Acesso em: 23 fev. 2023.
-
-Exemplos práticos:
-
-- link:um/activity_main.xml[activity_main]
-
-- link:um/MainActivity.java[MainActivity]
-
-- link:um/MyBroadcastReceiver.java[MyBroadcastReceiver]
-
-- No arquivo AndroidManifest.xml, deve-se acrescentar a tag <receiver android:name=".MyBroadcastReceiver"/>
-
-O objetivo do método disparar é criar um AlarmManager no qual dispara um BroadcastReceiver depois de um determinado tempo definido.
-
-Para que o alarme repita em dois em dois minutos, basta trocar o método alarmManager.set() para alarmManager.setRepeating(). 
-
-Veja o exemplo:
-
-alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),1000 * 2, pendingIntent);
-
-Exemplos práticos:
-
-- link:dois/activity_main.xml[activity_main]
-
-- link:dois/MainActivity.java[MainActivity]
-
-- link:dois/MyBroadcastReceiver.java[MyBroadcastReceiver]
-
-- No arquivo AndroidManifest.xml, deve-se acrescentar a tag <receiver android:name=".MyBroadcastReceiver"/>
+Referência do texto entre aspas: GOOGLE DEVELOPERS. Visão geral de notificações. Disponível em: https://developer.android.com/develop/ui/views/notifications?hl=pt-br. Acesso em: 03 de out. 2024.
