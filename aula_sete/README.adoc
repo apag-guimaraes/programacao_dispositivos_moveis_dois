@@ -49,51 +49,6 @@ Exemplos práticos:
 
 
 Atenção: No exemplo 1, como foi uma transmissão de uma ação personalizada, a configuração foi feita de forma programática (dentro da classe MainActivity). No exemplo 2, a definição foi feita no arquivo.xml.
-= Notificações
 
-De acordo com o que consta na documentação oficial, Google Developers (2021), "Uma notificação é uma mensagem que o Android exibe fora da IU do app para
-fornecer ao usuário lembretes, comunicados de outras pessoas ou outras informações oportunas do seu app."
 
-- Referência do texto entre aspas: GOOGLE DEVELOPERS. Visão geral de notificações. Disponível em: 
-https://developer.android.com/guide/topics/ui/notifiers/notifications?hl=pt-br. Acesso em: 23 de fev. 2023.
 
-As notificações podem ser simples, expandidas, ter a capacidade de responder ao toque do usuário. Um ponto importante em relação às notificações, 
-é que é necessário criar um canal antes de exibi-las.
-
-Exemplos práticos:
-
-- link:um/activity_main.xml[activity_main]
-
-- link:um/MainActivity.java[MainActivity]
-
-Antes de criar e emitir uma notificação, é necessário criar um canal. Conforme Google Developers (2020), "Antes de entregar a notificação no Android 8.0 e versões mais recentes, você precisa registrar o canal de notificação do seu app no sistema, transmitindo uma instância de NotificationChannel para createNotificationChannel()."
-
-- Referência do texto entre aspas: GOOGLE DEVELOPERS. Criar uma notificação. Disponível em: https://developer.android.com/training/notify-user/build-notification?hl=pt-br. Acesso em: 23 de fev. 2023.
-
-Exemplos práticos:
-
-- link:dois/activity_main.xml[activity_main]
-
-- link:dois/MainActivity.java[MainActivity]
-
-- link:dois/activity_segunda.xml[activity_segunda]
-
-- link:dois/SegundaActivity.java[SegundaActivity]
-
-Observe que neste exemplo, a notificação mostra uma mensagem. Quando o usuário clicar na notificação, será chamada uma outra Activity que apresenta a mensagem "Olá". Esta atividade não pertence ao fluxo normal do aplicativo, por isso foi usada a flag Intent.FLAG_ACTIVITY_NEW_TASK ou
-
-Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-Exemplos práticos:
-
-- link:tres/activity_main.xml[activity_main]
-
-- link:tres/MainActivity.java[MainActivity]
-
-Exemplos práticos:
-
-- link:quatro/activity_main.xml[activity_main]
-
-- link:quatro/notification_layout.xml[notification_layout]
-
-- link:quatro/MainActivity.java[MainActivity]
