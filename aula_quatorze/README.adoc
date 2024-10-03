@@ -52,10 +52,8 @@ Para obter os dados do Firestore basta acessar QueryDocumentSnapshot document : 
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String nome = document.getString("nome do campo");
                             int idade = Objects.requireNonNull(document.getLong("nome do campo")).intValue();
-                         
                             Log.d("Dado",document.getId() + " => " + document.getData());
-                        }
-                       
+                        }  
                     } else {
                         Log.d("Erro", "Erro ao obter dados: ", task.getException());
                     }
@@ -65,14 +63,179 @@ Para mais detalhes sobre leitura e gravação de dados no Realtime Database aces
 
 Para mais detalhes sobre o Firestore acesse a documentação oficial: https://firebase.google.com/docs/firestore/quickstart?hl=pt-br.
 
-
 Exemplo prático:
 
+- activity_main.xml
+[source,xml]
+<!-- //Solução feita pelo estudante Luan Luz --> 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/titulo"
+            />
+            <EditText
+                android:id="@+id/tituloText"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:hint="@string/digite_o_titulo_do_filme"
+                android:layout_height="wrap_content"
+                android:imeOptions="flagNoExtractUi"
+            />
+        </TableRow>
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/nota"
+            />
+            <EditText
+                android:id="@+id/notaText"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:hint="@string/digite_a_nota_para_o_filme"
+                android:layout_height="wrap_content"
+                android:imeOptions="flagNoExtractUi"
+                android:inputType="number"
+            />
+        </TableRow>
+    </TableLayout>
+    <Button
+        android:id="@+id/salvarButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/salvar"
+        android:onClick="criar"
+    />
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+    />
+</LinearLayout>
 
-link:codigos/activity_main.xml[activity_main]
+- MainActivity.java
+[source,java]
+//Solução feita pelo estudante Luan Luz
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+public class MainActivity extends AppCompatActivity {
+    private EditText tituloText;
+    private EditText notaText;
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
+    private final String NOME_COLECAO = "filmes";
+    private FirebaseFirestore db;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        db = FirebaseFirestore.getInstance();
+        tituloText = findViewById(R.id.tituloText);
+        notaText = findViewById(R.id.notaText);
+        listView = findViewById(R.id.listView);
+        adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                new ArrayList<>()
+        );
+        listView.setAdapter(adapter);
+        obterDados();
+    }
+    public void criar(View view) {
+        String tituloTextValue = tituloText.getText().toString();
+        String notaTextValue = notaText.getText().toString();
+        if (tituloTextValue.isEmpty() || notaTextValue.isEmpty()) {
+            return;
+        }
+        limparCampos();
+        int nota = Integer.parseInt(notaTextValue);
+        Filme filme = new Filme(tituloTextValue, nota);
+        db.collection(NOME_COLECAO)
+                .add(filme.toMap())
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(this, "Sucesso ao cadastrar filme", Toast.LENGTH_LONG).show();
+                    obterDados();
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Cadastro", "Erro ao cadastrar", e);
+                });
+    }
+    private void obterDados() {
+        db.collection(NOME_COLECAO)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<String> lista = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String titulo = document.getString("titulo");
+                            int nota = Objects.requireNonNull(document.getLong("nota")).intValue();
+                            lista.add(titulo + " - " + nota);
+                            Log.d("Dado",document.getId() + " => " + document.getData());
+                        }
+                        adapter.clear();
+                        adapter.addAll(lista);
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        Log.d("Erro", "Erro ao obter dados: ", task.getException());
+                    }
+                });
+    }
+    private void limparCampos() {
+        tituloText.setText("");
+        notaText.setText("");
+    }
+}
 
-link:codigos/MainActivity.java[MainActivity]
+- Filme.java
+[source,java]
+//Solução feita pelo estudante Luan Luz
+import java.util.HashMap;
+import java.util.Map;
+public class Filme {
+    public String titulo;
+    public int nota;
+    public Filme() {}
+    public Filme(String titulo, int nota) {
+        this.titulo = titulo;
+        this.nota = nota;
+    }
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("titulo", titulo);
+        result.put("nota", nota);
+        return result;
+    }
+}
 
-link:codigos/Filme.java[Estudante]
+ 
 
 
