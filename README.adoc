@@ -11,9 +11,20 @@
 //make slides
 //make ebook
 
+ifdef::env-github,env-browser[]
+// Exibe ícones para os blocos como NOTE e IMPORTANT no GitHub
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+
 = Programação para Dispositivos Móveis II
 
 Material de apoio com fins didáticos voltado para o aprendizado em programação móvel Android.
+
+IMPORTANT: Atenção, este material passa por atualizações/modificações.
 
 1. link:aula_um/[Verificação e instação do OPENJDK / Instalação da IDE / Uso do Emulador / Web Service / Consumo e Envio de Dados]
 
