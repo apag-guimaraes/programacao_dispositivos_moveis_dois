@@ -1,4 +1,17 @@
-= Outros Recursos
+//caminho padrão para imagens
+:imagesdir: images
+:figure-caption: Figura
+:doctype: book
+
+//gera apresentacao
+//pode se baixar os arquivos e add no diretório
+:revealjsdir: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0
+
+//GERAR ARQUIVOS
+//make slides
+//make ebook
+
+== Outros Recursos
 
 == Date Picker
 
@@ -8,9 +21,67 @@ Para mais detalhes: GOOGLE DEVELOPERS. DatePicker. Disponível em: https://devel
 
 Exemplos práticos:
 
-- link:um/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:orientation="vertical"
+   tools:context=".MainActivity">
+   <DatePicker
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:datePickerMode="calendar"
+       android:id="@+id/datePicker"/>
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:onClick="clicar"
+       android:text="Date"
+       android:id="@+id/buttonDate"/>
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Date"
+       android:id="@+id/textViewDate"/>
+</LinearLayout>
 
-- link:um/MainActivity.java[MainActivity]
+- link:um/MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.TextView;
+public class MainActivity extends AppCompatActivity {
+   private Button buttonDate;
+   private TextView textViewDate;
+   private DatePicker datePicker;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       datePicker=findViewById(R.id.datePicker);
+       buttonDate=findViewById(R.id.buttonDate);
+       textViewDate=findViewById(R.id.textViewDate);
+   }
+   private String obterData(){
+       int dia=0,mes=0,ano=0;
+       String date="";
+       dia=datePicker.getDayOfMonth();
+       mes=datePicker.getMonth();
+       ano=datePicker.getYear();
+       date=dia+"/"+mes+"/"+ano;
+       return date;
+   }
+   public void clicar(View view) {
+       textViewDate.setText(obterData());
+   }
+}//class
 
 == Date Picker Dialog
 
@@ -20,9 +91,75 @@ Para mais detalhes: GOOGLE DEVELOPERS. DatePickerDialog. Disponível em: https:/
 
 Exemplos práticos:
 
-- link:dois/activity_main.xml[activity_main]
+- link:dois/activity_main.xml
+[activity_main]
+<?xml version="1.0" encoding="utf-8"?>
 
-- link:dois/MainActivity.java[MainActivity]
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+
+   xmlns:tools="http://schemas.android.com/tools"
+
+   android:layout_width="match_parent"
+
+   android:layout_height="match_parent"
+
+   android:orientation="vertical"
+
+   tools:context=".MainActivity">
+
+
+   <TextView
+
+       android:layout_width="wrap_content"
+
+       android:layout_height="wrap_content"
+
+       android:text="Date"
+
+       android:onClick="clicar"
+
+       android:id="@+id/textViewDate"/>
+
+
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.app.DatePickerDialog;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.TextView;
+import java.util.Calendar;
+public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+   private TextView textViewDate;
+   private DatePickerDialog datePickerDialog;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       textViewDate=findViewById(R.id.textViewDate);
+   }
+   public void clicar(View view) {
+       if(view.getId() == R.id.textViewDate){
+           Calendar calendar = Calendar.getInstance();
+           int dia = calendar.get(Calendar.DAY_OF_MONTH);
+           int mes = calendar.get(Calendar.MONTH);
+           int ano = calendar.get(Calendar.YEAR);
+           datePickerDialog = new DatePickerDialog(MainActivity.this, this, ano,mes,dia);
+           datePickerDialog.show();
+       }
+   }
+   @Override
+   public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+       String date = day+"/"+month+"/"+year;
+       textViewDate.setText(date);
+   }
+}//class
 
 == Time Picker
 
@@ -32,9 +169,70 @@ Para mais detalhes: GOOGLE DEVELOPERS. TimePicker. Disponível em: https://devel
 
 Exemplos práticos:
 
-- link:tres/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:orientation="vertical"
+   tools:context=".MainActivity">
+   <TimePicker
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:timePickerMode="clock"
+       android:id="@+id/timePicker"/>
+   <Button
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:text="CLICK"
+       android:onClick="clicar"
+       android:id="@+id/button"/>
+</LinearLayout>
 
-- link:tres/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.app.DatePickerDialog;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
+import java.util.Calendar;
+public class MainActivity extends AppCompatActivity  {
+   private TimePicker timePicker;
+   private Button button;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       timePicker = findViewById(R.id.timePicker);
+       timePicker.setIs24HourView(true);
+       button = findViewById(R.id.button);
+   }//onCreate
+   private void obter(){
+       int hora =0,minuto=0;
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+           hora = timePicker.getHour();
+           minuto = timePicker.getMinute();
+       }else{
+           hora = timePicker.getCurrentHour();
+           minuto = timePicker.getCurrentMinute();
+       }
+       String tempo = hora+":"+minuto;
+       Toast.makeText(getApplicationContext(),tempo,Toast.LENGTH_SHORT).show();
+   }
+   public void clicar(View view) {
+      obter();
+   }//method
+}//class
+
 
 == Time Picker Dialog
 
@@ -44,9 +242,49 @@ Para mais detalhes: GOOGLE DEVELOPERS. TimePickerDialog. Disponível em: https:/
 
 Exemplos práticos:
 
-- link:quatro/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
 
-- link:quatro/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.app.DatePickerDialog;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
+import java.util.Calendar;
+public class MainActivity extends AppCompatActivity  {
+   private TimePicker timePicker;
+   private Button button;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       timePicker = findViewById(R.id.timePicker);
+       timePicker.setIs24HourView(true);
+       button = findViewById(R.id.button);
+   }//onCreate
+   private void obter(){
+       int hora =0,minuto=0;
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+           hora = timePicker.getHour();
+           minuto = timePicker.getMinute();
+       }else{
+           hora = timePicker.getCurrentHour();
+           minuto = timePicker.getCurrentMinute();
+       }
+       String tempo = hora+":"+minuto;
+       Toast.makeText(getApplicationContext(),tempo,Toast.LENGTH_SHORT).show();
+   }
+   public void clicar(View view) {
+       obter();
+   }//method
+}//class
 
 == SMS
 
@@ -54,19 +292,120 @@ Recurso que permite acessar o aplicativo de SMS que já vem instalado no disposi
 
 Exemplos práticos (Baseado no conteúdo: How to get the package name of sms app(default) in Android before KitKat version? Disponível em: <https://stackoverflow.com/questions/29471386/how-to-get-the-package-name-of-sms-appdefault-in-android-before-kitkat-version?noredirect=1&lq=1&gt;. Pergunta realizada pelo usuário: https://stackoverflow.com/users/3986081/malleswar-chinta e respondida pelo usuário: https://stackoverflow.com/users/3020568/deniz.):
 
-- link:cinco/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".MainActivity">
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="CLICK"
+       android:id="@+id/buttonSms"
+       android:onClick="clicar"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-- link:cinco/MainActivity.java[MainActivity]
-
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.Telephony;
+import android.view.View;
+import android.widget.Button;
+public class MainActivity extends AppCompatActivity {
+   private Button buttonSms;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       buttonSms = findViewById(R.id.buttonSms);
+   }//onCreate
+   public void clicar(View view){
+       Intent intent = null;
+       if(view.getId()==R.id.buttonSms){
+           if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT){
+               String defaultSmsPackage = Telephony.Sms.getDefaultSmsPackage(getApplicationContext());  //obter o pacote de SMS padrão 
+               intent = new Intent();
+               intent.setAction(Intent.ACTION_SEND); //defini uma ação a ser enviada, ou seja envia algo para alguém, mas não especifica.
+               intent.setType("text/plain");  //defini o tipo de dado
+               intent.putExtra(Intent.EXTRA_TEXT,"hello"); //add informação extra
+               intent.setPackage(defaultSmsPackage); //defina um nome de pacote de aplicativo explícito 
+               startActivity(intent);
+           }else{
+               intent = new Intent();
+               intent.setAction(Intent.ACTION_VIEW); //exiba os dados para o usuário
+               intent.putExtra(Intent.EXTRA_TEXT,"hello2");
+               intent.setType("vnd.android-dir/mms-sms");
+               startActivity(intent);
+           }
+       }
+   }//
+}
 == WhatsApp
 
 Recurso que permite acessar o aplicativo WhatsApp instalado no dispositivo móvel.
 
 Exemplos práticos(Baseado no conteúdo: https://faq.whatsapp.com/android/im-an-android-developer-how-can-i-integrate-whatsapp-with-my-app/?lang=en):
 
-- link:seis/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".MainActivity">
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="CLICK"
+       android:id="@+id/buttonWhatsApp"
+       android:onClick="clicar"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-- link:seis/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+public class MainActivity extends AppCompatActivity {
+   private Button buttonWA;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       buttonWA=findViewById(R.id.buttonWhatsApp);
+   }
+   public void clicar(View v){
+       Intent intent = null;
+       if(v.getId()==R.id.buttonWhatsApp){
+           String text = "hello world";
+           intent = new Intent();
+           intent.setAction(Intent.ACTION_SEND);
+           intent.putExtra(Intent.EXTRA_TEXT,text);
+           intent.setType("text/plain");
+           intent.setPackage("com.whatsapp");
+           startActivity(intent);
+       }
+   }
+}
 
 == Gmail
 
@@ -74,9 +413,58 @@ Recurso que permite acessar o aplicativo Gmail instalado no dispositivo móvel.
 
 Exemplos práticos:
 
-- link:sete/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".MainActivity">
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="CLICK"
+       android:id="@+id/buttonGmail"
+       android:onClick="clicar"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-- link:sete/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+public class MainActivity extends AppCompatActivity {
+   private Button buttonGmail;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       buttonGmail=findViewById(R.id.buttonGmail);
+   }
+   public void clicar(View v){
+       Intent intent = null;
+       if(v.getId()==R.id.buttonGmail){
+           String email = "email@gmail.com";
+           String subject = "MyTitle";
+           String text = "MyText";
+           intent = new Intent(Intent.ACTION_SEND);
+           intent.putExtra(Intent.EXTRA_EMAIL,email);
+           intent.putExtra(Intent.EXTRA_SUBJECT,subject);
+           intent.putExtra(Intent.EXTRA_TEXT,text);
+           intent.setType("text/plain");
+           intent.setPackage("com.google.android.gm");
+           startActivity(intent);
+     }
+   }
+}
 
 == Video View
 
@@ -94,13 +482,178 @@ ANDROID DEVELOPERS BLOG. An introduction to Text-To-Speech in Android. Disponív
 Exemplos práticos(Exemplo adaptado das seguintes fontes: Text to speech (TTS) - Android. Disponível em:<https://stackoverflow.com/questions/3058919/text-to-speechtts-android, pergunta realizada pelo usuário https://stackoverflow.com/users/366916/bharathi e respondida pelo usuário https://stackoverflow.com/users/3166375/sifat-ifty.
 Playing a video in VideoView in Anroid. Disponível em:<https://stackoverflow.com/questions/3263736/playing-a-video-in-videoview-in-android&gt;, pergunta realizada pelo usuário https://stackoverflow.com/users/2355649/muhammad-maqsoodur-rehman e respondida pelo usuário https://stackoverflow.com/users/3681880/suragch.):
 
-- link:oito/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:orientation="vertical"
+   android:layout_margin="10dp"
+   tools:context=".MainActivity">
+   <EditText
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:hint="Digite seu nome"
+       android:id="@+id/editTextNome"/>
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/buttonProximo"
+       android:onClick="clicar"
+       android:text="próximo"/>
+</LinearLayout>
 
-- link:oito/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+public class MainActivity extends AppCompatActivity {
+   private Button button;
+   private EditText editText;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       button = findViewById(R.id.buttonProximo);
+       editText = findViewById(R.id.editTextNome);
+   }//onCreate
+   public void clicar(View view) {
+       if(view.getId() == R.id.buttonProximo){
+           String nome = editText.getText().toString();
+           Intent intent = new Intent(getApplicationContext(),Activity2.class);
+           intent.putExtra("nome",nome);
+           startActivity(intent);
+       }
+   }//clicar
+}
 
-- link:oito/activity_segunda.xml[activity_segunda]
+- activity_segunda.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:orientation="vertical"
+   android:layout_margin="10dp"
+   tools:context=".MainActivity">
+   <VideoView
+       android:id="@+id/videoView"
+       android:layout_width="match_parent"
+       android:layout_height="665dp" />
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:orientation="horizontal"
+       android:layout_height="wrap_content">
+       <Button
+           android:layout_width="0dp"
+           android:layout_weight="1"
+           android:layout_height="wrap_content"
+           android:onClick="click"
+           android:text="play"
+           android:id="@+id/buttonPlay"
+           />
+       <Button
+           android:layout_width="0dp"
+           android:layout_weight="1"
+           android:layout_height="wrap_content"
+           android:onClick="click"
+           android:text="pause"
+           android:id="@+id/buttonPause"
+           />
+       <Button
+           android:layout_width="0dp"
+           android:layout_weight="1"
+           android:layout_height="wrap_content"
+           android:onClick="click"
+           android:text="stop"
+           android:id="@+id/buttonStop"
+           />
+   </LinearLayout>
+</LinearLayout>
 
-- link:oito/SegundaActivity.java[SegundaActivity]
+- SegundaActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+import android.widget.VideoView;
+import java.util.Locale;
+public class Activity2 extends AppCompatActivity implements
+       TextToSpeech.OnInitListener {   //interface para fornecer o método de suporte
+   private VideoView videoView;
+   private Button buttonPlay,buttonPause, buttonStop;
+   private Uri uri;
+   private TextToSpeech textToSpeech;
+   private String msg;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_2);
+       String nome = getIntent().getStringExtra("nome");
+       msg = nome+" seu vídeo está pronto";
+       textToSpeech =  new TextToSpeech(getApplicationContext(),this);
+       videoView = findViewById(R.id.videoView);
+       buttonPlay = findViewById(R.id.buttonPlay);
+       buttonPause = findViewById(R.id.buttonPause);
+       buttonStop = findViewById(R.id.buttonStop);
+       uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video);   //local de onde se encontra o recurso
+       videoView.setVideoURI(uri);  //configura o recurso no VideoView
+   }//onCreate
+   public void click(View view){
+       if(view.getId() == R.id.buttonPlay){
+           int duracao = videoView.getDuration();
+           Toast.makeText(getApplicationContext(),"Tempo total: "+duracao, Toast.LENGTH_SHORT).show();
+           videoView.start();  //começa o vídeo
+       }
+       if(view.getId() == R.id.buttonPause){
+           videoView.pause();
+           int posicao = videoView.getCurrentPosition();  //obtém a posição atual do vídeo
+           Toast.makeText(getApplicationContext(),"Tempo atual: "+posicao, Toast.LENGTH_SHORT).show();
+       }
+       if(view.getId() == R.id.buttonStop){
+           videoView.stopPlayback();  //para o vídeo
+           Toast.makeText(getApplicationContext(),"Vídeo não pode ser mais reproduzido ", Toast.LENGTH_SHORT).show();
+           finish();
+       }
+   }//click
+   @Override
+   public void onInit(int i) {
+       if(i == TextToSpeech.SUCCESS){
+           Locale locale = new Locale("pt","br");  //define o idioma
+           int result = textToSpeech.setLanguage(locale);  //define o idioma no TextToSpeech
+           textToSpeech.setSpeechRate(0.5f);  //define a velocidade da fala
+           if(result == TextToSpeech.LANG_MISSING_DATA ||
+           result == TextToSpeech.LANG_NOT_SUPPORTED){   //verifica se existe suporte ao idioma
+               Log.e("problemasI","problemas com o idioma");
+           }else{
+               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){  //verifica as versões do Android
+                   textToSpeech.speak(msg,TextToSpeech.QUEUE_FLUSH,  //passa a mensagem para o método. Os textos passados aqui serão pronunciados.
+                           null,null);
+               }else{
+                   textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH,
+                           null); //passa a mensagem para o método. Os textos passados aqui serão pronunciados.
+               }
+           }
+       }else{
+           Log.e("problemasT","problemas com o textToSpeech");
+       }
+   }//onInit
+}//class
 
 - criar uma pasta chamada raw no projeto, o vídeo deve estar armazenado dentro desta pasta.
 
