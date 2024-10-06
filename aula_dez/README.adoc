@@ -13,21 +13,143 @@ image:service.png[]
 
 Exemplos práticos:
 
-- link:um/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".MainActivity">
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Hello World!"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"
+       android:onClick="clicar"
+       app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-- link:um/Service1.java[Service1]
+- Service1.java
+[source,java]
+import android.app.IntentService;
+import android.content.Intent;
+import androidx.annotation.Nullable;
+public class Service1 extends IntentService {
+   public Service1() {
+       super("Service 1");
+   }
+   @Override
+   protected void onHandleIntent(@Nullable Intent intent) {
+       System.out.println("serviço....");
+   }
+}
 
-- link:um/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+public class MainActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+    public void clicar(View v){
+        Intent it = new Intent(this, Service2.class);
+        startService(it);
+    }
+}
 
 - No arquivo AndroidManifest.xml, acrescentar a tag  <service android:name=".Service1"/>
 
 Exemplos práticos:
 
-- link:dois/activity_main.xml[activity_main]
+- activity_main.xml
+[activity_main,xml]
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
+public class MainActivity extends AppCompatActivity {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+   }//onCreate
+   public void start(View v){
+       Toast.makeText(this, "start", Toast.LENGTH_SHORT).show();
+       Intent it = new Intent(this,MyService.class);
+       startService(it);
+   }//
+   public void stop(View v){
+       Toast.makeText(this, "stop", Toast.LENGTH_SHORT).show();
+       Intent it = new Intent(this,MyService.class);
+       stopService(it);
+   }//
+}//class
 
-- link:dois/Service2.java[Service2]
+- lService2.java
+[Service2,java]
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
+import androidx.annotation.Nullable;
+public class MyService extends Service {
+   @Override
+   public void onCreate() {
+       super.onCreate();
+       Toast.makeText(this, "onCreate", Toast.LENGTH_SHORT).show();
+   }
+   @Override
+   public int onStartCommand(Intent intent, int flags, int startId) {
+       Toast.makeText(this, "onStart", Toast.LENGTH_SHORT).show();
+       return START_NOT_STICKY;
+   }
+   @Override
+   public void onDestroy() {
+       super.onDestroy();
+       Toast.makeText(this, "onDestroy", Toast.LENGTH_SHORT).show();
+   }
+   @Nullable
+   @Override
+   public IBinder onBind(Intent intent) {
+       return null;
+   }
+}
 
-- link:dois/MainActivity.java[MainActivity]
+- MainActivity.java
+[MainActivity,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
+public class MainActivity extends AppCompatActivity {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+   }//onCreate
+   public void start(View v){
+       Toast.makeText(this, "start", Toast.LENGTH_SHORT).show();
+       Intent it = new Intent(this,MyService.class);
+       startService(it);
+   }//
+   public void stop(View v){
+       Toast.makeText(this, "stop", Toast.LENGTH_SHORT).show();
+       Intent it = new Intent(this,MyService.class);
+       stopService(it);
+   }//
+}//class
 
 - No arquivo AndroidManifest.xml, acrescentar a tag  <service android:name=".Service2"/>
 
