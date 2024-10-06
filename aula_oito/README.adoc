@@ -9,9 +9,60 @@ As notificações podem ser simples, expandidas, ter a capacidade de responder a
 
 Exemplos práticos:
 
-- link:um/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".MainActivity">
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="CLICK"
+       android:id="@+id/button"
+       android:onClick="gerar"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-- link:um/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+public class MainActivity extends AppCompatActivity {
+    private static final String CANAL_ID = "2";  //ID do canal
+    private static final int NOTIFICACAO_ID = 1;   //ID da notificação
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        criarCanal();
+    }//
+    private void criarCanal() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {  //verifica as versões do Android
+            CharSequence nome = "canal1";
+            String descricao = "descrição do canal 1";
+            int importancia = NotificationManager.IMPORTANCE_DEFAULT; //define a prioridade
+            NotificationChannel canal = new NotificationChannel(CANAL_ID, nome, importancia); //cria o objeto referente ao canal, passand o ID do canal, nome e prioridade.
+            canal.setDescription(descricao);
+            //registrando o canal no sistema
+            NotificationManager nm = getSystemService(NotificationManager.class);
+            nm.createNotificationChannel(canal);
+        }
+    }//
+    public void gerar(View view) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CANAL_ID)  //o construtor precisa do contexto e o ID do canal
+                        .setSmallIcon(R.mipmap.ic_launcher)   //defini uma imagem a ser visível
+                        .setContentTitle("Meu título")     //defini um título para a notificação
+                        .setContentText("Meu conteúdo")    //defini o conteúdo da notificação
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);   //a prioridade da notificação
+        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+        nm.notify(NOTIFICACAO_ID, builder.build());  //para exibir a notificação
+    }
+}
 
 Antes de criar e emitir uma notificação, é necessário criar um canal. Conforme Google Developers (2020), "Antes de entregar a notificação no Android 8.0 e versões mais recentes, você precisa registrar o canal de notificação do seu app no sistema, transmitindo uma instância de NotificationChannel para createNotificationChannel()."
 
@@ -19,29 +70,254 @@ Antes de criar e emitir uma notificação, é necessário criar um canal. Confor
 
 Exemplos práticos:
 
-- link:dois/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".MainActivity">
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="CLICK"
+       android:id="@+id/button"
+       android:onClick="gerar"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-- link:dois/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+public class MainActivity extends AppCompatActivity {
+    private static final String CANAL_ID = "2";  //ID do canal
+    private static final int NOTIFICACAO_ID = 1;   //ID da notificação
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        criarCanal();
+    }//
+    private void criarCanal() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {  //verifica as versões do Android
+            CharSequence nome = "canal1";
+            String descricao = "descrição do canal 1";
+            int importancia = NotificationManager.IMPORTANCE_DEFAULT; //define a prioridade
+            NotificationChannel canal = new NotificationChannel(CANAL_ID, nome, importancia); //cria o objeto referente ao canal, passand o ID do canal, nome e prioridade.
+            canal.setDescription(descricao);
+//registrando o canal no sistema
+            NotificationManager nm = getSystemService(NotificationManager.class);
+            nm.createNotificationChannel(canal);
+        }
+    }//
+    public void gerar(View view) {
+//quando a notificação for tocada, será aberta uma outra Activity. A notificação responde ao toque do usuário.
+        Intent i = new Intent(this, Activity2.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
+        Bitmap bitmap = BitmapFactory
+                .decodeResource(this.getResources(), R.drawable.image);  //criando um Bitmap com a imagem contida na pasta drawable
+        Notification builder = new NotificationCompat  //configurando a estrutura da notificação
+                .Builder(this, CANAL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Meu título")
+                .setContentText("Meu conteúdo")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pi)  //Passando o PendingIntent
+                .setLargeIcon(bitmap)
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText("fjasdlkfjadjkladlkajda\n" +
+                                "dakslkdaçlsdkasçldsa\n" +
+                                "kdasldkasçldlkasdsçal\n" +
+                                "ldaskdçlasdkaçldkasl")).build();
+        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+        nm.notify(NOTIFICACAO_ID, builder);
+    }//gerar
+}
 
-- link:dois/activity_segunda.xml[activity_segunda]
+- activity_segunda.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:orientation="vertical"
+   tools:context=".Activity2">
+   <TextView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:text="Olá"/>
+</LinearLayout>
 
-- link:dois/SegundaActivity.java[SegundaActivity]
+- SegundaActivity.java
+[source,java]
+public class SegundaActivity extends AppCompatActivity {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_segunda);
+   }
+}
 
-Observe que neste exemplo, a notificação mostra uma mensagem. Quando o usuário clicar na notificação, será chamada uma outra Activity que apresenta a mensagem "Olá". Esta atividade não pertence ao fluxo normal do aplicativo, por isso foi usada a flag Intent.FLAG_ACTIVITY_NEW_TASK ou
-
-Intent.FLAG_ACTIVITY_CLEAR_TASK
+Observe que neste exemplo, a notificação mostra uma mensagem. Quando o usuário clicar na notificação, será chamada uma outra Activity que apresenta a mensagem "Olá". Esta atividade não pertence ao fluxo normal do aplicativo, por isso foi usada a flag Intent.FLAG_ACTIVITY_NEW_TASK ou Intent.FLAG_ACTIVITY_CLEAR_TASK
 
 Exemplos práticos:
 
-- link:tres/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".MainActivity">
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:onClick="gerar"
+       android:text="Clique"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-- link:tres/MainActivity.java[MainActivity]
+- MainActivity.java
+[source,java]
+public class MainActivity extends AppCompatActivity {
+   private static final String CHANNEL_ID = "2"; //ID do canal
+   private static final int NOTIFICATION_ID = 1;  //ID da notificação
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       criarCanal();
+   }
+   public void gerar(View view) {
+      //construindo a notificação
+       NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+               .setSmallIcon(R.mipmap.ic_launcher)
+               .setContentTitle("Download File")
+               .setContentText("Download in progress")
+               .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+       NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+       int PROGRESS_MAX = 100;
+       new Thread(
+               new Runnable() {
+                   @Override
+                   public void run() {
+                       int PROGRESS_CURRENT;
+                       for (PROGRESS_CURRENT = 0; PROGRESS_CURRENT <= PROGRESS_MAX; PROGRESS_CURRENT += 20) {
+                           builder.setProgress(100, PROGRESS_CURRENT, false);
+                           notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
+                           try {
+                               Thread.sleep(1 * 1000);
+                           } catch (InterruptedException e) {
+                               Log.d("TAG", "sleep failure");
+                       }
+                       builder.setContentText("Download completed")
+                               .setProgress(0, 0, false);
+                       notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
+                   }
+               }
+       ).start();
+   }
+   private void criarCanal() {
+    //compara as versões, pois a classe NotificationChannel está disponível na API 26 e superior
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+           CharSequence name = "canal";
+           String descricao = "descricao do canal 1";
+           int importancia = NotificationManager.IMPORTANCE_DEFAULT;
+           NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importancia); //registra o canal e a prioridade
+           channel.setDescription(descricao);
+           NotificationManager notificationManager = getSystemService(NotificationManager.class);
+           notificationManager.createNotificationChannel(channel);
+       }
+   }
+}
 
 Exemplos práticos:
 
-- link:quatro/activity_main.xml[activity_main]
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".MainActivity">
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:onClick="gerar"
+       android:text="Clique"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-- link:quatro/notification_layout.xml[notification_layout]
+- notification_layout.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:orientation="vertical"
+   android:layout_height="match_parent">
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="match_parent"
+       android:layout_weight="1"
+       android:id="@+id/notification_title"
+       style="@style/TextAppearance.Compat.Notification.Title" />
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="match_parent"
+       android:layout_weight="1"
+       android:text="teste teste teste"
+       android:id="@+id/notification_conteudo"
+       style="@style/TextAppearance.Compat.Notification.Info" />
+</LinearLayout>
 
-- link:quatro/MainActivity.java[MainActivity]
-
+- MainActivity.java
+[source,java]
+public class MainActivity extends AppCompatActivity {
+   private static final String CHANNEL_ID = "2";
+   private int notificationId = 1;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       criarCanalNotificacao();
+   }//
+   public void gerar(View view){
+       RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.notification_small);
+       Notification builder = new NotificationCompat.Builder(this,
+               CHANNEL_ID)
+               .setSmallIcon(R.mipmap.ic_launcher)
+               .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+               .setCustomContentView(notificationLayout)
+               .build();
+       NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+       nm.notify(notificationId,builder);
+   }//
+   private void criarCanalNotificacao(){
+       if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+           CharSequence nome = "canal1";
+           String descricao = "descrição do canal 1";
+           int importance = NotificationManager.IMPORTANCE_DEFAULT;
+           NotificationChannel canal = new NotificationChannel(CHANNEL_ID, nome, importance);
+           canal.setDescription(descricao);
+           NotificationManager nm = getSystemService(NotificationManager.class);
+           nm.createNotificationChannel(canal);
+       }//if
+   }//method
+}
