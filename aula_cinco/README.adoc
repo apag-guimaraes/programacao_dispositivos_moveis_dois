@@ -1,1 +1,17 @@
+== Google Maps
 
+Através do SDK do Android é possível adicionar mapas ao seu projeto. É necessário criar um projeto na Google Cloud e gerar uma chave de API e adicionar essa chave no seu projeto Android. Para mais detalhes em como criar, configurar e ativar a API do SDK Maps, acesse o material disponível na documentação oficial: 
+
+- GOOGLE DEVELOPERS. Configurar seu projeto do Google Cloud. Disponível em: https://developers.google.com/maps/documentation/android-sdk/get-api-key?hl=pt-br. Acessado em: 8 de out. de 2024.
+
+== Outras APIs alternativas
+
+- OpenStreetMap (OSM):
+
+- Mapbox:
+
+- Here Maps:
+
+- Leaflet:
+
+- ArcGIS Runtime SDK for Android:
