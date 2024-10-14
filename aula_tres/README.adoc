@@ -215,15 +215,7 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
-
-
-
-
-
-
-
-
-Exemplos práticos (Elementos do Navigation Drawer):
+Exemplo prático 2 (Elementos do Navigation Drawer):
 
 No arquivo Gradle a nível de módulo, ative o DataBinding
 [source,xml]
