@@ -96,7 +96,7 @@ Exemplo prático 1:
         app:menu="@menu/nav_menu" />
 </androidx.drawerlayout.widget.DrawerLayout>
 
-- fragment_flamengo
+- fragment_flamengo.xml
 [source,xml]
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -116,7 +116,8 @@ Exemplo prático 1:
         android:textSize="20sp" />
 </LinearLayout>
 
-- fragment_corinthians
+- fragment_corinthians.xml
+[source,xml]
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -135,7 +136,8 @@ Exemplo prático 1:
         android:textSize="20sp" />
 </LinearLayout>
 
-- fragment_goias
+- fragment_goias.xml
+[source,xml]
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
