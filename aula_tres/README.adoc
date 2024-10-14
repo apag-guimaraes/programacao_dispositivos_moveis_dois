@@ -340,6 +340,18 @@ Na pasta layout adicione:
         android:text="@string/nav_header_subtitle" />
 </LinearLayout>
 
+- na pasta drawable, crie o arquivo side_nav_bar.xml
+[source,xml]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="135"
+        android:centerColor="@color/yellow_200"
+        android:endColor="@color/yellow_500"
+        android:startColor="@color/yellow_700"
+        android:type="linear" />
+</shape>
+
 - fragment_cake.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
