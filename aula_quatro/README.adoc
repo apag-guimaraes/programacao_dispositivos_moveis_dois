@@ -40,11 +40,146 @@ Para mais detalhes sobre MVVM acesse o material: SOUTO, Thiago. Arquiteturas em 
 Responsabilidades de alguns componentes dentro do MVVM:
 
 - DataBinding: permite o vínculo da View (por exemplo, um TextView) com um ViewModel. O vínculo é feito de forma declarativa no XML.
-- LiveData: é um container que pode ser observado. Isso significa que os componentes da UI (como Activities e Fragments) podem se inscrever para receber atualizações sobre mudanças nos dados. Notifica apenas os observadores que estão em um estado ativo.
+- LiveData: é um tipo que pode ser observado. Isso significa que os componentes da UI (como Activities e Fragments) podem se inscrever para receber atualizações sobre mudanças nos dados. Notifica apenas os observadores que estão em um estado ativo.
 
 O MVVM garante que a interface do usuário seja sempre atualizada de acordo com o ciclo de vida do componente.
 
-- Exemplo prático 01:
+Exemplo prático 01:
+
+Inicialmente no projeto criado habilite o DataBinding, no arquivo gradle a nível de app, acrescente as seguintes linhas:
+[source,xml]
+android{ ... 
+   buildFeatures {
+        dataBinding = true
+    }
+}
+
+- activity_main.xml
+[source,xml]
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.exemplomvvm_00.CalculadoraViewModel" />
+    </data>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <EditText
+            android:id="@+id/editTextN1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Número 1"
+            android:inputType="numberDecimal" />
+        <EditText
+            android:id="@+id/editTextN2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Número2"
+            android:inputType="numberDecimal" />
+        <EditText
+            android:id="@+id/editTextOperador"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Operador (+, -, *, /)" />
+        <Button
+            android:id="@+id/buttonCalcular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Calcular" />
+        <TextView
+            android:id="@+id/textViewResultado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.resultado}" />
+    </LinearLayout>
+</layout>
+
+- Calculadora.java
+[source,java]
+public class Calculadora {
+    public double calcular(double value1, double value2, String operator) {
+        switch (operator) {
+            case "+":
+                return value1 + value2;
+            case "-":
+                return value1 - value2;
+            case "*":
+                return value1 * value2;
+            case "/":
+                if (value2 != 0) {
+                    return value1 / value2;
+                } else {
+                    throw new ArithmeticException("Não pode dividir por zero");
+                }
+            default:
+                throw new IllegalArgumentException("Operador Inválido");
+        }
+    }
+}
+
+- CalculadoraViewModel.java
+[source,java]
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+public class CalculadoraViewModel extends ViewModel {
+    private Calculadora calculadora;
+    private MutableLiveData<String> resultado;
+    public CalculadoraViewModel(){
+        calculadora = new Calculadora();
+        resultado = new MutableLiveData<>();
+    }
+    public LiveData<String> getResultado() {
+        return resultado;
+    }
+    public void calcular(double n1, double n2, String op) {
+            double calculationResult = calculadora.calcular(n1, n2, op);
+            resultado.setValue(String.valueOf(calculationResult));
+        }
+}//class
+
+- MainActivity.java
+[source,java]
+package com.example.exemplomvvm_00;
+import android.os.Bundle;
+import android.view.View;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.databinding.DataBindingUtil;
+import com.example.exemplomvvm_00.databinding.ActivityMainBinding;
+public class MainActivity extends AppCompatActivity {
+    private CalculadoraViewModel viewModel;
+    private ActivityMainBinding binding;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        viewModel = new ViewModelProvider(this)
+                .get(CalculadoraViewModel.class);
+        // Configurando o Data Binding
+        binding.setViewModel(viewModel);
+        binding.setLifecycleOwner(this);
+        binding.buttonCalcular.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                double n1 = Double.parseDouble(binding.editTextN1.getText().toString());
+                double n2 = Double.parseDouble(binding.editTextN2.getText().toString());
+                String op = binding.editTextOperador.getText().toString();
+                viewModel.calcular(n1, n2, op);
+            }
+        });
+    }
+}
+
+
+
+
+
+
+- Exemplo prático:
 
 Inicialmente no projeto criado habilite o DataBinding, no arquivo gradle a nível de app, acrescente as seguintes linhas:
 [source,xml]
