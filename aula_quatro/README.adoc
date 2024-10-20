@@ -44,7 +44,7 @@ Responsabilidades de alguns componentes dentro do MVVM:
 
 O MVVM garante que a interface do usuário seja sempre atualizada de acordo com o ciclo de vida do componente.
 
-Exemplo prático 01:
+Exemplo prático 01 (com DataBinding e ViewModel):
 
 Inicialmente no projeto criado habilite o DataBinding, no arquivo gradle a nível de app, acrescente as seguintes linhas:
 [source,xml]
@@ -174,21 +174,144 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+Exemplo prático 02 (sem DataBinding e com ViewModel):
 
-
-
-
-
-- Exemplo prático:
-
-Inicialmente no projeto criado habilite o DataBinding, no arquivo gradle a nível de app, acrescente as seguintes linhas:
-[source,xml]
-android{ ... 
-   buildFeatures {
-        dataBinding = true
+- Calculadora.java
+[source,java]
+public class Calculadora {
+    public double calcular(double n1, double n2, String op) {
+        switch (op) {
+            case "+":
+                return n1 + n2;
+            case "-":
+                return n1 - n2;
+            case "*":
+                return n1 * n2;
+            case "/":
+                if (n2 != 0) {
+                    return n1 / n2;
+                } else {
+                    throw new ArithmeticException("Cannot divide by zero");
+                }
+            default:
+                throw new IllegalArgumentException("Invalid operator");
+        }
     }
 }
 
+- CalculadoraViewModel.java
+[source,java]
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+public class CalculadoraViewModel extends ViewModel {
+    private Calculadora modelo = new Calculadora();
+    private MutableLiveData<String> resultado = new MutableLiveData<>();
+    public LiveData<String> getResultado() {
+        return resultado;
+    }
+    public void calculate(double n1, double n2, String op) {
+        try {
+            double calculationResult = modelo.calcular(n1, n2, op);
+            resultado.setValue(String.valueOf(calculationResult));
+        } catch (Exception e) {
+            resultado.setValue("Erro: " + e.getMessage());
+        }
+    }
+}
+
+- activity_main.xml
+[source,xml]
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <EditText
+        android:id="@+id/editTextN1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="number 1"
+        android:inputType="numberDecimal" />
+    <EditText
+        android:id="@+id/editTextN2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="number 2"
+        android:inputType="numberDecimal" />
+    <EditText
+        android:id="@+id/editTextOp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Operator (+, -, *, /)" />
+    <Button
+        android:id="@+id/buttonCalculadora"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Calculadora" />
+    <TextView
+        android:id="@+id/textViewResultado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Resultado: " />
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+public class MainActivity extends AppCompatActivity {
+    private CalculadoraViewModel viewModel;
+    private TextView textViewResultado;
+    private Button buttonCalculadora;
+    private EditText editTextN1, editTextN2, editTextOp;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        textViewResultado = findViewById(R.id.textViewResultado);
+        buttonCalculadora = findViewById(R.id.buttonCalculadora);
+        editTextN1 = findViewById(R.id.editTextN1);
+        editTextN2 = findViewById(R.id.editTextN2);
+        editTextOp = findViewById(R.id.editTextOp);
+        viewModel = new ViewModelProvider(this).get(CalculadoraViewModel.class);
+        // Observando a LiveData
+        viewModel.getResultado().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String result) {
+                textViewResultado.setText(result);
+            }
+        });
+       buttonCalculadora.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                double n1 = Double.parseDouble(editTextN1.getText().toString());
+                double n2 = Double.parseDouble(editTextN2.getText().toString());
+                String op = editTextOp.getText().toString();
+                viewModel.calculate(n1, n2, op);
+            }
+        });
+    }
+}
+
+
+
+
+
+
+
+
+
+
+--------
+ 
 - activity_main.xml
 [source,xml]
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
