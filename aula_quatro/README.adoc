@@ -347,7 +347,7 @@ public class AlunoRepositorio {
     }
 }
 
-- AlunoAdapter.java
+- AlunoAdapter.java (Controller)
 [source,java]
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -378,7 +378,7 @@ public class AlunoAdapter extends ArrayAdapter<Aluno> {
     }
 }
 
-- AlunoViewModel.java
+- AlunoViewModel.java (Controller)
 [source,java]
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -400,7 +400,7 @@ public class AlunoViewModel extends ViewModel {
     }
 }
 
-- activity_main.xml
+- activity_main.xml (View)
 [source,xml]
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -412,7 +412,7 @@ public class AlunoViewModel extends ViewModel {
         android:layout_height="wrap_content" />
 </LinearLayout>
 
-- item_aluno.xml
+- item_aluno.xml (View)
 [source,xml]
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -431,7 +431,7 @@ public class AlunoViewModel extends ViewModel {
         android:textSize="14sp" />
 </LinearLayout>
 
-- MainActivity.java
+- MainActivity.java (View)
 [source,java]
 import android.os.Bundle;
 import android.widget.ListView;
