@@ -59,54 +59,76 @@ Exemplos práticos:
 
 - MainActivity.java
 [source,java]
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;  // Importa o LocalBroadcastManager
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 public class MainActivity extends AppCompatActivity {
-    private Button buttonGerar, buttonDisparar;
-    private ListView listViewNumeros;
+    private Button btnGenerateRandomNumber;
+    private Button btnSendBroadcast;
+    private ListView listView;
     private ArrayAdapter<Integer> adapter;
-    private ArrayList<Integer> dados;
-    private int numeroAleatorio;
+    private List<Integer> numberList;
+    private Integer randomNumber;
+    // Nome da ação do broadcast
+    public static final String ACTION_UPDATE_LIST = "com.example.numerosaleatorios.UPDATE_LIST";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        buttonGerar = findViewById(R.id.buttonGerar);
-        buttonDisparar = findViewById(R.id.buttonDisparar);
-        listViewNumeros = findViewById(R.id.listViewNumeros);
-        dados = new ArrayList<>();
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dados);
-        listViewNumeros.setAdapter(adapter);
-        MyBroadcastReceiver myBroadcastReceiver = new MyBroadcastReceiver(); //objeto da classe
-        IntentFilter intentFilter = new IntentFilter();  //cria uma IntentFilter 
-        intentFilter.addAction("com.example.appmybroadcastreceiver.MY_INTENT"); // defini as ações de transmissão. 
-        registerReceiver(myBroadcastReceiver, intentFilter); //registra a classe que irá receber a mensagem do transmissor específico.
-    }//onCreate
-    public void clicar(View v) {
-        switch (v.getId()) {
-            case R.id.buttonGerar:
-                Random random = new Random();
-                numeroAleatorio = random.nextInt(10);
-                Toast.makeText(this, "número gerado", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.buttonDisparar:
-                dispararEvento();
-                break;
-        }//switch
-    }//clicar
-    private void dispararEvento() {
-        Intent intent = new Intent();  //cria-se uma Intent
-        intent.putExtra("numero", numeroAleatorio);  //adiciona-se a informação a ser passada
-        intent.setAction("com.example.appmybroadcastreceiver.MY_INTENT"); //especifica-se o destinatário que recebe este dado extra
-        sendBroadcast(intent); //envia a mensagem
-    }//
-    private class MyBroadcastReceiver extends BroadcastReceiver { //para tratar a mensagem, é necessário estender a classe BroadcastReceiver, pois assim, terá acesso ao método onReceive.
+        btnGenerateRandomNumber = findViewById(R.id.buttonGerar);
+        btnSendBroadcast = findViewById(R.id.buttonDisparar);
+        listView = findViewById(R.id.listViewNumeros);
+        numberList = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, numberList);
+        listView.setAdapter(adapter);
+        // Botão para gerar número aleatório
+        btnGenerateRandomNumber.setOnClickListener(v -> {
+            randomNumber = new Random().nextInt(10) + 1; // Gera número entre 1 e 10
+            //numberList.add("Número Aleatório: " + randomNumber); // Armazena o número gerado
+            Toast.makeText(this, randomNumber.toString(), Toast.LENGTH_SHORT).show();
+        });
+        // Botão para disparar evento de broadcast
+        btnSendBroadcast.setOnClickListener(v -> {
+            Intent intent = new Intent(ACTION_UPDATE_LIST);
+            intent.putExtra("random",randomNumber);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent); // Envia o broadcast local
+        });
+        // Registrar o BroadcastReceiver usando LocalBroadcastManager
+        LocalBroadcastManager.getInstance(this).registerReceiver(updateListReceiver, new IntentFilter(ACTION_UPDATE_LIST));
+    }
+    // BroadcastReceiver para atualizar a lista
+    private final BroadcastReceiver updateListReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {  //método capaz de tratar a mensagem disparada
-            int num = intent.getIntExtra("numero", 0);  //obter o dado extra vindo da Intent
-            dados.add(num); //adiciona o número no ArrayList
-            adapter.notifyDataSetChanged();   //altera o adapter que preenche a ListView
-        }//
-    }//inner class
+        public void onReceive(Context context, Intent intent) {
+            if (ACTION_UPDATE_LIST.equals(intent.getAction())) {
+                // Atualiza a lista quando o broadcast for recebido
+                int num = intent.getIntExtra("random", 0);  //obter o dado extra vindo da Intent
+                numberList.add(num); // Armazena o número gerado
+                adapter.notifyDataSetChanged(); // Notifica o adaptador que a lista foi modificada
+            }
+        }
+    };
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Desregistrar o receiver para evitar vazamento de memória
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(updateListReceiver);
+    }
 }//class
+
 
 Exemplos práticos:
 
