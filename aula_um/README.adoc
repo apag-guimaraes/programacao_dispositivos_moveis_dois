@@ -52,14 +52,14 @@ image::api.png[]
 
 Mais detalhes sobre WebService: POLO, Gabriel. O que é um web service? Disponível em: https://gabrielpolo.medium.com/o-que-%C3%A9-um-webservice-c5104d847a85. Acesso em: 30 de jan. 2023.
 
-Diferenças entre Aplicação Web e Web Services: uma aplicação web é um programa acessado por meio de um navegador por meio do protocolo HTTP/HTTPS. É criado para interação direta com o usuário final, geralmente oferecendo uma interface gráfica (UI) renderizada em HTML, CSS e JavaScript. Exemplo: o site do IFTO. Já Web Services é uma tecnologia que permite a comunicação entre sistemas (máquina - máquina). Exemplo quando o aplicativo no seu celular acessa a API da GoogleMaps.
+Diferenças entre Aplicação Web e Web Services: uma aplicação web é um programa acessado por meio de um navegador usando o protocolo HTTP/HTTPS. É criado para interação direta com o usuário. Geralmente oferece uma interface gráfica (UI) renderizada em HTML, CSS e JavaScript. Exemplo: o site do IFTO. Já Web Services é uma tecnologia que permite a comunicação entre sistemas (máquina - máquina). Exemplo quando o aplicativo no seu celular acessa a API da GoogleMaps.
 
 = Diferenças Fundamentais
 
 [cols="1,2,2", options="header"]
 |===
 | *Aspecto*             | *Aplicação Web*                          | *Web Service*
-| *Público-Alvo*        | Usuários finais (humanos)                | Outros sistemas ou aplicações
+| *Destinatários*       | Usuários humanos                         | Outros sistemas ou aplicações
 | *Interface*           | Interface gráfica (HTML, CSS, JS)        | Interface de programação (API, XML, JSON)
 | *Propósito*           | Oferecer uma experiência interativa      | Fornecer dados ou serviços para integração
 | *Exemplo de Uso*      | Site de reservas de hotel                | API para consultar disponibilidade de quartos
