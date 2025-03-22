@@ -52,19 +52,49 @@ image::api.png[]
 
 Mais detalhes sobre WebService: POLO, Gabriel. O que é um web service? Disponível em: https://gabrielpolo.medium.com/o-que-%C3%A9-um-webservice-c5104d847a85. Acesso em: 30 de jan. 2023.
 
-Diferenças entre Aplicação Web e Web Services
+Diferenças entre Aplicação Web e Web Services: uma aplicação web é um programa acessado por meio de um navegador por meio do protocolo HTTP/HTTPS. É criado para interação direta com o usuário final, geralmente oferecendo uma interface gráfica (UI) renderizada em HTML, CSS e JavaScript. Exemplo: o site do IFTO. Já Web Services é uma tecnologia que permite a comunicação entre sistemas (máquina - máquina). Exemplo quando o aplicativo no seu celular acessa a API da GoogleMaps.
 
-Uma aplicação web é um programa acessado por meio de um navegador por meio do protocolo HTTP/HTTPS. É criado para interação direta com o usuário final, geralmente oferecendo uma interface gráfica (UI) renderizada em HTML, CSS e JavaScript. Exemplo: o site do IFTO.
-
-Web Services é um componente que permite a comunicação entre sistemas (máquina - máquina). Exemplo quando o aplicativo no seu celular acessa a API da GoogleMaps.
-
-| **Aspecto**            | **Aplicação Web**                          | **Web Service**                            |
-|-------------------------|--------------------------------------------|--------------------------------------------|
-| **Destinatários**       | Usuários finais 		               | Outros sistemas ou aplicações             |
-| **Interface**           | Interface gráfica (HTML, CSS, JS)         | Interface de programação (API, XML, JSON) |
-| **Propósito**           | Oferecer uma experiência interativa       | Fornecer dados ou serviços para integração|
-| **Protocolos**          | HTTP/HTTPS com foco em renderização       | HTTP/HTTPS, SOAP, REST, gRPC, etc.        |
-| **Formato de Resposta** | Páginas web (HTML)                        | Dados estruturados (JSON, XML)            |
+<table border="1">
+  <thead>
+    <tr>
+      <th><strong>Aspecto</strong></th>
+      <th><strong>Aplicação Web</strong></th>
+      <th><strong>Web Service</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Público-Alvo</strong></td>
+      <td>Usuários finais (humanos)</td>
+      <td>Outros sistemas ou aplicações</td>
+    </tr>
+    <tr>
+      <td><strong>Interface</strong></td>
+      <td>Interface gráfica (HTML, CSS, JS)</td>
+      <td>Interface de programação (API, XML, JSON)</td>
+    </tr>
+    <tr>
+      <td><strong>Propósito</strong></td>
+      <td>Oferecer uma experiência interativa</td>
+      <td>Fornecer dados ou serviços para integração</td>
+    </tr>
+    <tr>
+      <td><strong>Exemplo de Uso</strong></td>
+      <td>Site de reservas de hotel</td>
+      <td>API para consultar disponibilidade de quartos</td>
+    </tr>
+    <tr>
+      <td><strong>Protocolos</strong></td>
+      <td>HTTP/HTTPS com foco em renderização</td>
+      <td>HTTP/HTTPS, SOAP, REST, gRPC, etc.</td>
+    </tr>
+    <tr>
+      <td><strong>Formato de Resposta</strong></td>
+      <td>Páginas web (HTML)</td>
+      <td>Dados estruturados (JSON, XML)</td>
+    </tr>
+  </tbody>
+</table>
 
 Exemplo de Web Service usando o modelo de design REST
 
