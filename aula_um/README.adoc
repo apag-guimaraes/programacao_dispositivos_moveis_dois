@@ -374,10 +374,7 @@ No exemplo anterior foi usado o JSON de forma nativa. Existe uma opção mais f�
 
 Consumo/envio JSON com biblioteca (exemplo dois)
 
-Inicialmente deve-se adicionar a biblioteca GSON no projeto, portanto, no arquivo Gradle na área de dependências, adicione a linha: 
-
-implementation("com.google.code.gson:gson:2.11.0")
-[source,java]
+Inicialmente deve-se adicionar a biblioteca GSON no projeto, portanto, no arquivo Gradle na área de dependências, adicione a linha: implementation("com.google.code.gson:gson:2.11.0")
 
 - Estudante.java
 [source,java]
