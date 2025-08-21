@@ -13,96 +13,63 @@
 
 == Exemplos práticos (Consumo/envio JSON com biblioteca remotamente) 
 
-Inicialmente cria-se um novo projeto no Android Studio. No arquivo build.gradle (Module:app) deve ser adicionado a linha implementation ‘com.google.code.gson:gson:2.8.6'. No arquivo AndroidManifest.xml deve ser adicionado a linha <uses-permission android:name="android.permission.INTERNET"/>.
+Inicialmente cria-se um novo projeto no Android Studio. No arquivo build.gradle (Module:app) deve ser adicionado a linha implementation ‘com.google.code.gson:gson:2.11.0'. No arquivo AndroidManifest.xml deve ser adicionado a linha <uses-permission android:name="android.permission.INTERNET"/>.
 
 Neste exemplo, será consumido o JSON retornado da seguinte URL: https://jsonplaceholder.typicode.com/posts/. Antes de implementar a classe MainActivity, primeiro será criado a classe POJO derivada do arquivo JSON. Neste material será usado a biblioteca criada por joelittlejohn, disponível em: http://www.jsonschema2pojo.org/. Esse site permite fazer a conversão de JSON para classe POJO para ser usada com a biblioteca GSON. A figura 1 mostra o site.
 
 image::json_pojo.png[]
 
-- Para saber mais detalhes sobre as anotações @Expose e @SerializedName, acesse o link do site Stack Overflow: https://stackoverflow.com/questions/34752200/gson-expose-vs-serializedname. Pergunta realizada pelo usuário <https://stackoverflow.com/users/867591/ahmed-faisal> em 12 de jan. 2016 e respondida pelo usuário <https://stackoverflow.com/users/8942811/bek> em 7 de set. 2018.  Acesso em: 6 de fev. 2023.
+- Para saber mais detalhes sobre as anotações @Expose e @SerializedName, acesse o link do site Stack Overflow: https://stackoverflow.com/questions/34752200/gson-expose-vs-serializedname. Pergunta realizada pelo usuário <https://stackoverflow.com/users/867591/ahmed-faisal> em 12 de jan. 2016 e respondida pelo usuário <https://stackoverflow.com/users/8942811/bek> em 7 de set. 2018.  Acesso em: 21 de ago. 2025.
 
 Após a criação da class POJO, pode-se dar continuidade no projeto. Os códigos estão disponibilizados a seguir:
 
-- main_activity.xml
-[source,xml]
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:orientation="vertical"
-   android:layout_margin="10dp"
-   tools:context=".MainActivity">
-   <TextView
-       android:layout_width="match_parent"
-       android:id="@+id/dadosID"
-       android:dividerHeight="2dp"
-       android:layout_height="wrap_content">
- </TextView>
-</LinearLayout>
+No arquivo AndroidManifest.xml adicione <uses-permission android:name="android.permission.INTERNET" />
 
-- MainActivity.java
+- Auxilia.java
 [source,java]
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.util.List;
-public class MainActivity extends AppCompatActivity {
-    private TextView textViewID;
-    private final String URL = "https://jsonplaceholder.typicode.com/posts";
-    private StringBuilder builder = null;
-    private List<Item> dadosBaixados = null;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        textViewID = findViewById(R.id.textViewDados);
-        new obterDados().execute();
-    }//onCreate
-    private class obterDados extends AsyncTask<Void, Void, Void>{
-        @Override
-        protected Void doInBackground(Void... voids) {
-            Conexao conexao = new Conexao();
-            InputStream inputStream = conexao.obterRespostaHTTP(URL);
-            Auxilia auxilia = new Auxilia();
-            String textoJSON = auxilia.converter(inputStream);
-            Log.i("JSON", "doInBackground: "+textoJSON);
-            Gson gson = new Gson();
-            builder = new StringBuilder();
-            if(textoJSON != null){
-                Type type = new TypeToken<List<Item>>(){}.getType();
-                dadosBaixados = gson.fromJson(textoJSON,type);
-                for (int i = 0; i < dadosBaixados.size(); i++){
-                    builder.append(dadosBaixados.get(i).getUserId()).append("\n");
-                }//for
-            }else{
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),"Não foi possível obter JSON", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }//if else
-            return null;
-        }//doInBackground
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Toast.makeText(getApplicationContext(),"Download começando...", Toast.LENGTH_SHORT).show();
+import java.io.InputStreamReader;
+public class Auxilia {
+    public String converter(InputStream inputStream) {
+        if (inputStream == null) return null;
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        StringBuilder stringBuilder = new StringBuilder();
+        String conteudo;
+        try {
+            while ((conteudo = bufferedReader.readLine()) != null) {
+                stringBuilder.append(conteudo).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        @Override
-        protected void onPostExecute(Void unused) {
-            super.onPostExecute(unused);
-            textViewID.setText(builder.toString());
+        return stringBuilder.toString();
+    }
+}
+
+- Conexao.java
+[source,java]
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+public class Conexao {
+    public InputStream obterRespostaHTTP(String end) {
+        try {
+            URL url = new URL(end);
+            HttpURLConnection conexao = (HttpURLConnection) url.openConnection();
+            conexao.setRequestMethod("GET");
+            conexao.connect();
+            return new BufferedInputStream(conexao.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    }//inner class
-}//class
+        return null;
+    }
+}
 
 - Item.java
 [source,java]
@@ -121,30 +88,14 @@ public class Item {
     @SerializedName("body")
     @Expose
     private String body;
-    public Integer getUserId() {
-        return userId;
-    }
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-    public Integer getId() {
-        return id;
-    }
-    public void setId(Integer id) {
-        this.id = id;
-    }
-    public String getTitle() {
-        return title;
-    }
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    public String getBody() {
-        return body;
-    }
-    public void setBody(String body) {
-        this.body = body;
-    }
+    public Integer getUserId() { return userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    public String getBody() { return body; }
+    public void setBody(String body) { this.body = body; }
     @Override
     public String toString() {
         return "Item{" +
@@ -156,58 +107,102 @@ public class Item {
     }
 }
 
-- Auxilia.java
+- activity_main.xml
+[source,xml]
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".MainActivity">
+    <ListView
+        android:id="@+id/listViewDados"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp" />
+</LinearLayout>
+
+- MainActivity.java
 [source,java]
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
+import android.os.Bundle;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-public class Auxilia {
-    public String converter(InputStream inputStream){
-        InputStreamReader inputStreamReader=
-                new InputStreamReader(inputStream);
-        BufferedReader bufferedReader=new BufferedReader(inputStreamReader);
-        StringBuilder stringBuilder=new StringBuilder();
-        String conteudo="";
-        try {
-            while (((conteudo = bufferedReader.readLine())!=null)) {
-                stringBuilder.append(conteudo).append("\n");
-            }//while
-        }catch (IOException e){
-            e.printStackTrace();
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+public class MainActivity extends AppCompatActivity {
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
+    private List<String> listaStrings;
+    private final String URL = "https://jsonplaceholder.typicode.com/posts";
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        listView = findViewById(R.id.listViewDados);
+        listaStrings = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaStrings);
+        listView.setAdapter(adapter);
+        new obterDados().execute();
+    }
+    private class obterDados extends AsyncTask<Void, Void, List<Item>> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(getApplicationContext(), "Download começando...", Toast.LENGTH_SHORT).show();
         }
-        return stringBuilder.toString();
-    }//while
+        @Override
+        protected List<Item> doInBackground(Void... voids) {
+            Conexao conexao = new Conexao();
+            InputStream inputStream = conexao.obterRespostaHTTP(URL);
+            Auxilia auxilia = new Auxilia();
+            String textoJSON = auxilia.converter(inputStream);
+            Log.i("JSON", "doInBackground: " + textoJSON);
+            if (textoJSON != null) {
+                Gson gson = new Gson();
+                Type type = new TypeToken<List<Item>>() {}.getType();
+                return gson.fromJson(textoJSON, type);
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(List<Item> dadosBaixados) {
+            super.onPostExecute(dadosBaixados);
+            if (dadosBaixados != null) {
+                listaStrings.clear();
+                for (Item item : dadosBaixados) {
+                    listaStrings.add("UserID: " + item.getUserId()
+                            + "\nID: " + item.getId()
+                            + "\nTítulo: " + item.getTitle()
+                            + "\nBody: " + item.getBody());
+                }
+                adapter.notifyDataSetChanged();
+            } else {
+                Toast.makeText(getApplicationContext(), "Não foi possível obter JSON", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }
 
-- Conexao.java
-[source,java]
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.MalformedInputException;
-public class Conexao {
-    public InputStream obterRespostaHTTP(String end) {
-        try {
-            URL url =new URL(end);
-            HttpURLConnection conexao = (HttpURLConnection)
-                    url.openConnection();
-            conexao.setRequestMethod("GET");
-            return new BufferedInputStream(conexao.getInputStream());
-        }catch (MalformedInputException e){
-            e.printStackTrace();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-}//class
 
-- Referências: As classes Conexao e Auxilia foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m). Acesso em: 30 de jan. 2023.
+
+- Referências: As classes Conexao e Auxilia foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m). Acesso em: 21 de ago. 2025.
 
  - Exemplos práticos (API JSON SERVER)
 
