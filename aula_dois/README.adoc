@@ -25,13 +25,13 @@ Após a criação da class POJO, pode-se dar continuidade no projeto. Os código
 
 No arquivo AndroidManifest.xml adicione <uses-permission android:name="android.permission.INTERNET" />
 
-- Auxilia.java
+- Conversao.java
 [source,java]
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-public class Auxilia {
+public class Conversao {
     public String converter(InputStream inputStream) {
         if (inputStream == null) return null;
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -171,8 +171,8 @@ public class MainActivity extends AppCompatActivity {
         protected List<Item> doInBackground(Void... voids) {
             Conexao conexao = new Conexao();
             InputStream inputStream = conexao.obterRespostaHTTP(URL);
-            Auxilia auxilia = new Auxilia();
-            String textoJSON = auxilia.converter(inputStream);
+            Conversao Conversao = new Conversao();
+            String textoJSON = Conversao.converter(inputStream);
             Log.i("JSON", "doInBackground: " + textoJSON);
             if (textoJSON != null) {
                 Gson gson = new Gson();
@@ -200,9 +200,195 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+A classe AsyncTask foi descontinuada, segue a versão abaixo usando a classe Executor:
 
+- AndroidManisfest.xml: <uses-permission android:name="android.permission.INTERNET"/>
 
-- Referências: As classes Conexao e Auxilia foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m). Acesso em: 21 de ago. 2025.
+- Arquivo Gradle: implementation("com.google.code.gson:gson:2.11.0")
+
+- Item.java
+[source,java]
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+public class Item {
+    @SerializedName("userId")
+    @Expose
+    private Integer userId;
+    @SerializedName("id")
+    @Expose
+    private Integer id;
+    @SerializedName("title")
+    @Expose
+    private String title;
+    @SerializedName("body")
+    @Expose
+    private String body;
+    public Integer getUserId() { return userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    public String getBody() { return body; }
+    public void setBody(String body) { this.body = body; }
+    @Override
+    public String toString() {
+        return "Item{" +
+                "userId=" + userId +
+                ", id=" + id +
+                ", title='" + title + '\'' +
+                ", body='" + body + '\'' +
+                '}';
+    }
+}
+
+- Conexao.java
+[source,java]
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+public class Conexao {
+    public InputStream obterRespostaHTTP(String end) {
+        try {
+            URL url = new URL(end);
+            HttpURLConnection conexao = (HttpURLConnection) url.openConnection();
+            conexao.setRequestMethod("GET");
+            conexao.connect();
+            return new BufferedInputStream(conexao.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
+
+- Conversao.java
+[source,java]
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+public class Conversao {
+    public String converter(InputStream inputStream) {
+        if (inputStream == null) return null;
+
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        StringBuilder stringBuilder = new StringBuilder();
+        String conteudo;
+        try {
+            while ((conteudo = bufferedReader.readLine()) != null) {
+                stringBuilder.append(conteudo).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stringBuilder.toString();
+    }
+}
+
+- activity_main.xml
+[source,xml]
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".MainActivity">
+    <ListView
+        android:id="@+id/listViewDados"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp" />
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+public class MainActivity extends AppCompatActivity {
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
+    private List<String> listaStrings;
+    private final String URL = "https://jsonplaceholder.typicode.com/posts";
+    private List<Item> dadosBaixados;
+    private ExecutorService executorService;
+    private Handler mainHandler;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        listView = findViewById(R.id.listViewDados);
+        listaStrings = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaStrings);
+        listView.setAdapter(adapter);
+        executorService = Executors.newSingleThreadExecutor();
+        mainHandler = new Handler(Looper.getMainLooper());
+        obterDados();
+    }
+
+    private void obterDados() {
+        Toast.makeText(getApplicationContext(), "Download começando...", Toast.LENGTH_SHORT).show();
+        executorService.execute(() -> {
+            try {
+                Conexao conexao = new Conexao();
+                InputStream inputStream = conexao.obterRespostaHTTP(URL);
+                Conversao conversao = new Conversao();
+                String textoJSON = conversao.converter(inputStream);
+                Log.i("JSON", "doInBackground: " + textoJSON);
+                if (textoJSON != null) {
+                    Gson gson = new Gson();
+                    Type type = new TypeToken<List<Item>>() {}.getType();
+                    dadosBaixados = gson.fromJson(textoJSON, type);
+                }
+                List<String> finalLista = new ArrayList<>();
+                if (dadosBaixados != null) {
+                    for (Item item : dadosBaixados) {
+                        finalLista.add("UserID: " + item.getUserId()
+                                + "\nID: " + item.getId()
+                                + "\nTítulo: " + item.getTitle()
+                                + "\nBody: " + item.getBody());
+                    }
+                }
+                mainHandler.post(() -> {
+                    if (dadosBaixados != null) {
+                        listaStrings.clear();
+                        listaStrings.addAll(finalLista);
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Não foi possível obter JSON", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                mainHandler.post(() ->
+                        Toast.makeText(getApplicationContext(), "Erro ao baixar dados", Toast.LENGTH_SHORT).show()
+                );
+            }
+        });
+    }
+}
+
+- Referências: As classes Conexao e Conversao foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m). Acesso em: 21 de ago. 2025.
 
  - Exemplos práticos (API JSON SERVER)
 
