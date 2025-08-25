@@ -24,19 +24,18 @@ restritos ou realizar ações restritas."
 - permissões especiais: "Somente a plataforma e os OEMs podem definir permissões especiais."
 
 Referência do texto entre aspas: GOOGLE DEVELOPERS. Permissões no Android. Disponível em: 
-https://developer.android.com/guide/topics/permissions/overview?hl=pt-br>. Acesso em: 23 de fev. 2023.
+https://developer.android.com/guide/topics/permissions/overview?hl=pt-br>. Acesso em: 25 ago. 2025.
 
 Permissões no Android
 
-video::zCAx4WZ98rs[youtube, width=640, height=480]
+image::https://img.youtube.com/vi/zCAx4WZ98rs/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=zCAx4WZ98rs"]
 
 Solicitar permissões
 
-video::x38dYUm7tCY[youtube, width=640, height=480]
+image::https://img.youtube.com/vi/x38dYUm7tCY/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=x38dYUm7tCY"]
 
 Permissões em Tempo de Execução
 
-video::C8lUdPVSzDk[youtube, width=640, height=480]
 image::https://img.youtube.com/vi/C8lUdPVSzDk/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=C8lUdPVSzDk"]
 
 
