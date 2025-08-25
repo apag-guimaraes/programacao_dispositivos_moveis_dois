@@ -1,133 +1,39 @@
 = Broadcast Receiver
 
-Segundo a Google Developers (2019), "Os apps para Android podem enviar ou receber mensagens de transmissão do sistema Android e de outros apps Android". 
+Segundo a Google Developers (2025), "Os apps para Android podem enviar ou receber mensagens de transmissão do sistema Android e de outros apps Android". 
 Para entender com mais facilidade os broadcasts, relembre os tratamentos de eventos presentes na linguagem Java. Evento é algo que acontece no sistema:
 pode ser sua reinicialização; o aparelho habilitado em modo avião; a bateria sendo carregada, a desabilitação da Wi-fi e assim por diante.
 Resumindo: algo acontece, uma classe transmite uma mensagem e outra ficará responsável em tratá-la.
 
-Ainda, de acordo com a  Google Developers (2019), "Os apps podem se registrar para receber transmissões específicas. Quando uma transmissão é enviada,
+Ainda, de acordo com a  Google Developers (2025), "Os apps podem se registrar para receber transmissões específicas. Quando uma transmissão é enviada,
 o sistema a direciona automaticamente para apps que se inscreveram para receber esse tipo específico de transmissão."
 
 Para ocorrer a transmissão da mensagem, é necessário vinculá-la ao um objeto Intent. Através do método setAction é definido o evento que aconteceu. 
 Por meio do método putExtra é possível passar mais dados na transmissão da mensagem.
 
 - Referência do texto entre aspas: GOOGLE DEVELOPERS. Visão geral de transmissões.Disponível em: 
-https://developer.android.com/guide/components/broadcasts#java. Acesso em: 22 de fev. 2023. 
+https://developer.android.com/guide/components/broadcasts#java. Acesso em: 25 de ago. 2025. 
 
 Broadcast Receiver
 
-video::XXVsL3njoCQ[youtube, width=640, height=480]
+image::https://img.youtube.com/vi/XXVsL3njoCQ/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=XXVsL3njoCQ"]
 
 Existem duas maneiras de definir um BroadcastReceiver:
 
-- No arquivo AndroidManifest.xml;
+- No arquivo AndroidManifest.xml (muitos broadcasts não funcionam mais dessa forma nas APIs superiores à 26);
 
 - Pelo contexto, cuja definição é feita por linha de código dentro de uma classe específica.
 
 Para saber mais sobre as ações de transmissões existentes no Android, acesse na sua máquina a pasta do SDK. Por exemplo, na minha máquina o acesso ao 
 arquivo foi: Sdk/platforms/android-31/data/broadcast_actions.txt. 
 
-Exemplos práticos:
+Exemplo 01 (usando LocalBroadcast, não mais usado na API 33):
 
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
-   <Button
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:id="@+id/buttonGerar"
-       android:text="Gerar" />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/buttonDisparar"
-        android:text="Disparar" />
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/listViewNumeros"/>
+-
 
-</LinearLayout>
+Exemplo 02 (com dois apps diferentes, um para gerar o valor e outro para ler):
 
-- MainActivity.java
-[source,java]
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Bundle;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;  // Importa o LocalBroadcastManager
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-public class MainActivity extends AppCompatActivity {
-    private Button btnGenerateRandomNumber;
-    private Button btnSendBroadcast;
-    private ListView listView;
-    private ArrayAdapter<Integer> adapter;
-    private List<Integer> numberList;
-    private Integer randomNumber;
-    // Nome da ação do broadcast
-    public static final String ACTION_UPDATE_LIST = "com.example.numerosaleatorios.UPDATE_LIST";
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        btnGenerateRandomNumber = findViewById(R.id.buttonGerar);
-        btnSendBroadcast = findViewById(R.id.buttonDisparar);
-        listView = findViewById(R.id.listViewNumeros);
-        numberList = new ArrayList<>();
-        adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, numberList);
-        listView.setAdapter(adapter);
-        // Botão para gerar número aleatório
-        btnGenerateRandomNumber.setOnClickListener(v -> {
-            randomNumber = new Random().nextInt(10) + 1; // Gera número entre 1 e 10
-            //numberList.add("Número Aleatório: " + randomNumber); // Armazena o número gerado
-            Toast.makeText(this, randomNumber.toString(), Toast.LENGTH_SHORT).show();
-        });
-        // Botão para disparar evento de broadcast
-        btnSendBroadcast.setOnClickListener(v -> {
-            Intent intent = new Intent(ACTION_UPDATE_LIST);
-            intent.putExtra("random",randomNumber);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent); // Envia o broadcast local
-        });
-        // Registrar o BroadcastReceiver usando LocalBroadcastManager
-        LocalBroadcastManager.getInstance(this).registerReceiver(updateListReceiver, new IntentFilter(ACTION_UPDATE_LIST));
-    }
-    // BroadcastReceiver para atualizar a lista
-    private final BroadcastReceiver updateListReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (ACTION_UPDATE_LIST.equals(intent.getAction())) {
-                // Atualiza a lista quando o broadcast for recebido
-                int num = intent.getIntExtra("random", 0);  //obter o dado extra vindo da Intent
-                numberList.add(num); // Armazena o número gerado
-                adapter.notifyDataSetChanged(); // Notifica o adaptador que a lista foi modificada
-            }
-        }
-    };
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Desregistrar o receiver para evitar vazamento de memória
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(updateListReceiver);
-    }
-}//class
+- 
 
 
 Exemplos práticos:
