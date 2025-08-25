@@ -1,0 +1,193 @@
+= Permissões
+
+Um aplicativo no sistema Android pode usar alguns recursos disponíveis como: 
+
+- câmera;
+
+- galeria de fotos;
+
+- arquivos;
+
+- localização do dispositivo e outros.
+
+Para alguns recursos é necessário solicitar acesso ao usuário, isto é feito através das permissões. As permissões são declaradas no arquivo 
+Android Manifest.xml e algumas são solicitadas em tempo de execução.
+
+Como consta na documentação oficial (Google Developers), existem 3 tipos de permissões:
+
+- permissões em tempo de instalação: "Quando você declara as permissões no momento da instalação, o sistema automaticamente concede-as quando o usuário 
+instala o app.";
+
+- permissões de execução: "[...] conhecidas como permissões perigosas [...] você precisa solicitar permissões de execução no app antes de acessar os dados
+restritos ou realizar ações restritas." 	
+
+- permissões especiais: "Somente a plataforma e os OEMs podem definir permissões especiais."
+
+Referência do texto entre aspas: GOOGLE DEVELOPERS. Permissões no Android. Disponível em: 
+https://developer.android.com/guide/topics/permissions/overview?hl=pt-br>. Acesso em: 25 ago. 2025.
+
+Permissões no Android
+
+image::https://img.youtube.com/vi/zCAx4WZ98rs/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=zCAx4WZ98rs"]
+
+Solicitar permissões
+
+image::https://img.youtube.com/vi/x38dYUm7tCY/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=x38dYUm7tCY"]
+
+Permissões em Tempo de Execução
+
+image::https://img.youtube.com/vi/C8lUdPVSzDk/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=C8lUdPVSzDk"]
+
+
+Exemplos práticos:
+
+- No arquivo AndroidManifest.xml, deve ser acrescentado a tag <uses-permission android:name="android.permission.CAMERA" />.
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        android:id="@+id/buttonHello"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- MainActivity.java
+[source,java]
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PackageManagerCompat;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.Manifest;
+import android.widget.Toast;
+public class MainActivity extends AppCompatActivity {
+    private Button button;
+    private static final int CODIGO_SOLICITACAO = 1;
+    private static final String PERMISSAO = Manifest.permission.CAMERA;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        button = findViewById(R.id.buttonHello);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clicar();
+            }
+        });
+    }//onCreate
+    private void solicitarPermissao(){
+        int temPermissao = ContextCompat.checkSelfPermission(this,
+                PERMISSAO);
+        if(temPermissao != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,
+                    new String[]{PERMISSAO},CODIGO_SOLICITACAO);
+        }//if
+        else{
+            chamarActivity();
+        }
+    }//method
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults.length>0){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                chamarActivity();
+            }else if(grantResults[0] == PackageManager.PERMISSION_DENIED){
+                if(ActivityCompat.shouldShowRequestPermissionRationale(
+                        this, PERMISSAO)){
+                    AlertDialog.Builder builder =
+                            new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("Atenção")
+                            .setMessage("A permissão é necessária para ...")
+                            .setCancelable(false)
+                            .setPositiveButton("SIM", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    ActivityCompat.requestPermissions(MainActivity.this,
+                                            new String[]{PERMISSAO},CODIGO_SOLICITACAO);
+                                }//onClick
+                            })
+                            .setNegativeButton("NÃO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Toast.makeText(getApplicationContext(),"É necessário" +
+                                            " a permissão " +
+                                            "para funcionar",Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }//onClick
+                            });
+                    AlertDialog dialog =  builder.create();
+                    dialog.show();
+                }
+                else{
+                    finish();
+                }
+            }//else if
+        }//if
+    }//method
+    public void clicar(){
+        solicitarPermissao();
+    }//
+    private void chamarActivity() {
+        Intent i = new Intent(getApplicationContext(),
+                SegundaActivity.class);
+        startActivity(i);
+    }//method
+}//class
+
+- activity_segunda.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SegundaActivity">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Activity 2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- SegundaActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+public class SegundaActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_segunda);
+    }
+}
+
+Análise da classe PermissionUtils.java, disponível no seguinte endereço: https://github.com/googlemaps/android-samples/blob/main/ApiDemos/java/app/src/gms/java/com/example/mapdemo/PermissionUtils.java. 
+
+
+
