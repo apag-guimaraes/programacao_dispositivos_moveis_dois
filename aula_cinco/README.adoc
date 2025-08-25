@@ -38,6 +38,26 @@ Permissões em Tempo de Execução
 
 image::https://img.youtube.com/vi/C8lUdPVSzDk/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=C8lUdPVSzDk"]
 
+Algumas permissões definidas como perigosas pela documentação oficial Google Developers (usando como referência a API 33):
+
+- READ_CALENDAR 
+- WRITE_CALENDAR
+- CAMERA 
+- READ_CONTACTS 
+- WRITE_CONTACTS 
+- GET_ACCOUNTS 
+- ACCESS_FINE_LOCATION 
+- ACCESS_COARSE_LOCATION 
+- ACCESS_BACKGROUND_LOCATION 
+- RECORD_AUDIO 
+- READ_PHONE_STATE 
+- CALL_PHONE 
+- READ_CALL_LOG 
+- WRITE_CALL_LOG
+- ADD_VOICEMAIL 
+- BODY_SENSORS
+- SEND_SMS, RECEIVE_SMS, READ_SMS, RECEIVE_WAP_PUSH, RECEIVE_MMS
+- POST_NOTIFICATIONS 
 
 Exemplo 01:
 
@@ -317,7 +337,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
-
 
 - Análise da classe PermissionUtils.java, disponível no seguinte endereço: https://github.com/googlemaps/android-samples/blob/main/ApiDemos/java/app/src/gms/java/com/example/mapdemo/PermissionUtils.java. 
 
