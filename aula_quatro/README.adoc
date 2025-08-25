@@ -27,7 +27,7 @@
 
 = Padrão MVVM
 
-Trata-se de um padrão de projeto de arquitetura, as camadas são divididas em Model, View e View-Model.
+Trata-se de um padrão de projeto arquitetural, as camadas são divididas em Model, View e View-Model.
 
 Model: Responsável pela manipulação dos dados. Nesta parte compreendem as classes que representam as entidades e que realizam as persistências no banco de dados.
 
@@ -35,7 +35,7 @@ View: Parte visual do projeto. A View relaciona-se com o ViewModel e não conhec
 
 ViewModel: Camada intermediária entre a View e o Model. O ViewModel pode ter acesso ao Model diretamente. O ViewModel atualiza o objeto LiveData através da atualização do Model. O LiveData usa o método observe para atualizar a View. 
 
-Para mais detalhes sobre MVVM acesse o material: SOUTO, Thiago. Arquiteturas em Android: MVVM + Kotlin + Android Architecture Components (Databinding, Lifecycle, LiveData, Room). 2019. Disponível em: <https://medium.com/android-dev-br/arquiteturas-em-android-mvvm-kotlin-android-architecture-components-databinding-lifecycle-d5e7a9023cf3>.
+Para mais detalhes sobre MVVM acesse o material: SOUTO, Thiago. Arquiteturas em Android: MVVM + Kotlin + Android Architecture Components (Databinding, Lifecycle, LiveData, Room). 2019. Disponível em: <https://medium.com/android-dev-br/arquiteturas-em-android-mvvm-kotlin-android-architecture-components-databinding-lifecycle-d5e7a9023cf3>.Acessao em 25 ago. 2025.
 
 Responsabilidades de alguns componentes dentro do MVVM:
 
@@ -56,11 +56,12 @@ android{ ...
 
 - activity_main.xml
 [source,xml]
+<?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
             name="viewModel"
-            type="com.example.exemplomvvm_00.CalculadoraViewModel" />
+            type="nomeDoPacote.CalculadoraViewModel" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"
@@ -77,13 +78,14 @@ android{ ...
             android:id="@+id/editTextN2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Número2"
+            android:hint="Número 2"
             android:inputType="numberDecimal" />
         <EditText
             android:id="@+id/editTextOperador"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Operador (+, -, *, /)" />
+            android:hint="Operador (+, -, *, /)"
+            android:inputType="text" />
         <Button
             android:id="@+id/buttonCalcular"
             android:layout_width="wrap_content"
@@ -109,13 +111,9 @@ public class Calculadora {
             case "*":
                 return value1 * value2;
             case "/":
-                if (value2 != 0) {
-                    return value1 / value2;
-                } else {
-                    throw new ArithmeticException("Não pode dividir por zero");
-                }
+                return value1 / value2;
             default:
-                throw new IllegalArgumentException("Operador Inválido");
+                return 0;
         }
     }
 }
@@ -126,8 +124,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 public class CalculadoraViewModel extends ViewModel {
-    private Calculadora calculadora;
-    private MutableLiveData<String> resultado;
+    private final Calculadora calculadora;
+    private final MutableLiveData<String> resultado;
     public CalculadoraViewModel(){
         calculadora = new Calculadora();
         resultado = new MutableLiveData<>();
@@ -138,18 +136,17 @@ public class CalculadoraViewModel extends ViewModel {
     public void calcular(double n1, double n2, String op) {
             double calculationResult = calculadora.calcular(n1, n2, op);
             resultado.setValue(String.valueOf(calculationResult));
-        }
-}//class
+    }
+}
 
 - MainActivity.java
 [source,java]
-package com.example.exemplomvvm_00;
 import android.os.Bundle;
 import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.databinding.DataBindingUtil;
-import com.example.exemplomvvm_00.databinding.ActivityMainBinding;
+import nomeDoPacote.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
     private CalculadoraViewModel viewModel;
     private ActivityMainBinding binding;
@@ -157,17 +154,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        viewModel = new ViewModelProvider(this)
-                .get(CalculadoraViewModel.class);
-        // Configurando o Data Binding
+        viewModel = new ViewModelProvider(this).get(CalculadoraViewModel.class);
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(this);
         binding.buttonCalcular.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 double n1 = Double.parseDouble(binding.editTextN1.getText().toString());
                 double n2 = Double.parseDouble(binding.editTextN2.getText().toString());
-                String op = binding.editTextOperador.getText().toString();
+                String op = binding.editTextOperador.getText().toString().trim();
                 viewModel.calcular(n1, n2, op);
             }
         });
@@ -175,6 +170,57 @@ public class MainActivity extends AppCompatActivity {
 }
 
 Exemplo prático 02 (sem DataBinding e com ViewModel):
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <EditText
+        android:id="@+id/editTextN1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Número 1"
+        android:inputType="numberDecimal"
+        android:padding="8dp"
+        android:textSize="16sp" />
+    <EditText
+        android:id="@+id/editTextN2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Número 2"
+        android:inputType="numberDecimal"
+        android:padding="8dp"
+        android:textSize="16sp" />
+    <EditText
+        android:id="@+id/editTextOp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Operador (+, -, *, /)"
+        android:inputType="text"
+        android:padding="8dp"
+        android:textSize="16sp" />
+    <Button
+        android:id="@+id/buttonCalculadora"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Calcular"
+        android:layout_marginTop="12dp"
+        android:padding="8dp"
+        android:textSize="16sp" />
+    <TextView
+        android:id="@+id/textViewResultado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Resultado: "
+        android:textSize="18sp"
+        android:paddingTop="16dp"
+        android:textStyle="bold" />
+</LinearLayout>
 
 - Calculadora.java
 [source,java]
@@ -188,13 +234,9 @@ public class Calculadora {
             case "*":
                 return n1 * n2;
             case "/":
-                if (n2 != 0) {
                     return n1 / n2;
-                } else {
-                    throw new ArithmeticException("Cannot divide by zero");
-                }
             default:
-                throw new IllegalArgumentException("Invalid operator");
+               return 0;
         }
     }
 }
@@ -205,96 +247,56 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 public class CalculadoraViewModel extends ViewModel {
-    private Calculadora modelo = new Calculadora();
-    private MutableLiveData<String> resultado = new MutableLiveData<>();
+    private final Calculadora modelo = new Calculadora();
+    private final MutableLiveData<String> resultado = new MutableLiveData<>();
     public LiveData<String> getResultado() {
         return resultado;
     }
     public void calculate(double n1, double n2, String op) {
-        try {
             double calculationResult = modelo.calcular(n1, n2, op);
-            resultado.setValue(String.valueOf(calculationResult));
-        } catch (Exception e) {
-            resultado.setValue("Erro: " + e.getMessage());
-        }
+            resultado.setValue("Resultado: " + calculationResult);
     }
 }
-
-- activity_main.xml
-[source,xml]
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
-    <EditText
-        android:id="@+id/editTextN1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="number 1"
-        android:inputType="numberDecimal" />
-    <EditText
-        android:id="@+id/editTextN2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="number 2"
-        android:inputType="numberDecimal" />
-    <EditText
-        android:id="@+id/editTextOp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Operator (+, -, *, /)" />
-    <Button
-        android:id="@+id/buttonCalculadora"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Calculadora" />
-    <TextView
-        android:id="@+id/textViewResultado"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Resultado: " />
-</LinearLayout>
 
 - MainActivity.java
 [source,java]
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcopat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 public class MainActivity extends AppCompatActivity {
     private CalculadoraViewModel viewModel;
     private TextView textViewResultado;
-    private Button buttonCalculadora;
     private EditText editTextN1, editTextN2, editTextOp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         textViewResultado = findViewById(R.id.textViewResultado);
-        buttonCalculadora = findViewById(R.id.buttonCalculadora);
+        Button buttonCalculadora = findViewById(R.id.buttonCalculadora);
         editTextN1 = findViewById(R.id.editTextN1);
         editTextN2 = findViewById(R.id.editTextN2);
         editTextOp = findViewById(R.id.editTextOp);
         viewModel = new ViewModelProvider(this).get(CalculadoraViewModel.class);
-        // Observando a LiveData
         viewModel.getResultado().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String result) {
                 textViewResultado.setText(result);
             }
         });
-       buttonCalculadora.setOnClickListener(new View.OnClickListener() {
+        buttonCalculadora.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                double n1 = Double.parseDouble(editTextN1.getText().toString());
-                double n2 = Double.parseDouble(editTextN2.getText().toString());
-                String op = editTextOp.getText().toString();
+                String s1 = editTextN1.getText().toString().trim();
+                String s2 = editTextN2.getText().toString().trim();
+                String op = editTextOp.getText().toString().trim();
+                double n1 = Double.parseDouble(s1);
+                double n2 = Double.parseDouble(s2);
                 viewModel.calculate(n1, n2, op);
             }
         });
@@ -338,7 +340,7 @@ public class Aluno {
 import java.util.ArrayList;
 import java.util.List;
 public class AlunoRepositorio {
-    public List<Aluno> obterDadosAlunos(){
+    public List<Aluno> obterDadosAlunos() {
         List<Aluno> listaAlunos = new ArrayList<>();
         listaAlunos.add(new Aluno("Ana", 6));
         listaAlunos.add(new Aluno("Rodrigo", 8));
@@ -355,8 +357,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import com.example.exemplomvvm_01.R;
-import com.example.exmplomvvm_01.model.Aluno;
 import java.util.List;
 public class AlunoAdapter extends ArrayAdapter<Aluno> {
     public AlunoAdapter(Context context, List<Aluno> alunos) {
@@ -366,13 +366,14 @@ public class AlunoAdapter extends ArrayAdapter<Aluno> {
     public View getView(int position, View convertView, ViewGroup parent) {
         Aluno aluno = getItem(position);
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_aluno, parent, false);
+            convertView = LayoutInflater.from(getContext())
+                    .inflate(R.layout.item_aluno, parent, false);
         }
         TextView textViewNome = convertView.findViewById(R.id.textViewNome);
-        TextView textViewIdade = convertView.findViewById(R.id.textViewIdade);
+        TextView textViewNota = convertView.findViewById(R.id.textViewNota);
         if (aluno != null) {
             textViewNome.setText(aluno.getNome());
-            textViewIdade.setText(String.valueOf(aluno.getNota()));
+            textViewNota.setText("Nota: " + aluno.getNota());
         }
         return convertView;
     }
@@ -383,13 +384,10 @@ public class AlunoAdapter extends ArrayAdapter<Aluno> {
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import com.example.exemplomvvm_01.model.Aluno;
-import com.example.exemplomvvm_01.model.AlunoRepositorio;
-import java.util.ArrayList;
 import java.util.List;
 public class AlunoViewModel extends ViewModel {
     private final MutableLiveData<List<Aluno>> alunos;
-    private AlunoRepositorio alunoRepositorio;
+    private final AlunoRepositorio alunoRepositorio;
     public AlunoViewModel() {
         alunos = new MutableLiveData<>();
         alunoRepositorio = new AlunoRepositorio();
@@ -402,33 +400,39 @@ public class AlunoViewModel extends ViewModel {
 
 - activity_main.xml (View)
 [source,xml]
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp">
     <ListView
         android:id="@+id/listViewAlunos"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent" />
 </LinearLayout>
 
 - item_aluno.xml (View)
 [source,xml]
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="12dp">
     <TextView
         android:id="@+id/textViewNome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp" />
+        android:text="Nome"
+        android:textSize="18sp"
+        android:textStyle="bold" />
     <TextView
-        android:id="@+id/textViewIdade"
+        android:id="@+id/textViewNota"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        android:text="Nota"
+        android:textSize="16sp" />
 </LinearLayout>
 
 - MainActivity.java (View)
@@ -439,9 +443,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import com.example.exemplomvvm_01.controller.AlunoAdapter;
-import com.example.exemplomvvm_01.controller.AlunoViewModel;
-import com.example.exemplomvvm_01.model.Aluno;
 import java.util.ArrayList;
 import java.util.List;
 public class MainActivity extends AppCompatActivity {
@@ -453,14 +454,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         listViewAlunos = findViewById(R.id.listViewAlunos);
         alunoViewModel = new ViewModelProvider(this).get(AlunoViewModel.class);
-        AlunoAdapter adapter = new AlunoAdapter(this,
-                new ArrayList<>());
+        final AlunoAdapter adapter = new AlunoAdapter(this, new ArrayList<Aluno>());
         listViewAlunos.setAdapter(adapter);
         alunoViewModel.getAlunos().observe(this, new Observer<List<Aluno>>() {
             @Override
             public void onChanged(List<Aluno> alunos) {
                 adapter.clear();
                 adapter.addAll(alunos);
+                adapter.notifyDataSetChanged();
             }
         });
     }
@@ -492,12 +493,9 @@ import java.util.List;
 public class BoloRepositorio {
     public List<Bolo> getBolos() {
         List<Bolo> bolos = new ArrayList<>();
-        bolos.add(new Bolo("Bolo de Fubá",
-                "Receita: Fubá, leite, ovos..."));
-        bolos.add(new Bolo("Bolo de Chocolate",
-                "Receita: Chocolate, leite, ovos..."));
-        bolos.add(new Bolo("Bolo de Mandioca",
-                "Receita: Mandioca, leite, ovos..."));
+        bolos.add(new Bolo("Bolo de Fubá", "Receita: Fubá, leite, ovos..."));
+        bolos.add(new Bolo("Bolo de Chocolate", "Receita: Chocolate, leite, ovos..."));
+        bolos.add(new Bolo("Bolo de Mandioca", "Receita: Mandioca, leite, ovos..."));
         return bolos;
     }
 }
@@ -509,7 +507,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import java.util.List;
 public class BoloViewModel extends ViewModel {
-    private final BoloRepository repository = new BoloRepository();
+    private final BoloRepositorio repository = new BoloRepositorio();
     private final MutableLiveData<List<Bolo>> bolos = new MutableLiveData<>();
     public BoloViewModel() {
         loadBolos();
@@ -524,7 +522,6 @@ public class BoloViewModel extends ViewModel {
 
 - BoloAdapter.java
 [source,java]
-package com.example.exemplomvvm_02;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -540,7 +537,8 @@ public class BoloAdapter extends ArrayAdapter<Bolo> {
     public View getView(int position, View convertView, ViewGroup parent) {
         Bolo bolo = getItem(position);
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_bolo, parent, false);
+            convertView = LayoutInflater.from(getContext())
+                    .inflate(R.layout.item_bolo, parent, false);
         }
         TextView textViewNome = convertView.findViewById(R.id.textViewNome);
         if (bolo != null) {
@@ -571,9 +569,12 @@ public class ReceitaFragment extends Fragment {
     }
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_receita, container, false);
         TextView textViewReceita = view.findViewById(R.id.textViewReceita);
+
         if (getArguments() != null) {
             String receita = getArguments().getString(ARG_RECEITA);
             textViewReceita.setText(receita);
@@ -584,6 +585,7 @@ public class ReceitaFragment extends Fragment {
 
 - item_bolo.xml
 [source,xml]
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -593,11 +595,13 @@ public class ReceitaFragment extends Fragment {
         android:id="@+id/textViewNome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Nome do bolo"
         android:textSize="18sp" />
 </LinearLayout>
 
 - fragment_receita.xml
 [source,xml]
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -607,11 +611,13 @@ public class ReceitaFragment extends Fragment {
         android:id="@+id/textViewReceita"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Receita"
         android:textSize="18sp" />
 </LinearLayout>
 
 - activity_main.xml
 [source,xml]
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -637,8 +643,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import com.example.exemplomvvm_02.Bolo;
-import com.example.exemplomvvm_02.ReceitaFragment;
 import java.util.ArrayList;
 import java.util.List;
 public class MainActivity extends AppCompatActivity {
@@ -650,13 +654,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         listViewBolos = findViewById(R.id.listViewBolos);
         boloViewModel = new ViewModelProvider(this).get(BoloViewModel.class);
-        BoloAdapter adapter = new BoloAdapter(this, new ArrayList<>());
+        final BoloAdapter adapter = new BoloAdapter(this, new ArrayList<Bolo>());
         listViewBolos.setAdapter(adapter);
         boloViewModel.getBolos().observe(this, new Observer<List<Bolo>>() {
             @Override
             public void onChanged(List<Bolo> bolos) {
                 adapter.clear();
                 adapter.addAll(bolos);
+                adapter.notifyDataSetChanged();
             }
         });
         listViewBolos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -666,7 +671,7 @@ public class MainActivity extends AppCompatActivity {
                 if (bolo != null) {
                     ReceitaFragment fragment = ReceitaFragment.newInstance(bolo.getReceita());
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, fragment) // Usando o FrameLayout
+                            .replace(R.id.fragment_container, fragment)
                             .addToBackStack(null)
                             .commit();
                 }
@@ -674,24 +679,3 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
