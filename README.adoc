@@ -34,9 +34,9 @@ IMPORTANT: Atenção, este material está sendo atualizado regularmente.
 
 4. link:aula_quatro/[Padrão MVVM]
 
-5. link:aula_cinco/[Google Maps]
+5. link:aula_cinco/[Permissões] 
 
-6. link:aula_seis/[Permissões]
+6. link:aula_seis/[Google Maps]
 
 7. link:aula_sete[Broadcast Receiver]
 
