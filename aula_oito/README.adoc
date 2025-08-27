@@ -344,157 +344,305 @@ public class SegundaActivity extends AppCompatActivity {
 
 Observe que neste exemplo, a notificação mostra uma mensagem. Quando o usuário clicar na notificação, será chamada uma outra Activity que apresenta a mensagem "Hello World". Esta atividade não pertence ao fluxo normal do aplicativo, por isso foi usada a flag Intent.FLAG_ACTIVITY_NEW_TASK ou Intent.FLAG_ACTIVITY_CLEAR_TASK.
 
-Exemplos práticos:
+Exemplo 03 (Notificação com progress bar):
+
+- No arquivo AndroidManifest.xml acrescente <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
 - activity_main.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   tools:context=".MainActivity">
-   <Button
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:onClick="gerar"
-       android:text="Clique"
-       app:layout_constraintBottom_toBottomOf="parent"
-       app:layout_constraintLeft_toLeftOf="parent"
-       app:layout_constraintRight_toRightOf="parent"
-       app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextPalavra"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gerar notificação!"
+        android:id="@+id/buttonSalvar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</LinearLayout>
 
 - MainActivity.java
 [source,java]
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 public class MainActivity extends AppCompatActivity {
-   private static final String CHANNEL_ID = "2"; //ID do canal
-   private static final int NOTIFICATION_ID = 1;  //ID da notificação
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
-       setContentView(R.layout.activity_main);
-       criarCanal();
-   }
-   public void gerar(View view) {
-      //construindo a notificação
-       NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-               .setSmallIcon(R.mipmap.ic_launcher)
-               .setContentTitle("Download File")
-               .setContentText("Download in progress")
-               .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-       NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
-       int PROGRESS_MAX = 100;
-       new Thread(
-               new Runnable() {
-                   @Override
-                   public void run() {
-                       int PROGRESS_CURRENT;
-                       for (PROGRESS_CURRENT = 0; PROGRESS_CURRENT <= PROGRESS_MAX; PROGRESS_CURRENT += 20) {
-                           builder.setProgress(100, PROGRESS_CURRENT, false);
-                           notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
-                           try {
-                               Thread.sleep(1 * 1000);
-                           } catch (InterruptedException e) {
-                               Log.d("TAG", "sleep failure");
-                       }
-                       builder.setContentText("Download completed")
-                               .setProgress(0, 0, false);
-                       notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
-                   }
-               }
-       ).start();
-   }
-   private void criarCanal() {
-    //compara as versões, pois a classe NotificationChannel está disponível na API 26 e superior
-       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-           CharSequence name = "canal";
-           String descricao = "descricao do canal 1";
-           int importancia = NotificationManager.IMPORTANCE_DEFAULT;
-           NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importancia); //registra o canal e a prioridade
-           channel.setDescription(descricao);
-           NotificationManager notificationManager = getSystemService(NotificationManager.class);
-           notificationManager.createNotificationChannel(channel);
-       }
-   }
+    private static final int REQUEST_NOTIFICACAO = 100;
+    private static final String CHANNEL_ID = "gravar_dado_channel";
+    private static final int NOTIFICATION_ID = 1;
+    private EditText editTextPalavra;
+    private Button buttonSalvar;
+    @Override
+    protected void onCreate(android.os.Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextPalavra = findViewById(R.id.editTextPalavra);
+        buttonSalvar = findViewById(R.id.buttonSalvar);
+        criarCanalNotificacao();
+        buttonSalvar.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+               verificarPermissao();
+            } else {
+                gerarNotificacaoComProgresso();
+            }
+        });
+    }
+    public void verificarPermissao(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            gerarNotificacaoComProgresso();
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+            Toast.makeText(this,
+                    "A permissão é necessária ....",
+                    Toast.LENGTH_LONG).show();
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    REQUEST_NOTIFICACAO);
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    REQUEST_NOTIFICACAO);
+        }
+    }
+    private boolean salvarFrase() {
+        String frase = editTextPalavra.getText().toString().trim();
+        SharedPreferences prefs = getSharedPreferences("dado", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("frase", frase);
+        return editor.commit();
+    }
+    private void criarCanalNotificacao() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence nome = "Gravando Dado";
+            String descricao = "Notificação mostrando progresso de gravação";
+            int importancia = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel canal = new NotificationChannel(CHANNEL_ID, nome, importancia);
+            canal.setDescription(descricao);
+            NotificationManager nm = getSystemService(NotificationManager.class);
+            nm.createNotificationChannel(canal);
+        }
+    }
+    @SuppressLint("MissingPermission")
+    private void gerarNotificacaoComProgresso() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Gravando dado")
+                .setContentText("Processando...")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+        int PROGRESS_MAX = 100;
+        new Thread(() -> {
+            for (int PROGRESS_CURRENT = 0; PROGRESS_CURRENT <= PROGRESS_MAX; PROGRESS_CURRENT += 20) {
+                builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false);
+                notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Log.d("TAG", " thread sleep failure");
+                }
+            }
+            if (salvarFrase()) {
+                builder.setContentText("Gravação concluída")
+                        .setProgress(0, 0, false)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText("Dado salvo!!"));
+                notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
+            } else {
+                builder.setContentText("Falha ao salvar")
+                        .setProgress(0, 0, false)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText("Tente novamente"));
+                notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
+            }
+        }).start();
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_NOTIFICACAO) {
+            if (grantResults.length > 0 && grantResults[0] ==  PackageManager.PERMISSION_GRANTED
+                    ) {
+                gerarNotificacaoComProgresso();
+            } else {
+                Toast.makeText(this,
+                        "Permissão negada",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 }
 
-Exemplos práticos:
+Exemplo 04 (notificação personalizada):
 
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   tools:context=".MainActivity">
-   <Button
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:onClick="gerar"
-       android:text="Clique"
-       app:layout_constraintBottom_toBottomOf="parent"
-       app:layout_constraintLeft_toLeftOf="parent"
-       app:layout_constraintRight_toRightOf="parent"
-       app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+- No arquivo AndroidManifest.xml acrescente <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
 - notification_layout.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   android:layout_width="match_parent"
-   android:orientation="vertical"
-   android:layout_height="match_parent">
-   <TextView
-       android:layout_width="wrap_content"
-       android:layout_height="match_parent"
-       android:layout_weight="1"
-       android:id="@+id/notification_title"
-       style="@style/TextAppearance.Compat.Notification.Title" />
-   <TextView
-       android:layout_width="wrap_content"
-       android:layout_height="match_parent"
-       android:layout_weight="1"
-       android:text="teste teste teste"
-       android:id="@+id/notification_conteudo"
-       style="@style/TextAppearance.Compat.Notification.Info" />
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher_foreground"
+        />
+    <TextView
+        android:id="@+id/notification_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Título da Notificação"
+        style="@style/TextAppearance.Compat.Notification.Title" />
+    <TextView
+        android:id="@+id/notification_conteudo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Conteúdo da notificação"
+        style="@style/TextAppearance.Compat.Notification.Info" />
 </LinearLayout>
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <Button
+        android:id="@+id/buttonGerar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clique"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
 - MainActivity.java
 [source,java]
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.widget.Button;
+import android.widget.RemoteViews;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 public class MainActivity extends AppCompatActivity {
-   private static final String CHANNEL_ID = "2";
-   private int notificationId = 1;
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
-       setContentView(R.layout.activity_main);
-       criarCanalNotificacao();
-   }//
-   public void gerar(View view){
-       RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.notification_small);
-       Notification builder = new NotificationCompat.Builder(this,
-               CHANNEL_ID)
-               .setSmallIcon(R.mipmap.ic_launcher)
-               .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-               .setCustomContentView(notificationLayout)
-               .build();
-       NotificationManagerCompat nm = NotificationManagerCompat.from(this);
-       nm.notify(notificationId,builder);
-   }//
-   private void criarCanalNotificacao(){
-       if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-           CharSequence nome = "canal1";
-           String descricao = "descrição do canal 1";
-           int importance = NotificationManager.IMPORTANCE_DEFAULT;
-           NotificationChannel canal = new NotificationChannel(CHANNEL_ID, nome, importance);
-           canal.setDescription(descricao);
-           NotificationManager nm = getSystemService(NotificationManager.class);
-           nm.createNotificationChannel(canal);
-       }//if
-   }//method
+    private static final String CHANNEL_ID = "2";
+    private static final int REQUEST_NOTIFICACAO = 100;
+    private int notificationId = 1;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        criarCanalNotificacao();
+        Button buttonGerar = findViewById(R.id.buttonGerar);
+        buttonGerar.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                        == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    gerarNotificacao();
+                } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+                    Toast.makeText(this, "Permissão necessária!", Toast.LENGTH_LONG).show();
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                            REQUEST_NOTIFICACAO);
+                } else {
+                    // Primeira vez ou sistema bloqueou pop-up
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                            REQUEST_NOTIFICACAO);
+                }
+            } else {
+                gerarNotificacao();
+            }
+        });
+    }
+    @SuppressLint("MissingPermission")
+    private void gerarNotificacao() {
+        RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.notification_layout);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .setCustomContentView(notificationLayout)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+        nm.notify(notificationId, builder.build());
+    }
+    private void criarCanalNotificacao() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence nome = "canal1";
+            String descricao = "Descrição do canal 1";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel canal = new NotificationChannel(CHANNEL_ID, nome, importance);
+            canal.setDescription(descricao);
+            NotificationManager nm = getSystemService(NotificationManager.class);
+            nm.createNotificationChannel(canal);
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_NOTIFICACAO) {
+            if (grantResults.length > 0 && grantResults[0] ==
+                    PackageManager.PERMISSION_GRANTED) {
+                gerarNotificacao();
+            } else {
+                Toast.makeText(this,
+                        "Permissão negada.",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 }
