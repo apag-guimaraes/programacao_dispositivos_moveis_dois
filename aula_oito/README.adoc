@@ -2,170 +2,347 @@
 
 São mensagens emitidas na tela do dispositivo móvel para informar o usuário sobre downloads, atualizações, eventos, etc. As notificações podem ser emitidos por aplicativos de terceiros instalados, do próprio sistema operacional, mensagens de operadoras, de promoções, chamadas de telefones não atendidas. Conforme consta na documentação oficial (Google Developers), "uma notificação é uma mensagem que o Android exibe fora da interface do seu app para fornecer ao usuário lembretes, comunicações de outras pessoas ou outros informações oportunas do seu app. Os usuários podem tocar na notificação para abrir seu ou realizar uma ação diretamente da notificação".
 
-Referência do texto entre aspas: GOOGLE DEVELOPERS. Visão geral de notificações. Disponível em: https://developer.android.com/develop/ui/views/notifications?hl=pt-br. Acesso em: 03 de out. 2024.
+Referência do texto entre aspas: GOOGLE DEVELOPERS. Visão geral de notificações. Disponível em: https://developer.android.com/develop/ui/views/notifications?hl=pt-br. Acesso em: 27 ago. 2025.
 
 As notificações podem ser simples, expandidas, ter a capacidade de responder ao toque do usuário. Um ponto importante em relação às notificações, 
 é que é necessário criar um canal antes de exibi-las.
 
-Exemplos práticos:
+Exemplo 01 (notificação simples):
+
+- No arquivo AndroidManifest.xml acrescente <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
 - activity_main.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   tools:context=".MainActivity">
-   <Button
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:text="CLICK"
-       android:id="@+id/button"
-       android:onClick="gerar"
-       app:layout_constraintBottom_toBottomOf="parent"
-       app:layout_constraintLeft_toLeftOf="parent"
-       app:layout_constraintRight_toRightOf="parent"
-       app:layout_constraintTop_toTopOf="parent" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gerar Notificação"
+        android:onClick="gerar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
-- MainActivity.java
+- NotificationHelper.java
 [source,java]
-public class MainActivity extends AppCompatActivity {
-    private static final String CANAL_ID = "2";  //ID do canal
-    private static final int NOTIFICACAO_ID = 1;   //ID da notificação
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        criarCanal();
-    }//
-    private void criarCanal() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {  //verifica as versões do Android
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+public class NotificationHelper {
+    private static final String CANAL_ID = "2";  
+    private static final int NOTIFICACAO_ID = 1; 
+    public static void criarCanal(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence nome = "canal1";
             String descricao = "descrição do canal 1";
-            int importancia = NotificationManager.IMPORTANCE_DEFAULT; //define a prioridade
-            NotificationChannel canal = new NotificationChannel(CANAL_ID, nome, importancia); //cria o objeto referente ao canal, passand o ID do canal, nome e prioridade.
+            int importancia = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel canal = new NotificationChannel(CANAL_ID, nome, importancia);
             canal.setDescription(descricao);
-            //registrando o canal no sistema
-            NotificationManager nm = getSystemService(NotificationManager.class);
+            NotificationManager nm = context.getSystemService(NotificationManager.class);
             nm.createNotificationChannel(canal);
         }
-    }//
-    public void gerar(View view) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CANAL_ID)  //o construtor precisa do contexto e o ID do canal
-                        .setSmallIcon(R.mipmap.ic_launcher)   //defini uma imagem a ser visível
-                        .setContentTitle("Meu título")     //defini um título para a notificação
-                        .setContentText("Meu conteúdo")    //defini o conteúdo da notificação
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);   //a prioridade da notificação
-        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
-        nm.notify(NOTIFICACAO_ID, builder.build());  //para exibir a notificação
+    }
+    public static void gerarNotificacao(Context context, String titulo, String conteudo) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            return; 
+        }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CANAL_ID)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle(titulo)
+                .setContentText(conteudo)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationManagerCompat nm = NotificationManagerCompat.from(context);
+        nm.notify(NOTIFICACAO_ID, builder.build());
     }
 }
 
-Antes de criar e emitir uma notificação, é necessário criar um canal. Conforme Google Developers (2020), "Antes de entregar a notificação no Android 8.0 e versões mais recentes, você precisa registrar o canal de notificação do seu app no sistema, transmitindo uma instância de NotificationChannel para createNotificationChannel()."
-
-- Referência do texto entre aspas: GOOGLE DEVELOPERS. Criar uma notificação. Disponível em: https://developer.android.com/training/notify-user/build-notification?hl=pt-br. Acesso em: 23 de fev. 2023.
-
-Exemplos práticos:
-
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   tools:context=".MainActivity">
-   <Button
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:text="CLICK"
-       android:id="@+id/button"
-       android:onClick="gerar"
-       app:layout_constraintBottom_toBottomOf="parent"
-       app:layout_constraintLeft_toLeftOf="parent"
-       app:layout_constraintRight_toRightOf="parent"
-       app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+- PermissionHelper.java
+[source,java]
+import android.Manifest;
+import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import androidx.core.app.ActivityCompat;
+public class PermissionHelper {
+    public static final int REQUEST_NOTIFICACAO = 101;
+    public static boolean temPermissaoNotificacao(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return ActivityCompat.checkSelfPermission(activity,
+                    Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+        }
+        return true; 
+    }
+    public static void pedirPermissaoNotificacao(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!temPermissaoNotificacao(activity)) {
+                ActivityCompat.requestPermissions(activity,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        REQUEST_NOTIFICACAO);
+            }
+        }
+    }
+}
 
 - MainActivity.java
 [source,java]
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
-    private static final String CANAL_ID = "2";  //ID do canal
-    private static final int NOTIFICACAO_ID = 1;   //ID da notificação
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        criarCanal();
-    }//
-    private void criarCanal() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {  //verifica as versões do Android
-            CharSequence nome = "canal1";
-            String descricao = "descrição do canal 1";
-            int importancia = NotificationManager.IMPORTANCE_DEFAULT; //define a prioridade
-            NotificationChannel canal = new NotificationChannel(CANAL_ID, nome, importancia); //cria o objeto referente ao canal, passand o ID do canal, nome e prioridade.
-            canal.setDescription(descricao);
-//registrando o canal no sistema
-            NotificationManager nm = getSystemService(NotificationManager.class);
-            nm.createNotificationChannel(canal);
-        }
-    }//
+        NotificationHelper.criarCanal(this);
+        PermissionHelper.pedirPermissaoNotificacao(this);
+    }
     public void gerar(View view) {
-//quando a notificação for tocada, será aberta uma outra Activity. A notificação responde ao toque do usuário.
-        Intent i = new Intent(this, Activity2.class);
+        if (PermissionHelper.temPermissaoNotificacao(this)) {
+            NotificationHelper.gerarNotificacao(this,
+                    "Título de Teste",
+                    "Esta é a minha notificação :)");
+        } else {
+            Toast.makeText(this,
+                    "Ative a permissão!!!",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PermissionHelper.REQUEST_CODE_NOTIFICACAO) {
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this,
+                        "Permissão concedida",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this,
+                        "Permissão negada",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+}
+
+Antes de criar e emitir uma notificação, é necessário criar um canal. Conforme Google Developers (2025), "Antes de entregar a notificação no Android 8.0 e versões mais recentes, você precisa registrar o canal de notificação do seu app no sistema, transmitindo uma instância de NotificationChannel para createNotificationChannel()."
+
+- Referência do texto entre aspas: GOOGLE DEVELOPERS. Criar uma notificação. Disponível em: https://developer.android.com/training/notify-user/build-notification?hl=pt-br. Acesso em: 27 ago 2025.
+
+Exemplo 02 (notificação expansível):
+
+- No arquivo AndroidManifest.xml acrescente <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <Button
+        android:id="@+id/buttonGerar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gerar Notificação"
+        android:onClick="gerar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- NotificationHelper.java
+[source,java]
+import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+public class NotificationHelper {
+    public static final String CANAL_ID = "canal_notificacao";
+    public static final int NOTIFICACAO_ID = 1;
+    private final Context context;
+    public NotificationHelper(Context context) {
+        this.context = context;
+    }
+    @SuppressLint("MissingPermission")
+    public void gerarNotificacao(String titulo, String conteudo) {
+        criarCanal();
+        Intent i = new Intent(context, SegundaActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
-        Bitmap bitmap = BitmapFactory
-                .decodeResource(this.getResources(), R.drawable.image);  //criando um Bitmap com a imagem contida na pasta drawable
-        Notification builder = new NotificationCompat  //configurando a estrutura da notificação
-                .Builder(this, CANAL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Meu título")
-                .setContentText("Meu conteúdo")
+        PendingIntent pi = PendingIntent.getActivity(context, 0, i,
+              PendingIntent.FLAG_IMMUTABLE);
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.sunflower);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CANAL_ID)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle(titulo)
+                .setContentText(conteudo)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pi)  //Passando o PendingIntent
+                .setContentIntent(pi)
+                .setAutoCancel(true)
                 .setLargeIcon(bitmap)
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText("fjasdlkfjadjkladlkajda\n" +
-                                "dakslkdaçlsdkasçldsa\n" +
-                                "kdasldkasçldlkasdsçal\n" +
-                                "ldaskdçlasdkaçldkasl")).build();
-        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
-        nm.notify(NOTIFICACAO_ID, builder);
-    }//gerar
+                        .bigText("Texto longo de teste\nteste teste\nteste teste teste"));
+        NotificationManagerCompat nm = NotificationManagerCompat.from(context);
+        nm.notify(NOTIFICACAO_ID, builder.build());
+    }
+
+    private void criarCanal() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence nome = "Canal Notificação";
+            String descricao = "Canal para notificações padrão";
+            int importancia = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel canal = new NotificationChannel(CANAL_ID, nome, importancia);
+            canal.setDescription(descricao);
+            NotificationManager nm = context.getSystemService(NotificationManager.class);
+            nm.createNotificationChannel(canal);
+        }
+    }
+}
+
+- PermissionHelper.java
+[source,java]
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+public class PermissionHelper {
+    private final AppCompatActivity activity;
+    public PermissionHelper(AppCompatActivity activity) {
+        this.activity = activity;
+    }
+    public boolean temPermissaoNotificacao() {
+        return ContextCompat.checkSelfPermission(activity,
+                Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+    }
+    public void solicitarPermissao(int requestCode) {
+        // Se o usuário já negou antes → mostra explicação
+        if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
+                Manifest.permission.POST_NOTIFICATIONS)) {
+            Toast.makeText(activity,
+                    "A permissão é necessária." ,
+                    Toast.LENGTH_LONG).show();
+        }
+        ActivityCompat.requestPermissions(
+                activity,
+                new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                requestCode
+        );
+    }
+}
+
+- MainActivity.java
+[source,java]
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.widget.Button;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_NOTIFICACAO = 100;
+    private PermissionHelper permissionHelper;
+    private NotificationHelper notificationHelper;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        permissionHelper = new PermissionHelper(this);
+        notificationHelper = new NotificationHelper(this);
+        Button btn = findViewById(R.id.buttonGerar);
+        btn.setOnClickListener(v -> {
+            if (permissionHelper.temPermissaoNotificacao()) {
+                notificationHelper.gerarNotificacao(
+                        "Título teste",
+                        "Conteúdo teste"
+                );
+            } else {
+                permissionHelper.solicitarPermissao(REQUEST_NOTIFICACAO);
+            }
+        });
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_NOTIFICACAO) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                notificationHelper.gerarNotificacao(
+                        "Permissão concedida!",
+                        "Agora você pode receber notificações."
+                );
+            }
+        }
+    }
 }
 
 - activity_segunda.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:orientation="vertical"
-   tools:context=".Activity2">
-   <TextView
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:text="Olá"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="20dp"
+    tools:context=".SegundaActivity">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:text="Hello World!!" />
 </LinearLayout>
 
 - SegundaActivity.java
 [source,java]
+import android.os.Bundle;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 public class SegundaActivity extends AppCompatActivity {
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
-       setContentView(R.layout.activity_segunda);
-   }
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_segunda);
+    }
 }
 
-Observe que neste exemplo, a notificação mostra uma mensagem. Quando o usuário clicar na notificação, será chamada uma outra Activity que apresenta a mensagem "Olá". Esta atividade não pertence ao fluxo normal do aplicativo, por isso foi usada a flag Intent.FLAG_ACTIVITY_NEW_TASK ou Intent.FLAG_ACTIVITY_CLEAR_TASK
+Observe que neste exemplo, a notificação mostra uma mensagem. Quando o usuário clicar na notificação, será chamada uma outra Activity que apresenta a mensagem "Hello World". Esta atividade não pertence ao fluxo normal do aplicativo, por isso foi usada a flag Intent.FLAG_ACTIVITY_NEW_TASK ou Intent.FLAG_ACTIVITY_CLEAR_TASK.
 
 Exemplos práticos:
 
