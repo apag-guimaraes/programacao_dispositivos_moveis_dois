@@ -2,7 +2,7 @@
 
 Uma opção para efetuar operações baseadas em tempo.
 
-Para mais detalhes: GOOGLE DEVELOPERS. Disponível em: https://developer.android.com/training/scheduling/alarms?hl=pt-br#java. Acesso em: 27 ago. 2024.
+Para mais detalhes: GOOGLE DEVELOPERS. Disponível em: https://developer.android.com/training/scheduling/alarms?hl=pt-br#java. Acesso em: 27 ago. 2025.
 
 Exemplo 01:
 
