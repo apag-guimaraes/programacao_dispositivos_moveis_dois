@@ -159,5 +159,335 @@ public class MainActivity extends AppCompatActivity
     }
 }
 
-Exemplo 02: (criar um provedor de conteúdo em seu app)
+Exemplo 02: (criar dois apps, um para prover o conteúdo e outro para consumir)
+
+App provedor
+
+- No arquivo AndroidManifest.xml acrescentar <provider
+            android:name=".DadosProvider"
+            android:authorities="nomeDaAutoridade"
+            android:exported="true"
+            android:grantUriPermissions="true"/>
+
+- DadosProvider.java
+[source,java]
+import android.content.ContentProvider;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.UriMatcher;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
+import android.net.Uri;
+import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+public class DadosProvider extends ContentProvider {
+    private static final int BANCO_VERSAO = 1;
+    private static final String BANCO_NOME = "meu_banco.db";
+    private static final String BANCO_TABELA = "contato";
+    public static final String ID = "_id";
+    public static final String NOME = "nome";
+    public static final String TELEFONE = "telefone";
+    private static final String CRIA_TABELA =
+            "CREATE TABLE " + BANCO_TABELA + " (" +
+                    ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    NOME + " TEXT, " +
+                    TELEFONE + " TEXT)";
+    private static final String DELETA_TABELA =
+            "DROP TABLE IF EXISTS " + BANCO_TABELA;
+    private SQLiteDatabase banco;
+    private static final String TAG = DadosProvider.class.getSimpleName();
+    public static final String AUTHORITY = "nomeDaAutoridade";
+    public static final String PATH = "dados";
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + PATH);
+    private static final int CODIGO_URI_TODOS = 1;
+    private static final UriMatcher URI_MATCHER;
+    static {
+        URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
+        URI_MATCHER.addURI(AUTHORITY, PATH, CODIGO_URI_TODOS);
+    }
+    @Override
+    public boolean onCreate() {
+        Context context = getContext();
+        BancoHelper helper = new BancoHelper(context);
+        banco = helper.getWritableDatabase();
+        if (banco != null) {
+            Log.i(TAG, "Provedor criado");
+            return true;
+        }
+        return false;
+    }
+    @Nullable
+    @Override
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection,
+                        @Nullable String selection, @Nullable String[] selectionArgs,
+                        @Nullable String sortOrder) {
+        SQLiteQueryBuilder sqb = new SQLiteQueryBuilder();
+        sqb.setTables(BANCO_TABELA);
+        Cursor cursor = sqb.query(banco, projection, selection, selectionArgs,
+                null, null, sortOrder);
+        if (cursor != null) {
+            cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        }
+        Log.i(TAG, "Query executada");
+        return cursor;
+    }
+    @Nullable
+    @Override
+    public String getType(@NonNull Uri uri) {
+        switch (URI_MATCHER.match(uri)) {
+            case CODIGO_URI_TODOS:
+                return "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + PATH;
+            default:
+                throw new IllegalArgumentException("URI inválida: " + uri);
+        }
+    }
+    @Nullable
+    @Override
+    public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
+        long id = banco.insert(BANCO_TABELA, null, values);
+        if (id > 0) {
+            Uri uriID = ContentUris.withAppendedId(CONTENT_URI, id);
+            getContext().getContentResolver().notifyChange(uriID, null);
+            Log.i(TAG, "Dados inseridos: ID = " + id);
+            return uriID;
+        }
+        throw new SQLException("Erro ao inserir registro em " + uri);
+    }
+    @Override
+    public int delete(@NonNull Uri uri, @Nullable String selection,
+                      @Nullable String[] selectionArgs) {
+        int count;
+        switch (URI_MATCHER.match(uri)) {
+            case CODIGO_URI_TODOS:
+                count = banco.delete(BANCO_TABELA, selection, selectionArgs);
+                Log.i(TAG, "Registros deletados: " + count);
+                break;
+            default:
+                throw new IllegalArgumentException("URI inválida para delete: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
+    }
+    @Override
+    public int update(@NonNull Uri uri, @Nullable ContentValues values,
+                      @Nullable String selection, @Nullable String[] selectionArgs) {
+        int count;
+        switch (URI_MATCHER.match(uri)) {
+            case CODIGO_URI_TODOS:
+                count = banco.update(BANCO_TABELA, values, selection, selectionArgs);
+                Log.i(TAG, "Registros alterados: " + count);
+                break;
+            default:
+                throw new IllegalArgumentException("URI inválida para update: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
+    }
+    private static class BancoHelper extends SQLiteOpenHelper {
+        BancoHelper(Context context) {
+            super(context, BANCO_NOME, null, BANCO_VERSAO);
+        }
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL(CRIA_TABELA);
+        }
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL(DELETA_TABELA);
+            onCreate(db);
+        }
+    }
+}
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <Button
+        android:id="@+id/btnAdicionar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Adicionar Contato" />
+    <Button
+        android:id="@+id/btnMostrar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Mostrar Contatos" />
+    <ListView
+        android:id="@+id/lista"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="12dp"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"/>
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import java.util.Random;
+public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
+    private ListView lista;
+    private SimpleCursorAdapter adapter;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Button btnAdicionar = findViewById(R.id.btnAdicionar);
+        Button btnMostrar = findViewById(R.id.btnMostrar);
+        lista = findViewById(R.id.lista);
+        String[] colunas = new String[]{DadosProvider.NOME, DadosProvider.TELEFONE};
+        int[] views = new int[]{android.R.id.text1, android.R.id.text2};
+        adapter = new SimpleCursorAdapter(
+                this,
+                android.R.layout.simple_list_item_2,
+                null,
+                colunas,
+                views,
+                0
+        );
+        lista.setAdapter(adapter);
+        btnAdicionar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ContentValues values = new ContentValues();
+                values.put(DadosProvider.NOME, "Contato " + new Random().nextInt(100));
+                values.put(DadosProvider.TELEFONE, "9999-" + new Random().nextInt(9999));
+                Uri uri = getContentResolver().insert(DadosProvider.CONTENT_URI, values);
+                Log.i(TAG, "Inserido em: " + uri);
+            }
+        });
+        btnMostrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                atualizarLista();
+            }
+        });
+    }
+    private void atualizarLista() {
+        Cursor cursor = getContentResolver().query(
+                DadosProvider.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        adapter.changeCursor(cursor);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (adapter != null && adapter.getCursor() != null) {
+            adapter.getCursor().close();
+        }
+    }
+}
+
+AppCliente
+
+- No AndroidManifest.xml acrescente a tag 
+   <queries>
+        <provider android:authorities="nomeDaAutoridade" />
+    </queries>
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <Button
+        android:id="@+id/btnMostrar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mostrar Contatos" />
+    <ListView
+        android:id="@+id/lista"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="12dp"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"/>
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import androidx.appcompat.app.AppCompatActivity;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+public class MainActivity extends AppCompatActivity {
+    private ListView lista;
+    private SimpleCursorAdapter adapter;
+    private static final String AUTHORITY = "nomeDaAutoridade";
+    private static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/contatos");
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Button btnMostrar = findViewById(R.id.btnMostrar);
+        lista = findViewById(R.id.lista);
+        String[] colunas = new String[]{"nome", "telefone"};
+        int[] views = new int[]{android.R.id.text1, android.R.id.text2};
+        adapter = new SimpleCursorAdapter(
+                this,
+                android.R.layout.simple_list_item_2,
+                null,
+                colunas,
+                views,
+                0
+        );
+        lista.setAdapter(adapter);
+        btnMostrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                atualizarLista();
+            }
+        });
+    }
+    private void atualizarLista() {
+        Cursor cursor = getContentResolver().query(
+                CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        adapter.changeCursor(cursor);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (adapter != null && adapter.getCursor() != null) {
+            adapter.getCursor().close();
+        }
+    }
+}
+
 
