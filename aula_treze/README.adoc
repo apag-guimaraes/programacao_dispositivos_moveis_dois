@@ -688,10 +688,6 @@ No Android é possível gravar áudio com o uso da classe AudioRecord e AudioTra
 
 == Android Accessibility Suite / Android Studio Profiles / Novidades
 
-image::https://img.youtube.com/vi/Ce7q_cu8mvo/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=Ce7q_cu8mvo"]
-
-image::https://img.youtube.com/vi/uTCQ8rAdPGE/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=uTCQ8rAdPGE"]
-
 image::https://img.youtube.com/vi/6hTC-fcVPtk/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=6hTC-fcVPtk"]
 
 image::https://img.youtube.com/vi/-xvnsa-1R1Q/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=-xvnsa-1R1Q"]
