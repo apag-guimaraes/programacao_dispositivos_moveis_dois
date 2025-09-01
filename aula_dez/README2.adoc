@@ -1,0 +1,13 @@
+= Handler
+
+Permite a troca de mensagens entre a pilha de execução principal e uma pilha de execução secundária. Lembre-se a função da thread principal é redenrizar 
+a interface gráfica. Se há a necessidade de fazer uma conexão remota, isto deve ficar a cargo da thread secundária, se um determinado valor presente na 
+thread secundária é necessário para atualizar uma view da interface gráfica, o handler pode ser essa ponte entre as duas threads.
+
+Para mais detalhes sobre handler: GOOGLE DEVELOPERS. Handler. Disponível em: https://developer.android.com/reference/android/os/Handler. Acesso em:
+29 ago. 2025.
+
+Exemplo 01 (POST):
+
+
+Exemplo 02 (MSG):
