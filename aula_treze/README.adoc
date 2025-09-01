@@ -682,7 +682,7 @@ public class Activity2 extends AppCompatActivity implements
 
 - criar uma pasta chamada raw no projeto, o vídeo deve estar armazenado dentro desta pasta.
 
-== Gravar audio
+== Gravar áudio
 
 No Android é possível gravar áudio com o uso da classe AudioRecord e AudioTrack. O repositório disponível em: https://github.com/dolbyio-samples/media-sample-android-recording-local-files fornece exemplos práticos de como usar estas classes em projetos Android. Os perfis dos contribuidores no projeto: https://github.com/alaboy3, https://github.com/j12y e https://github.com/mjren23).  
 
