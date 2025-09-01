@@ -495,7 +495,7 @@ public class MainActivity extends AppCompatActivity {
 
 Recurso que oferece controle de vídeo como: play, pause e stop.
 
-Para mais detalhes: GOOGLE DEVELOPERS. VideoView. Disponível em: https://developer.android.com/reference/android/widget/VideoView. Acesso em: 24 fev. 2023.
+Para mais detalhes: GOOGLE DEVELOPERS. VideoView. Disponível em: https://developer.android.com/reference/android/widget/VideoView. Acesso em: 01 set. 2024.
 
 == Text To Speech
 
@@ -682,15 +682,19 @@ public class Activity2 extends AppCompatActivity implements
 
 - criar uma pasta chamada raw no projeto, o vídeo deve estar armazenado dentro desta pasta.
 
+== Gravar audio
+
+No Android é possível gravar áudio com o uso da classe AudioRecord e AudioTrack. O repositório disponível em: https://github.com/dolbyio-samples/media-sample-android-recording-local-files fornece exemplos práticos de como usar estas classes em projetos Android. Os perfis dos contribuidores no projeto: https://github.com/alaboy3, https://github.com/j12y e https://github.com/mjren23) 
+
 == Android Accessibility Suite / Android Studio Profiles / Novidades
 
-video::Ce7q_cu8mvo[youtube, width=640, height=480]
+image::https://img.youtube.com/vi/Ce7q_cu8mvo/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=Ce7q_cu8mvo"]
 
-video::uTCQ8rAdPGE[youtube, width=640, height=480]
+image::https://img.youtube.com/vi/uTCQ8rAdPGE/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=uTCQ8rAdPGE"]
 
-video::6hTC-fcVPtk[youtube, width=640, height=480]
+image::https://img.youtube.com/vi/6hTC-fcVPtk/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=6hTC-fcVPtk"]
 
-video::-xvnsa-1R1Q[youtube, width=640, height=480]
+image::https://img.youtube.com/vi/-xvnsa-1R1Q/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=-xvnsa-1R1Q"]
 
-video::PfwHq8w9GBc[youtube, width=640, height=480]
+image::https://img.youtube.com/vi/PfwHq8w9GBc/0.jpg[width=640, height=480, link="https://www.youtube.com/watch?v=PfwHq8w9GBc"]
 
