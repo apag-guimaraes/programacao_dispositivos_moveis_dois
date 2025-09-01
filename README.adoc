@@ -44,9 +44,9 @@ IMPORTANT: Atenção, este material está sendo atualizado regularmente.
 
 9. link:aula_nove[Alarm Manager]
 
-10. link:aula_dez[Service]
+10. link:aula_dez[Handler]
 
-11. link:aula_onze[Handler]
+11. link:aula_onze[Service]
 
 12. link:aula_doze[Content Provider]
 
