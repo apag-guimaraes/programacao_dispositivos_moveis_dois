@@ -3,7 +3,7 @@
 Recurso que possibilita compartilhar dados privados entre aplicativos. 
 
 Para mais detalhes: GOOGLE DEVELOPERS. Fundamentos do provedor de conteúdo. Disponível em: 
-https://developer.android.com/guide/topics/providers/content-provider-basics?hl=pt-br. Acesso em: 24 fev. 2023.
+https://developer.android.com/guide/topics/providers/content-provider-basics?hl=pt-br. Acesso em: 01 set. 2025.
 
 Content Provider
 
