@@ -9,7 +9,7 @@ Content Provider
 
 video::fNVMqACYPnQ[youtube, width=640, height=480]
 
-Exemplo 01: (Adaptado de: Stack overflow. Android: não estou obtendo nenhum contato da lista de contatos. 2018. Disponível em: 
+Exemplo 01: (Baseado em: Stack overflow. Android: não estou obtendo nenhum contato da lista de contatos. 2018. Disponível em: 
 https://stackoverflow.com/questions/53956496/android-not-getting-any-contacts-from-contact-list. Pergunta feita pelo usuário 
 https://stackoverflow.com/users/4951663/mohit-suthar e respondida pelo https://stackoverflow.com/users/4390987/%e0%a5%90-rakesh-kumar.):
 
