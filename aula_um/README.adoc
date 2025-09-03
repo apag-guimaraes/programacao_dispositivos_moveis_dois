@@ -63,7 +63,7 @@ Diferenças entre Aplicação Web e Web Services: uma aplicação web é um prog
 | *Interface*           | Interface gráfica (HTML, CSS, JS)        | Interface de programação (API, XML, JSON)
 | *Propósito*           | Oferecer uma experiência interativa      | Fornecer dados ou serviços para integração
 | *Exemplo de Uso*      | Site de reservas de hotel                | API para consultar disponibilidade de quartos
-| *Protocolos*          | HTTP/HTTPS com foco em renderização      | HTTP/HTTPS, SOAP, REST, gRPC, etc.
+| *Protocolos/Modelos*  | HTTP/HTTPS                               | HTTP/HTTPS, SOAP, REST, etc.
 | *Formato de Resposta* | Páginas web (HTML)                       | Dados estruturados (JSON, XML)
 |===
 
