@@ -67,6 +67,10 @@ Diferenças entre Aplicação Web e Web Services: uma aplicação web é um prog
 | *Formato de Resposta* | Páginas web (HTML)                       | Dados estruturados (JSON, XML)
 |===
 
+HTTP -> Protocolo -> Transportar as mensagens
+JSON -> Formato-> Representar os dados
+REST -> Arquitetura-> Organizar as regras de comunicação usando HTTP
+
 Exemplo de Web Service usando o modelo de design REST
 
 Endpoint (URL) do serviço para obter a lista de alunos: https://api.exemplo.com/alunos
