@@ -328,7 +328,7 @@ Na pasta layout adicione:
         <item name="windowNoTitle">true</item>
     </style>
     <style name="Theme.AppNav.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-    <style name="Theme.TesteNav02.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.AppNav.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>
 
 - app_bar_main.xml
