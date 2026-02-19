@@ -26,13 +26,13 @@ Material de apoio com fins didáticos voltado para o aprendizado em programaçã
 
 IMPORTANT: Atenção, este material está sendo atualizado regularmente.
 
-1. link:aula_um/[Verificação e instação do OPENJDK / Instalação da IDE / Uso do Emulador / Web Service / Consumo e Envio de Dados]
+1. link:aula_um/[Verificação e instação do OPENJDK / Instalação da IDE / Uso do Emulador]
 
-2. link:aula_dois/[HTTPS / Uso da lib GSON / Consumo JSON remotamente / Converter JSON em classes POJO]
+2. link:aula_dois/[Padrão MVVM]
 
-3. link:aula_tres/[Navigation Drawer / Animação com JSON]
+3. link:aula_tres/[Web Service / Consumo e Envio de Dados / HTTPS / Uso da lib GSON / Consumo JSON remotamente / Converter JSON em classes POJO]
 
-4. link:aula_quatro/[Padrão MVVM]
+4. link:aula_quatro/[Navigation Drawer / Animação com JSON]
 
 5. link:aula_cinco/[Permissões] 
 
