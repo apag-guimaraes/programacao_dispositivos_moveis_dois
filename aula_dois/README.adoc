@@ -335,7 +335,7 @@ public class AlunoRepositorio {
     }
 }
 
-- AlunoAdapter.java (Controller)
+- AlunoAdapter.java (View)
 [source,java]
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -477,7 +477,7 @@ public class Bolo {
 import java.util.ArrayList;
 import java.util.List;
 public class BoloRepositorio {
-    public List<Bolo> getBolos() {
+    public static List<Bolo> getBolos() {
         List<Bolo> bolos = new ArrayList<>();
         bolos.add(new Bolo("Bolo de Fubá", "Receita: Fubá, leite, ovos..."));
         bolos.add(new Bolo("Bolo de Chocolate", "Receita: Chocolate, leite, ovos..."));
@@ -493,13 +493,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import java.util.List;
 public class BoloViewModel extends ViewModel {
-    private final BoloRepositorio repository = new BoloRepositorio();
     private final MutableLiveData<List<Bolo>> bolos = new MutableLiveData<>();
     public BoloViewModel() {
         loadBolos();
     }
     private void loadBolos() {
-        bolos.setValue(repository.getBolos());
+        bolos.setValue(BoloRepositorio.getBolos());
     }
     public LiveData<List<Bolo>> getBolos() {
         return bolos;
@@ -640,7 +639,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         listViewBolos = findViewById(R.id.listViewBolos);
         boloViewModel = new ViewModelProvider(this).get(BoloViewModel.class);
-        final BoloAdapter adapter = new BoloAdapter(this, new ArrayList<Bolo>());
+        BoloAdapter adapter = new BoloAdapter(this, new ArrayList<Bolo>());
         listViewBolos.setAdapter(adapter);
         boloViewModel.getBolos().observe(this, new Observer<List<Bolo>>() {
             @Override
