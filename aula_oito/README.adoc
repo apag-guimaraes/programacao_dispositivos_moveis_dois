@@ -218,7 +218,6 @@ public class NotificationHelper {
         NotificationManagerCompat nm = NotificationManagerCompat.from(context);
         nm.notify(NOTIFICACAO_ID, builder.build());
     }
-
     private void criarCanal() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence nome = "Canal Notificação";
