@@ -440,7 +440,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         listViewAlunos = findViewById(R.id.listViewAlunos);
         alunoViewModel = new ViewModelProvider(this).get(AlunoViewModel.class);
-        final AlunoAdapter adapter = new AlunoAdapter(this, new ArrayList<Aluno>());
+        AlunoAdapter adapter = new AlunoAdapter(this, new ArrayList<Aluno>());
         listViewAlunos.setAdapter(adapter);
         alunoViewModel.getAlunos().observe(this, new Observer<List<Aluno>>() {
             @Override
@@ -493,7 +493,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import java.util.List;
 public class BoloViewModel extends ViewModel {
-    private final MutableLiveData<List<Bolo>> bolos = new MutableLiveData<>();
+    private MutableLiveData<List<Bolo>> bolos = new MutableLiveData<>();
     public BoloViewModel() {
         loadBolos();
     }
