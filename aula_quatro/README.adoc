@@ -25,657 +25,827 @@
 :lang: pt-BR
 //3+| mesclar linha tabela
 
-= Padrão MVVM
+= Navigation Drawer
 
-Trata-se de um padrão de projeto arquitetural, as camadas são divididas em Model, View e View-Model.
+O Navigation Drawer é um componente que permite construir um menu lateral que desliza no sentido esquerda para a direita. É possível criar um Navigation Drawer do zero, mas atualmente, é disponibilizado o template pronto do Navigation Drawer quando você cria um projeto no Android Studio. Dessa forma, o trabalho fica compreendido em entender as funções de vários elementos que o compõe. Isto pode ser visto logo a seguir nos exemplos práticos.
 
-Model: Responsável pela manipulação dos dados. Nesta parte compreendem as classes que representam as entidades e que realizam as persistências no banco de dados.
+Para mais detalhes:
 
-View: Parte visual do projeto. A View relaciona-se com o ViewModel e não conhece diretamente o Model.
+- GOOGLE MATERIAL DESIGN. Navigation Drawer. Disponível em: https://material.io/components/navigation-drawer. Acessado em: 21 ago. 2025.
 
-ViewModel: Camada intermediária entre a View e o Model. O ViewModel pode ter acesso ao Model diretamente. O ViewModel atualiza o objeto LiveData através da atualização do Model. O LiveData usa o método observe para atualizar a View. 
+Exemplo prático 1:
 
-Para mais detalhes sobre MVVM acesse o material: SOUTO, Thiago. Arquiteturas em Android: MVVM + Kotlin + Android Architecture Components (Databinding, Lifecycle, LiveData, Room). 2019. Disponível em: <https://medium.com/android-dev-br/arquiteturas-em-android-mvvm-kotlin-android-architecture-components-databinding-lifecycle-d5e7a9023cf3>.Acessao em 25 ago. 2025.
-
-Responsabilidades de alguns componentes dentro do MVVM:
-
-- DataBinding: permite o vínculo da View (por exemplo, um TextView) com um ViewModel. O vínculo é feito de forma declarativa no XML.
-- LiveData: é um tipo que pode ser observado. Isso significa que os componentes da UI (como Activities e Fragments) podem se inscrever para receber atualizações sobre mudanças nos dados. Notifica apenas os observadores que estão em um estado ativo.
-
-O MVVM garante que a interface do usuário seja sempre atualizada de acordo com o ciclo de vida do componente.
-
-Exemplo prático 01 (com DataBinding e ViewModel):
-
-Inicialmente no projeto criado habilite o DataBinding, no arquivo gradle a nível de app, acrescente as seguintes linhas:
+- string.xml
 [source,xml]
-android{ ... 
-   buildFeatures {
-        dataBinding = true
-    }
-}
+<resources>
+    <string name="app_name">NavDrawerSimples</string>
+    <string name="navigation_drawer_open">Abrir menu</string>
+    <string name="navigation_drawer_close">Fechar menu</string>
+    <string name="flamengo">Flamengo</string>
+    <string name="corinthians">Corinthians</string>
+    <string name="goias">Goiás</string>
+</resources>
 
-- activity_main.xml
+- colors.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
-    <data>
-        <variable
-            name="viewModel"
-            type="nomeDoPacote.CalculadoraViewModel" />
-    </data>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
-        <EditText
-            android:id="@+id/editTextN1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Número 1"
-            android:inputType="numberDecimal" />
-        <EditText
-            android:id="@+id/editTextN2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Número 2"
-            android:inputType="numberDecimal" />
-        <EditText
-            android:id="@+id/editTextOperador"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Operador (+, -, *, /)"
-            android:inputType="text" />
-        <Button
-            android:id="@+id/buttonCalcular"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Calcular" />
-        <TextView
-            android:id="@+id/textViewResultado"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{viewModel.resultado}" />
-    </LinearLayout>
-</layout>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="green">#8BC34A</color>
+</resources>
 
-- Calculadora.java
-[source,java]
-public class Calculadora {
-    public double calcular(double value1, double value2, String operator) {
-        switch (operator) {
-            case "+":
-                return value1 + value2;
-            case "-":
-                return value1 - value2;
-            case "*":
-                return value1 * value2;
-            case "/":
-                return value1 / value2;
-            default:
-                return 0;
-        }
-    }
-}
-
-- CalculadoraViewModel.java
-[source,java]
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-public class CalculadoraViewModel extends ViewModel {
-    private final Calculadora calculadora;
-    private final MutableLiveData<String> resultado;
-    public CalculadoraViewModel(){
-        calculadora = new Calculadora();
-        resultado = new MutableLiveData<>();
-    }
-    public LiveData<String> getResultado() {
-        return resultado;
-    }
-    public void calcular(double n1, double n2, String op) {
-            double calculationResult = calculadora.calcular(n1, n2, op);
-            resultado.setValue(String.valueOf(calculationResult));
-    }
-}
-
-- MainActivity.java
-[source,java]
-import android.os.Bundle;
-import android.view.View;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.databinding.DataBindingUtil;
-import nomeDoPacote.ActivityMainBinding;
-public class MainActivity extends AppCompatActivity {
-    private CalculadoraViewModel viewModel;
-    private ActivityMainBinding binding;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        viewModel = new ViewModelProvider(this).get(CalculadoraViewModel.class);
-        binding.setViewModel(viewModel);
-        binding.setLifecycleOwner(this);
-        binding.buttonCalcular.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                double n1 = Double.parseDouble(binding.editTextN1.getText().toString());
-                double n2 = Double.parseDouble(binding.editTextN2.getText().toString());
-                String op = binding.editTextOperador.getText().toString().trim();
-                viewModel.calcular(n1, n2, op);
-            }
-        });
-    }
-}
-
-Exemplo prático 02 (sem DataBinding e com ViewModel):
-
-- activity_main.xml
+- nav_menu.xml (pasta menu)
 [source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
-    <EditText
-        android:id="@+id/editTextN1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Número 1"
-        android:inputType="numberDecimal"
-        android:padding="8dp"
-        android:textSize="16sp" />
-    <EditText
-        android:id="@+id/editTextN2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Número 2"
-        android:inputType="numberDecimal"
-        android:padding="8dp"
-        android:textSize="16sp" />
-    <EditText
-        android:id="@+id/editTextOp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Operador (+, -, *, /)"
-        android:inputType="text"
-        android:padding="8dp"
-        android:textSize="16sp" />
-    <Button
-        android:id="@+id/buttonCalculadora"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Calcular"
-        android:layout_marginTop="12dp"
-        android:padding="8dp"
-        android:textSize="16sp" />
-    <TextView
-        android:id="@+id/textViewResultado"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Resultado: "
-        android:textSize="18sp"
-        android:paddingTop="16dp"
-        android:textStyle="bold" />
-</LinearLayout>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_flamengo"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:title="@string/flamengo" />
+    <item
+        android:id="@+id/nav_corinthians"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:title="@string/corinthians" />
+    <item
+        android:id="@+id/nav_goias"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:title="@string/goias" />
+</menu>
 
-- Calculadora.java
-[source,java]
-public class Calculadora {
-    public double calcular(double n1, double n2, String op) {
-        switch (op) {
-            case "+":
-                return n1 + n2;
-            case "-":
-                return n1 - n2;
-            case "*":
-                return n1 * n2;
-            case "/":
-                    return n1 / n2;
-            default:
-               return 0;
-        }
-    }
-}
-
-- CalculadoraViewModel.java
-[source,java]
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-public class CalculadoraViewModel extends ViewModel {
-    private final Calculadora modelo = new Calculadora();
-    private final MutableLiveData<String> resultado = new MutableLiveData<>();
-    public LiveData<String> getResultado() {
-        return resultado;
-    }
-    public void calculate(double n1, double n2, String op) {
-            double calculationResult = modelo.calcular(n1, n2, op);
-            resultado.setValue("Resultado: " + calculationResult);
-    }
-}
-
-- MainActivity.java
-[source,java]
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import androidx.appcopat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-public class MainActivity extends AppCompatActivity {
-    private CalculadoraViewModel viewModel;
-    private TextView textViewResultado;
-    private EditText editTextN1, editTextN2, editTextOp;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        textViewResultado = findViewById(R.id.textViewResultado);
-        Button buttonCalculadora = findViewById(R.id.buttonCalculadora);
-        editTextN1 = findViewById(R.id.editTextN1);
-        editTextN2 = findViewById(R.id.editTextN2);
-        editTextOp = findViewById(R.id.editTextOp);
-        viewModel = new ViewModelProvider(this).get(CalculadoraViewModel.class);
-        viewModel.getResultado().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String result) {
-                textViewResultado.setText(result);
-            }
-        });
-        buttonCalculadora.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String s1 = editTextN1.getText().toString().trim();
-                String s2 = editTextN2.getText().toString().trim();
-                String op = editTextOp.getText().toString().trim();
-                double n1 = Double.parseDouble(s1);
-                double n2 = Double.parseDouble(s2);
-                viewModel.calculate(n1, n2, op);
-            }
-        });
-    }
-}
-
-Exemplo prático 03:
-
-- Aluno.java (Model)
-[source,java]
-public class Aluno {
-    private String nome;
-    private int nota;
-    public Aluno(String nome, int nota) {
-        this.nome = nome;
-        this.nota = nota;
-    }
-    public String getNome() {
-        return nome;
-    }
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-    public int getNota() {
-        return nota;
-    }
-    public void setNota(int nota) {
-        this.nota = nota;
-    }
-    @Override
-    public String toString() {
-        return "Aluno{" +
-                "nome='" + nome + '\'' +
-                ", nota=" + nota +
-                '}';
-    }
-}
-
-- AlunoRepositorio.java (Model)
-[source,java]
-import java.util.ArrayList;
-import java.util.List;
-public class AlunoRepositorio {
-    public List<Aluno> obterDadosAlunos() {
-        List<Aluno> listaAlunos = new ArrayList<>();
-        listaAlunos.add(new Aluno("Ana", 6));
-        listaAlunos.add(new Aluno("Rodrigo", 8));
-        listaAlunos.add(new Aluno("Paulo", 7));
-        return listaAlunos;
-    }
-}
-
-- AlunoAdapter.java (Controller)
-[source,java]
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
-import java.util.List;
-public class AlunoAdapter extends ArrayAdapter<Aluno> {
-    public AlunoAdapter(Context context, List<Aluno> alunos) {
-        super(context, 0, alunos);
-    }
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Aluno aluno = getItem(position);
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext())
-                    .inflate(R.layout.item_aluno, parent, false);
-        }
-        TextView textViewNome = convertView.findViewById(R.id.textViewNome);
-        TextView textViewNota = convertView.findViewById(R.id.textViewNota);
-        if (aluno != null) {
-            textViewNome.setText(aluno.getNome());
-            textViewNota.setText("Nota: " + aluno.getNota());
-        }
-        return convertView;
-    }
-}
-
-- AlunoViewModel.java (Controller)
-[source,java]
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-import java.util.List;
-public class AlunoViewModel extends ViewModel {
-    private final MutableLiveData<List<Aluno>> alunos;
-    private final AlunoRepositorio alunoRepositorio;
-    public AlunoViewModel() {
-        alunos = new MutableLiveData<>();
-        alunoRepositorio = new AlunoRepositorio();
-        alunos.setValue(alunoRepositorio.obterDadosAlunos());
-    }
-    public LiveData<List<Aluno>> getAlunos() {
-        return alunos;
-    }
-}
-
-- activity_main.xml (View)
+- nav_header.xml (pasta layout)
 [source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
-    <ListView
-        android:id="@+id/listViewAlunos"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</LinearLayout>
-
-- item_aluno.xml (View)
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="12dp">
-    <TextView
-        android:id="@+id/textViewNome"
+    android:padding="16dp"
+    android:background="@color/green">
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nome"
-        android:textSize="18sp"
+        android:src="@drawable/ic_launcher_background" />
+    <TextView
+        android:id="@+id/header_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Times de Futebol"
+        android:textColor="@color/white"
+        android:textSize="20sp"
         android:textStyle="bold" />
     <TextView
-        android:id="@+id/textViewNota"
+        android:id="@+id/header_subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nota"
+        android:text="Escolha seu time"
+        android:textColor="@color/white"
         android:textSize="16sp" />
 </LinearLayout>
 
-- MainActivity.java (View)
-[source,java]
-import android.os.Bundle;
-import android.widget.ListView;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import java.util.ArrayList;
-import java.util.List;
-public class MainActivity extends AppCompatActivity {
-    private AlunoViewModel alunoViewModel;
-    private ListView listViewAlunos;
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        listViewAlunos = findViewById(R.id.listViewAlunos);
-        alunoViewModel = new ViewModelProvider(this).get(AlunoViewModel.class);
-        final AlunoAdapter adapter = new AlunoAdapter(this, new ArrayList<Aluno>());
-        listViewAlunos.setAdapter(adapter);
-        alunoViewModel.getAlunos().observe(this, new Observer<List<Aluno>>() {
-            @Override
-            public void onChanged(List<Aluno> alunos) {
-                adapter.clear();
-                adapter.addAll(alunos);
-                adapter.notifyDataSetChanged();
-            }
-        });
-    }
-}
-
-Exemplo prático 04:
-
-- Bolo.java
-[source,java]
-public class Bolo {
-    private String nome;
-    private String receita;
-    public Bolo(String nome, String receita) {
-        this.nome = nome;
-        this.receita = receita;
-    }
-    public String getNome() {
-        return nome;
-    }
-    public String getReceita() {
-        return receita;
-    }
-}
-
-- BoloRepositorio.java
-[source,java]
-import java.util.ArrayList;
-import java.util.List;
-public class BoloRepositorio {
-    public List<Bolo> getBolos() {
-        List<Bolo> bolos = new ArrayList<>();
-        bolos.add(new Bolo("Bolo de Fubá", "Receita: Fubá, leite, ovos..."));
-        bolos.add(new Bolo("Bolo de Chocolate", "Receita: Chocolate, leite, ovos..."));
-        bolos.add(new Bolo("Bolo de Mandioca", "Receita: Mandioca, leite, ovos..."));
-        return bolos;
-    }
-}
-
-- BoloViewModel.java
-[source,java]
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-import java.util.List;
-public class BoloViewModel extends ViewModel {
-    private final BoloRepositorio repository = new BoloRepositorio();
-    private final MutableLiveData<List<Bolo>> bolos = new MutableLiveData<>();
-    public BoloViewModel() {
-        loadBolos();
-    }
-    private void loadBolos() {
-        bolos.setValue(repository.getBolos());
-    }
-    public LiveData<List<Bolo>> getBolos() {
-        return bolos;
-    }
-}
-
-- BoloAdapter.java
-[source,java]
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
-import java.util.List;
-public class BoloAdapter extends ArrayAdapter<Bolo> {
-    public BoloAdapter(Context context, List<Bolo> bolos) {
-        super(context, 0, bolos);
-    }
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Bolo bolo = getItem(position);
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext())
-                    .inflate(R.layout.item_bolo, parent, false);
-        }
-        TextView textViewNome = convertView.findViewById(R.id.textViewNome);
-        if (bolo != null) {
-            textViewNome.setText(bolo.getNome());
-        }
-        return convertView;
-    }
-}
-
-- ReceitaFragment.java
-[source,java]
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-public class ReceitaFragment extends Fragment {
-    private static final String ARG_RECEITA = "receita";
-    public static ReceitaFragment newInstance(String receita) {
-        ReceitaFragment fragment = new ReceitaFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_RECEITA, receita);
-        fragment.setArguments(args);
-        return fragment;
-    }
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_receita, container, false);
-        TextView textViewReceita = view.findViewById(R.id.textViewReceita);
-
-        if (getArguments() != null) {
-            String receita = getArguments().getString(ARG_RECEITA);
-            textViewReceita.setText(receita);
-        }
-        return view;
-    }
-}
-
-- item_bolo.xml
+- fragment_corinthians.xml
 [source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
-    <TextView
-        android:id="@+id/textViewNome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nome do bolo"
-        android:textSize="18sp" />
-</LinearLayout>
-
-- fragment_receita.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher_foreground" />
     <TextView
-        android:id="@+id/textViewReceita"
+        android:id="@+id/text_corinthians"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Receita"
-        android:textSize="18sp" />
+        android:text="Corinthians"
+        android:textSize="20sp" />
 </LinearLayout>
 
-- activity_main.xml
+- fragment_flamengo.xml
 [source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher_foreground" />
+    <TextView
+        android:id="@+id/text_corinthians"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Flamengo"
+        android:textSize="20sp" />
+</LinearLayout>
+
+- fragment_goias.xml
+[source,xml]
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher_foreground" />
+    <TextView
+        android:id="@+id/text_goias"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Goiás"
+        android:textSize="20sp" />
+</LinearLayout>
+
+- activity_main.xml (pasta layout)
+[source,xml]
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <ListView
-        android:id="@+id/listViewBolos"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_below="@id/listViewBolos" />
-</RelativeLayout>
+        android:layout_gravity="start"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/nav_menu" />
+</androidx.drawerlayout.widget.DrawerLayout>
 
-- MainActivity.java
+- CorinthiansFragment.java
 [source,java]
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import java.util.ArrayList;
-import java.util.List;
-public class MainActivity extends AppCompatActivity {
-    private BoloViewModel boloViewModel;
-    private ListView listViewBolos;
+import android.view.ViewGroup;
+import androidx.fragment.app.Fragment;
+public class CorinthiansFragment extends Fragment {
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_corinthians, container, false);
+    }
+}
+
+- FlamengoFragment.java
+[source,java]
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import androidx.fragment.app.Fragment;
+public class FlamengoFragment extends Fragment {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_flamengo, container, false);
+    }
+}
+
+- GoiasFragment.java
+[source,java]
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import androidx.fragment.app.Fragment;
+public class GoiasFragment extends Fragment {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_goias, container, false);
+    }
+}
+
+MainActivity.java
+[source,java]
+import android.os.Bundle;
+import android.view.MenuItem;
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import com.google.android.material.navigation.NavigationView;
+public class MainActivity extends AppCompatActivity {
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        listViewBolos = findViewById(R.id.listViewBolos);
-        boloViewModel = new ViewModelProvider(this).get(BoloViewModel.class);
-        final BoloAdapter adapter = new BoloAdapter(this, new ArrayList<Bolo>());
-        listViewBolos.setAdapter(adapter);
-        boloViewModel.getBolos().observe(this, new Observer<List<Bolo>>() {
-            @Override
-            public void onChanged(List<Bolo> bolos) {
-                adapter.clear();
-                adapter.addAll(bolos);
-                adapter.notifyDataSetChanged();
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int id = item.getItemId();
+            if (id == R.id.nav_flamengo) {
+                selectedFragment = new FlamengoFragment();
+            } else if (id == R.id.nav_corinthians) {
+                selectedFragment = new CorinthiansFragment();
+            } else if (id == R.id.nav_goias) {
+                selectedFragment = new GoiasFragment();
             }
+            if (selectedFragment != null) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
+            }
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
         });
-        listViewBolos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new FlamengoFragment())
+                    .commit();
+        }
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Bolo bolo = adapter.getItem(position);
-                if (bolo != null) {
-                    ReceitaFragment fragment = ReceitaFragment.newInstance(bolo.getReceita());
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, fragment)
-                            .addToBackStack(null)
-                            .commit();
+            public void handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    // Fecha a Activity
+                    finish();
                 }
             }
         });
     }
+}//class
+
+Exemplo prático 2 (Elementos do Navigation Drawer):
+
+No arquivo Gradle a nível de módulo, ative o DataBinding
+[source,xml]
+  buildFeatures {
+        viewBinding = true
+    }
+
+Na pasta layout adicione:
+
+- activty_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
+    <include
+        android:id="@+id/app_bar_main"
+        layout="@layout/app_bar_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_main_drawer" />
+</androidx.drawerlayout.widget.DrawerLayout>
+
+- themes.xml
+[source,xml]
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.AppNav" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/yellow_500</item>
+        <item name="colorPrimaryVariant">@color/yellow_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+    <style name="Theme.AppNav.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.AppNav.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.AppNav.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>
+
+- app_bar_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Theme.ExemploNavigationDrawer_01.AppBarOverlay">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/Theme.ExemploNavigationDrawer_01.PopupOverlay" />
+    </com.google.android.material.appbar.AppBarLayout>
+    <include layout="@layout/content_main" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="16dp"
+        app:srcCompat="@android:drawable/ic_menu_agenda" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+- content_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/app_bar_main">
+    <fragment
+        android:id="@+id/nav_host_fragment_content_main"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/mobile_navigation" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- nav_header_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/nav_header_height"
+    android:background="@drawable/side_nav_bar"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/nav_header_desc"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        app:srcCompat="@mipmap/ic_launcher_round" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:text="@string/nav_header_title"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nav_header_subtitle" />
+</LinearLayout>
+
+- na pasta drawable, crie o arquivo side_nav_bar.xml
+[source,xml]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="135"
+        android:centerColor="@color/yellow_200"
+        android:endColor="@color/yellow_500"
+        android:startColor="@color/yellow_700"
+        android:type="linear" />
+</shape>
+
+- fragment_cake.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.coffee.CoffeeFragment">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/image_cake"
+        android:src="@drawable/ic_launcher_foreground"/>
+    <TextView
+        android:id="@+id/text_cake"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+         />
+</LinearLayout>
+
+- fragment_coffee.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.coffee.CoffeeFragment">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/image_coffee"
+        android:src="@drawable/ic_launcher_foreground"/>
+    <TextView
+        android:id="@+id/text_coffee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        />
+</LinearLayout>
+
+Na pasta menu adicione:
+
+- activity_main_drawer.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_cake"
+            android:icon="@drawable/coffee"
+            android:title="@string/menu_cake" />
+        <item
+            android:id="@+id/nav_coffee"
+            android:icon="@drawable/strawberry_cake"
+            android:title="@string/menu_coffee" />
+    </group>
+</menu>
+
+- main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_contact"
+        android:orderInCategory="100"
+        android:title="@string/contact"
+        app:showAsAction="never" />
+</menu>
+
+Na paste navigation adicione:
+
+- mobile_navigation.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_cake">
+    <fragment
+        android:id="@+id/nav_cake"
+        android:name="com.example.exemplonavigationdrawer_01.ui.cake.CakeFragment"
+        android:label="@string/menu_cake"
+        tools:layout="@layout/fragment_cake" />
+    <fragment
+        android:id="@+id/nav_coffee"
+        android:name="com.example.exemplonavigationdrawer_01.ui.coffee.CoffeeFragment"
+        android:label="@string/menu_coffee"
+        tools:layout="@layout/fragment_coffee" />
+</navigation>
+
+Outros arquivos a serem adicionados no projeto:
+
+- colors.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="yellow_200">#FFEB3B</color>
+    <color name="yellow_500">#FFC107</color>
+    <color name="yellow_700">#FF9800</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>
+
+- strings.xml
+[source,xml]
+<resources>
+    <string name="app_name">ExemploNavigationDrawer_01</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="menu_cake">Cake</string>
+    <string name="menu_coffee">Coffee</string>
+    <string name="contact">Contact</string>
+</resources>
+
+- dimens.xml
+[source,xml]
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing">8dp</dimen>
+    <dimen name="nav_header_height">176dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+</resources>
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Menu;
+import android.widget.Toast;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.navigation.NavigationView;
+import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import com.example.exemplonavigationdrawer_01.databinding.ActivityMainBinding;
+public class MainActivity extends AppCompatActivity {
+    private AppBarConfiguration mAppBarConfiguration;
+    private ActivityMainBinding binding;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.e("MainActivity","onCreate");
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        setSupportActionBar(binding.appBarMain.toolbar);
+        binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null)
+                        .setAnchorView(R.id.fab).show();
+            }
+        });
+        DrawerLayout drawer = binding.drawerLayout;
+        NavigationView navigationView = binding.navView;
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_cake, R.id.nav_coffee)
+                .setOpenableLayout(drawer)
+                .build();
+        navigationView.setItemIconTintList(null); //para os icones ficarem coloridos
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.action_settings){
+            Toast.makeText(getApplicationContext(),"Settings",
+                    Toast.LENGTH_SHORT).show();
+        }
+        if(item.getItemId() == R.id.action_contact){
+            Toast.makeText(getApplicationContext(),"Contact",
+                    Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                || super.onSupportNavigateUp();
+    }    
 }
+
+- CakeFragment.java
+[source,java]
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import com.example.exemplonavigationdrawer_01.databinding.FragmentCakeBinding;
+import com.example.exemplonavigationdrawer_01.ui.coffee.CoffeeViewModel;
+public class CakeFragment extends Fragment {
+    private FragmentCakeBinding binding;
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentCakeBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+        Log.i("CakeFragment","onCreateView");
+        return root;
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // super.onViewCreated(view, savedInstanceState);
+        CakeViewModel cakeViewModel =
+                new ViewModelProvider(this).get(CakeViewModel.class);
+        final TextView textView = binding.textCake;
+        cakeViewModel.getText().observe(getViewLifecycleOwner(),
+                textView::setText);
+        final ImageView imageView = binding.imageCake;
+        cakeViewModel.getInteger().observe(getViewLifecycleOwner(),imageView::setImageResource);
+        Log.i("CakeFragment","onViewCreated");
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+        Log.i("CakeFragment","onDestroyView");
+    }
+}
+
+- CakeViewModel.java
+[source,xml]
+import android.util.Log;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import com.example.exemplonavigationdrawer_01.R;
+public class CakeViewModel extends ViewModel {
+    private final MutableLiveData<String> mText;
+    private final MutableLiveData<Integer> mImage;
+    public CakeViewModel() {
+        mText = new MutableLiveData<>();
+        mText.setValue("This is cake fragment");
+        mImage = new MutableLiveData<>();
+        mImage.setValue(R.drawable.strawberry_cake);
+        Log.i("CakeViewModel","construtor");
+    }
+    public LiveData<String> getText() {
+        return mText;
+    }
+    public LiveData<Integer> getInteger() {
+        return mImage;
+    }
+}
+
+- CoffeeFragment.java
+[source,java]
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import com.example.exemplonavigationdrawer_01.databinding.FragmentCoffeeBinding;
+public class CoffeeFragment extends Fragment {
+    private FragmentCoffeeBinding binding;
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentCoffeeBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+        Log.e("CoffeeFragment","onCreateView");
+        return root;
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+       // super.onViewCreated(view, savedInstanceState);
+        CoffeeViewModel coffeeViewModel =
+                new ViewModelProvider(this).get(CoffeeViewModel.class);
+        final TextView textView = binding.textCoffee;
+        coffeeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        final ImageView imageView = binding.imageCoffee;
+        coffeeViewModel.getInteger().observe(getViewLifecycleOwner(),imageView::setImageResource);
+        Log.e("CoffeeFragment","onViewCreated");
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+        Log.e("CoffeeFragment","onDestroyView");
+    }
+}
+
+- CoffeeViewModel.java
+[source,java]
+import android.util.Log;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import com.example.exemplonavigationdrawer_01.R;
+public class CoffeeViewModel extends ViewModel {
+    private final MutableLiveData<String> mText;
+    private final MutableLiveData<Integer> mImage;
+    public CoffeeViewModel() {
+        mText = new MutableLiveData<>();
+        mText.setValue("This is coffee fragment");
+        mImage = new MutableLiveData<>();
+        mImage.setValue(R.drawable.coffee);
+        Log.i("CoffeeViewModel","construtor");
+    }
+    public LiveData<String> getText() {
+        return mText;
+    }
+    public LiveData<Integer> getInteger() {
+        return mImage;
+    }
+}
+
+= Animação Usando Arquivos JSON
+
+Já vimos nos tópicos anteriores que o arquivo JSON facilita a troca de dados entre aplicativos, mas seria possível aplicá-lo em outras situações? Por exemplo: em animações? Sim, atualmente o JSON é usado também para essa finalidade, um exemplo disto é a biblioteca Lottie que renderiza animações exportadas do software Adobe After Effects.
+
+Para saber mais detalhes sobre a biblioteca, acesse o projeto disponível no GitHub no seguinte endereço: https://github.com/airbnb/lottie-android
+
+Exemplos práticos:
+
+- Crie um projeto na IDE;
+
+- Escolha uma Activity vazia;
+
+- No arquivo build.gradle, adicione uma dependência:
+dependencies 
+
+{...
+    implementation "com.airbnb.android:lottie:4.2.2"  //obter a lib
+    ...}
+
+- Clique com o botão direito do mouse na pasta res e adicione um diretório chamado raw. Coloque o arquivo json baixado neste diretório.
+
+- No arquivo activity_main.xml, acrescente a tag:
+[source,xml]
+<com.airbnb.lottie.LottieAnimationView
+   android:id="@+id/animation_view"
+   android:layout_width="wrap_content"
+   android:layout_height="wrap_content"
+   app:lottie_rawRes="@raw/cube"    //onde fica o arquivo json
+   app:lottie_autoPlay="true"   //iniciar a animação
+   app:lottie_loop="true"   //animação continua indefinidamente
+   />
+   
+   - Pronto, basta executar o app.
+   
+Referências do exemplo acima:
+
+- AIRBNB. Getting Started. Disponível em: https://airbnb.io/lottie/#/android. Acessado em: 10 fev. 2023.
+- LOTTIEFILES. Disponível em: https://lottiefiles.com/. Acessado em: 10 fev. 2023.
+
