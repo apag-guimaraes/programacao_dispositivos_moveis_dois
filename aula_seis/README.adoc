@@ -216,11 +216,14 @@ public class MainActivity extends AppCompatActivity {
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setTitle("Minha localização");
         marker.setDraggable(false);
-        marker.setOnMarkerClickListener((m, mv) -> {
-            marker.setDraggable(true);
-            Toast.makeText(this, "Agora você pode arrastar o marcador!", Toast.LENGTH_SHORT).show();
-            return true;
-        });
+       marker.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        marker.setDraggable(true);
+        Toast.makeText(MapsActivity.this, "Agora você pode arrastar o marcador!", Toast.LENGTH_SHORT).show();
+        return true;
+    }
+});
         marker.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
             @Override
             public void onMarkerDrag(Marker marker) {
