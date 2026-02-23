@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Usuario usuario = new Usuario(null, "Ana",
-                        "emil@email.com");
+                        "email@email.com");
                 viewModel.addUsuario(usuario);
             }
         });
