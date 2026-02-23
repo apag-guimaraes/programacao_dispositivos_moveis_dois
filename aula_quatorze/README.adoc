@@ -67,175 +67,277 @@ Exemplo prático:
 
 - activity_main.xml
 [source,xml]
-<!-- //Solução feita pelo estudante Luan Luz --> 
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp">
-    <TableLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/titulo"
-            />
-            <EditText
-                android:id="@+id/tituloText"
-                android:layout_width="0dp"
-                android:layout_weight="3"
-                android:hint="@string/digite_o_titulo_do_filme"
-                android:layout_height="wrap_content"
-                android:imeOptions="flagNoExtractUi"
-            />
-        </TableRow>
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/nota"
-            />
-            <EditText
-                android:id="@+id/notaText"
-                android:layout_width="0dp"
-                android:layout_weight="3"
-                android:hint="@string/digite_a_nota_para_o_filme"
-                android:layout_height="wrap_content"
-                android:imeOptions="flagNoExtractUi"
-                android:inputType="number"
-            />
-        </TableRow>
-    </TableLayout>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
     <Button
-        android:id="@+id/salvarButton"
+        android:id="@+id/buttonConectar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/salvar"
-        android:onClick="criar"
-    />
-    <ListView
-        android:id="@+id/listView"
+        android:layout_marginTop="40dp"
+        android:text="Conectar"
+        />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerUsuarios"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-    />
+        />
+</LinearLayout>
+
+- item_lista.xml
+[source,xml]
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp">
+    <TextView
+        android:id="@+id/txtNome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nome"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/txtEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Email"/>
 </LinearLayout>
 
 - MainActivity.java
 [source,java]
-//Solução feita pelo estudante Luan Luz
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.Button;
 import android.widget.Toast;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
-    private EditText tituloText;
-    private EditText notaText;
-    private ListView listView;
-    private ArrayAdapter<String> adapter;
-    private final String NOME_COLECAO = "filmes";
-    private FirebaseFirestore db;
+    private UsuarioViewModel viewModel;
+    private UsuarioAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        db = FirebaseFirestore.getInstance();
-        tituloText = findViewById(R.id.tituloText);
-        notaText = findViewById(R.id.notaText);
-        listView = findViewById(R.id.listView);
-        adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                new ArrayList<>()
-        );
-        listView.setAdapter(adapter);
-        obterDados();
-    }
-    public void criar(View view) {
-        String tituloTextValue = tituloText.getText().toString();
-        String notaTextValue = notaText.getText().toString();
-        if (tituloTextValue.isEmpty() || notaTextValue.isEmpty()) {
-            return;
-        }
-        limparCampos();
-        int nota = Integer.parseInt(notaTextValue);
-        Filme filme = new Filme(tituloTextValue, nota);
-        db.collection(NOME_COLECAO)
-                .add(filme.toMap())
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(this, "Sucesso ao cadastrar filme", Toast.LENGTH_LONG).show();
-                    obterDados();
-                })
-                .addOnFailureListener(e -> {
-                    Log.w("Cadastro", "Erro ao cadastrar", e);
-                });
-    }
-    private void obterDados() {
-        db.collection(NOME_COLECAO)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<String> lista = new ArrayList<>();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String titulo = document.getString("titulo");
-                            int nota = Objects.requireNonNull(document.getLong("nota")).intValue();
-                            lista.add(titulo + " - " + nota);
-                            Log.d("Dado",document.getId() + " => " + document.getData());
-                        }
-                        adapter.clear();
-                        adapter.addAll(lista);
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        Log.d("Erro", "Erro ao obter dados: ", task.getException());
-                    }
-                });
-    }
-    private void limparCampos() {
-        tituloText.setText("");
-        notaText.setText("");
-    }
-}
+        RecyclerView recyclerView = findViewById(R.id.recyclerUsuarios);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new UsuarioAdapter(new ArrayList<>());
+        recyclerView.setAdapter(adapter);
+        viewModel = new ViewModelProvider(this)
+                .get(UsuarioViewModel.class);
 
-- Filme.java
+        viewModel.getUsuarios().observe(this,
+                new Observer<List<Usuario>>() {
+            @Override
+            public void onChanged(List<Usuario> usuarios) {
+                adapter = new UsuarioAdapter(usuarios);
+                recyclerView.setAdapter(adapter);
+            }
+        });
+        viewModel.getErro().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String error) {
+                Toast.makeText(
+                        MainActivity.this,
+                        error,
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
+        Button buttonConectar = findViewById(R.id.buttonConectar);
+        buttonConectar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Usuario usuario = new Usuario(null, "Ana",
+                        "emil@email.com");
+                viewModel.addUsuario(usuario);
+            }
+        });
+    }
+}//
+
+- Usuario.java
 [source,java]
-//Solução feita pelo estudante Luan Luz
-import java.util.HashMap;
-import java.util.Map;
-public class Filme {
-    public String titulo;
-    public int nota;
-    public Filme() {}
-    public Filme(String titulo, int nota) {
-        this.titulo = titulo;
-        this.nota = nota;
+public class Usuario {
+    private String id;
+    private String nome;
+    private String email;
+    public Usuario() {
+
     }
-    public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("titulo", titulo);
-        result.put("nota", nota);
-        return result;
+    public Usuario(String id, String nome, String email) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+    }
+    public String getId() { return id; }
+    public String getNome() { return nome; }
+    public String getEmail() { return email; }
+    public void setId(String id) { this.id = id; }
+    public void setNome(String nome) { this.nome = nome; }
+    public void setEmail(String email) { this.email = email; }
+}
+
+- UsuarioAdapter.java
+[source,java]
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
+public class UsuarioAdapter extends
+        RecyclerView.Adapter<UsuarioAdapter.UserViewHolder> {
+    private List<Usuario> usuarios;
+    public UsuarioAdapter(List<Usuario> usuarios) {
+        this.usuarios = usuarios;
+    }
+    @NonNull
+    @Override
+    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                             int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_lista, parent,
+                        false);
+        return new UserViewHolder(view);
+    }
+    @Override
+    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+        Usuario usuario = usuarios.get(position);
+        holder.txtNome.setText(usuario.getNome());
+        holder.txtEmail.setText(usuario.getEmail());
+    }
+    @Override
+    public int getItemCount() {
+        return usuarios.size();
+    }
+    static class UserViewHolder extends RecyclerView.ViewHolder {
+        TextView txtNome, txtEmail;
+        public UserViewHolder(@NonNull View itemView) {
+            super(itemView);
+            txtNome = itemView.findViewById(R.id.txtNome);
+            txtEmail = itemView.findViewById(R.id.txtEmail);
+        }
     }
 }
 
- 
+- UsuarioRepository.java
+[source,java]
+import androidx.annotation.NonNull;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import java.util.ArrayList;
+import java.util.List;
+public class UsuarioRepository {
+    private DatabaseReference firebase;
+    public UsuarioRepository() {
+        firebase = FirebaseDatabase
+                .getInstance()
+                .getReference("usuarios");
+    }
+    public void addUsuario(Usuario usuario) {
+        String id = firebase.push().getKey();
+        usuario.setId(id);
+        firebase.child(id).setValue(usuario);
+    }
+    public void obterUsuarios(UsuariosListener listener) {
+        firebase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Usuario> list = new ArrayList<>();
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    Usuario usuario = child.getValue(Usuario.class);
+                    if (usuario != null) {
+                        list.add(usuario);
+                    }
+                }
+                listener.onSuccess(list);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                listener.onError(error.getMessage());
+            }
+        });
+    }
+    public void updateUser(Usuario usuario) {
+        firebase.child(usuario.getId()).setValue(usuario);
+    }
+    public void deleteUser(String id) {
+        firebase.child(id).removeValue();
+    }
+    public interface UsuariosListener {
+        void onSuccess(List<Usuario> usuarios);
+        void onError(String error);
+    }
+}
+
+- UsuarioViewModel.java
+[source,java]
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import java.util.List;
+public class UsuarioViewModel extends ViewModel {
+    private UsuarioRepository repository = new UsuarioRepository();
+    private MutableLiveData<List<Usuario>> usuariosLiveData = new MutableLiveData<>();
+    private MutableLiveData<String> erroLiveData = new MutableLiveData<>();
+    public UsuarioViewModel() {
+        obterUsuarios();
+    }
+    public LiveData<List<Usuario>> getUsuarios() {
+        return usuariosLiveData;
+    }
+    public LiveData<String> getErro() {
+        return erroLiveData;
+    }
+    public void obterUsuarios() {
+        repository.obterUsuarios(new UsuarioRepository.UsuariosListener() {
+            @Override
+            public void onSuccess(List<Usuario> usuarios) {
+
+                usuariosLiveData.setValue(usuarios);
+            }
+            @Override
+            public void onError(String error) {
+                erroLiveData.setValue(error);
+            }
+        });
+    }
+    public void addUsuario(Usuario usuario) {
+        repository.addUsuario(usuario);
+    }
+    public void deleteUsuario(String id) {
+        repository.deleteUser(id);
+    }
+    public void updateUsuario(Usuario usuario) {
+        repository.updateUser(usuario);
+    }
+}
+
+
+
+
+
+
+
+
+
+
 
 
