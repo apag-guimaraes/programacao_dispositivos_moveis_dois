@@ -132,7 +132,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         button = findViewById(R.id.buttonHello);
-        button.setOnClickListener(v -> solicitarPermissao());
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                solicitarPermissao();
+            }
+        });
     }
     private void solicitarPermissao() {
         int temPermissao = ContextCompat.checkSelfPermission(this, PERMISSAO);
@@ -301,7 +306,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         btnChamada = findViewById(R.id.btnChamada);
-        btnChamada.setOnClickListener(v -> verificarPermissao());
+        btnChamada.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verificarPermissao();
+            }
+        });
     }
     private void verificarPermissao() {
         int granted = ContextCompat.checkSelfPermission(this, PERMISSAO);
