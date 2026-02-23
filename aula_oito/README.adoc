@@ -282,16 +282,19 @@ public class MainActivity extends AppCompatActivity {
         permissionHelper = new PermissionHelper(this);
         notificationHelper = new NotificationHelper(this);
         Button btn = findViewById(R.id.buttonGerar);
-        btn.setOnClickListener(v -> {
-            if (permissionHelper.temPermissaoNotificacao()) {
-                notificationHelper.gerarNotificacao(
-                        "Título teste",
-                        "Conteúdo teste"
-                );
-            } else {
-                permissionHelper.solicitarPermissao(REQUEST_NOTIFICACAO);
-            }
-        });
+       btn.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        if (permissionHelper.temPermissaoNotificacao()) {
+            notificationHelper.gerarNotificacao(
+                    "Título teste",
+                    "Conteúdo teste"
+            );
+        } else {
+            permissionHelper.solicitarPermissao(REQUEST_NOTIFICACAO);
+        }
+    }
+});
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -409,13 +412,16 @@ public class MainActivity extends AppCompatActivity {
         editTextPalavra = findViewById(R.id.editTextPalavra);
         buttonSalvar = findViewById(R.id.buttonSalvar);
         criarCanalNotificacao();
-        buttonSalvar.setOnClickListener(v -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-               verificarPermissao();
-            } else {
-                gerarNotificacaoComProgresso();
-            }
-        });
+       buttonSalvar.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            verificarPermissao();
+        } else {
+            gerarNotificacaoComProgresso();
+        }
+    }
+});
     }
     public void verificarPermissao(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
