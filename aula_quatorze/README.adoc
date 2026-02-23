@@ -137,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         viewModel = new ViewModelProvider(this)
                 .get(UsuarioViewModel.class);
-
         viewModel.getUsuarios().observe(this,
                 new Observer<List<Usuario>>() {
             @Override
@@ -310,7 +309,6 @@ public class UsuarioViewModel extends ViewModel {
         repository.obterUsuarios(new UsuarioRepository.UsuariosListener() {
             @Override
             public void onSuccess(List<Usuario> usuarios) {
-
                 usuariosLiveData.setValue(usuarios);
             }
             @Override
