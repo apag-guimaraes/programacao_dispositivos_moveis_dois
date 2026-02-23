@@ -1156,7 +1156,6 @@ public class MainViewModel extends ViewModel {
     private MutableLiveData<List<String>> lista;
     private MutableLiveData<String> mensagem;
     public MainViewModel() {
-        carregarDados();
         this.repositorio = new Repositorio();
         lista = new MutableLiveData<>();
         mensagem = new MutableLiveData<>();
