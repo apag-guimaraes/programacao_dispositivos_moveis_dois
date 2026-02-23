@@ -71,13 +71,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onClick(View v) {
         Integer numero = new Random().nextInt(100) + 1;
-        
         Intent intent = new Intent(ACTION_NUMERO);
         intent.setPackage("nomeDoPacoteDoAppReceptor");
         intent.putExtra("numero", numero);
-        
         Toast.makeText(MainActivity.this, numero.toString(), Toast.LENGTH_LONG).show();
-        
         sendBroadcast(intent);
     }
 });
