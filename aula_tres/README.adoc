@@ -1175,7 +1175,6 @@ public class MainViewModel extends ViewModel {
             @Override
             public void erro(String msg) {
                 mensagem.postValue(msg);
-
             }
         });
     }
