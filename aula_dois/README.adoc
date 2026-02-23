@@ -141,8 +141,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         viewModel = new ViewModelProvider(this).get(CalculadoraViewModel.class);
-        binding.setViewModel(viewModel);
-        binding.setLifecycleOwner(this);
+        binding.setViewModel(viewModel);//conecta a ViewModel ao layout (Data Binding)
+        binding.setLifecycleOwner(this);//Sem o setLifecycleOwner, o Data Binding não observa o LiveData
         binding.buttonCalcular.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
