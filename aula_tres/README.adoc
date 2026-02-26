@@ -1322,6 +1322,8 @@ Observe na figura 3 que  há 3 links clicáveis:
 
 Agora, basta criar um app cliente no Android para consumir os dados disponíveis em: https://my-json-server.typicode.com/<seu nome de usuário no GitHub><seu repositório>/db.
 
+Para os projetos das aulas vamos usar as seguintes camadas: VIEW -> VIEWMODEL -> USECASE -> REPOSITORY. Para mais detalhes sobre arquitetura de app, segue o material: GOOGLE DEVELOPERS, Guia para a arquitetura do app, disponível em: https://developer.android.com/topic/architecture?hl=pt-br. Acessado em: 26 de fev. 2026. 
+
 
 
 
