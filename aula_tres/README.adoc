@@ -1289,7 +1289,7 @@ Agora, basta criar um app cliente no Android para consumir os dados disponíveis
 
 Outra opção é usar diretamente a API do GitHub, basta criar um repositório público, adicionar o arquivo db.json, clicar no botão RAW e copiar a URL gerada.
 
-Para os projetos das aulas vamos usar as seguintes camadas: VIEW -> VIEWMODEL -> USECASE -> REPOSITORY. Para mais detalhes sobre arquitetura de app, segue o material: GOOGLE DEVELOPERS, Guia para a arquitetura do app, disponível em: https://developer.android.com/topic/architecture?hl=pt-br. Acessado em: 26 de fev. 2026. 
+Para os projetos das aulas vamos usar as seguintes camadas: VIEW -> VIEWMODEL -> USECASE (opcional) -> REPOSITORY. Para mais detalhes sobre arquitetura de app, segue o material: GOOGLE DEVELOPERS, Guia para a arquitetura do app, disponível em: https://developer.android.com/topic/architecture?hl=pt-br. Acessado em: 26 de fev. 2026. 
 
 
 
