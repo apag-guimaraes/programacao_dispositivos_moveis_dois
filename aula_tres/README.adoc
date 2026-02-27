@@ -1263,42 +1263,7 @@ public class MainActivity extends AppCompatActivity {
 
  - Exemplos práticos (API JSON SERVER)
 
-Neste exemplo, será usado uma biblioteca que permite criar uma API REST falsa destinada à testes. Para maiores detalhes sobre o biblioteca, acesse o endereço: https://github.com/typicode/json-server. Acesso em: 30 de jan. 2023.
-
-Conforme mostra no endereço supracitado para instalar o json-server, basta abrir o terminal e digitar o comando:
-npm install -g json-server
-
-Atenção: É necessário ter o node.js instalado no computador para biblitoca funcionar. Em seguida, crie um arquivo com extensão.json, por exemplo db.json, banco.json, dados.json, etc.
-
-db.json
-[source,xml]
-{
-   "agenda" : [
-    { "id" : 1 , "nome" : "Ana" , "telefone" : "1111-1111"  },
-    { "id" : 2 , "nome" : "Helder" , "telefone" : "2222-2222"  },
-    { "id" : 3 , "nome" : "Fagno" , "telefone" : "3333-3333"  }
-  ],
-  "adicionais" : [
-    { "id" : 1 , "email" : "ana@ifto.edu.br"},
-    { "id" : 2 , "email" : "helder@ifto.edu.br"},
-    { "id" : 3 , "email" : "fagno@ifto.edu.br"}
-  ]
-  }
-
-Após salvar o arquivo abre o terminal e vamos ligar o servidor usando o comando:
-json-server db.json
-
-Se tudo deu certo, a seguinte mensagem será impressa no terminal:
-   
-  \{^_^}/ hi!
-  Loading db.json
-  Done
-
-  Resources
-  http://localhost:3000/agenda    //o conteúdo do arquivo db.json, porém mostrando o conteúdo do array agenda
-  http://localhost:3000/adicionais   //o conteúdo do arquivo db.json,  porém mostrando o conteúdo do array adicionais
-  
-Infelizmente, não é possível consumir o arquivo disponibilizado pelo endereço: http://localhost:3000, pois o Android, por questões de segurança, atualmente aceita apenas comunicação via HTTPS. Mas a equipe que desenvolveu a biblioteca também disponibiliza um servidor com HTTPS chamado My JSON Server cujo o endereço para acesso é: https://my-json-server.typicode.com/.
+Neste exemplo, será usado uma biblioteca que permite criar uma API REST falsa destinada à testes. Para maiores detalhes sobre o biblioteca, acesse o endereço: https://github.com/typicode/json-server. Acesso em: 30 de jan. 2023. No Android, por questões de segurança, atualmente aceita apenas comunicação via HTTPS. A equipe que desenvolveu a biblioteca também disponibiliza um servidor com HTTPS chamado My JSON Server cujo o endereço para acesso é: https://my-json-server.typicode.com/.
 Na página Web supracitada tem-se os passos necessários para usar o servidor. São etapas simples, como pode ser vista a seguir:
 
 - Crie uma conta no GitHub;
@@ -1321,6 +1286,8 @@ Observe na figura 3 que  há 3 links clicáveis:
 - e na opção db, serão mostrados tanto o array agenda e o adicionais com os conteúdos.
 
 Agora, basta criar um app cliente no Android para consumir os dados disponíveis em: https://my-json-server.typicode.com/<seu nome de usuário no GitHub><seu repositório>/db.
+
+Outra opção é usar diretamente a API do GitHub, basta criar um repositório público, adicionar o arquivo db.json, clicar no botão RAW e copiar a URL gerada.
 
 Para os projetos das aulas vamos usar as seguintes camadas: VIEW -> VIEWMODEL -> USECASE -> REPOSITORY. Para mais detalhes sobre arquitetura de app, segue o material: GOOGLE DEVELOPERS, Guia para a arquitetura do app, disponível em: https://developer.android.com/topic/architecture?hl=pt-br. Acessado em: 26 de fev. 2026. 
 
