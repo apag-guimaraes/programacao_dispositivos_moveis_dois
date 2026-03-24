@@ -268,7 +268,6 @@ public class NumeroReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if ("com.example.ACTION_NUMERO".equals(intent.getAction())) {
             int numero = intent.getIntExtra("numero", -1);
-
             SharedPreferences prefs = context.getSharedPreferences("dados", Context.MODE_PRIVATE);
             prefs.edit().putInt("numero", numero).apply();
         }
