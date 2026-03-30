@@ -53,3 +53,5 @@ IMPORTANT: Atenção, este material está sendo atualizado regularmente.
 13. link:aula_treze[Outros Recursos]
 
 14. link:aula_quatorze[Salvar/listar dados no Firebase]
+
+15. link:aula_quinze[Atividades resolvidas]
