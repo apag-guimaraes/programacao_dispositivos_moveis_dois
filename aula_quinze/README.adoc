@@ -660,6 +660,631 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+== AppHttp com ViewModel
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.MainActivity">
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/consolidacao"
+        app:layout_constraintBottom_toTopOf="@+id/student_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/student_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="63dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="227dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- activity_status.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/status_activity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.StatusActivity">
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/voltar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.120000005" />
+    <TextView
+        android:id="@+id/class_average"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/guideline2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/student_status_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="63dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="227dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- activity_status_list_item.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/student_status_list_item"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <TextView
+        android:id="@+id/student_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/student_age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/student_attendance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/student_grades"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+
+- students_list_item.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/student_list_item">
+    <TextView
+        android:id="@+id/student_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="102dp" />
+    <TextView
+        android:id="@+id/student_age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/student_name"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="0dp" />
+    <TextView
+        android:id="@+id/student_grades"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/student_age"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="16dp" />
+    <TextView
+        android:id="@+id/student_attendance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/student_grades"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="-27dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- MainActivity.java
+[source,java]
+package com.example.atividade3.activity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.example.atividade3.adapter.StudentListAdapter;
+import com.example.atividade3.data.model.Student;
+import com.example.atividade3.databinding.ActivityMainBinding;
+import com.example.atividade3.viewmodel.MainViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
+public class MainActivity extends AppCompatActivity {
+    private ActivityMainBinding binding;
+    private MainViewModel viewmodel;
+    private StudentListAdapter adapter;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        viewmodel = new ViewModelProvider(this).get(MainViewModel.class);
+        adapter = new StudentListAdapter(new ArrayList<>());
+        binding.studentList.setLayoutManager(new LinearLayoutManager(this));
+        binding.studentList.setAdapter(adapter);
+        binding.button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, StatusActivity.class);
+                startActivity(intent);
+            }
+        });
+        viewmodel.getStudents().observe(this, new Observer<List<Student>>() {
+            @Override
+            public void onChanged(List<Student> students) {
+                if (students != null) {
+                    adapter.setStudents(students);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+        viewmodel.loadData();
+    }
+}
+
+- StatusActivity.java
+[source,java]
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import com.example.atividade3.adapter.StudentStatusListAdapter;
+import com.example.atividade3.data.model.Student;
+import com.example.atividade3.databinding.ActivityStatusBinding;
+import com.example.atividade3.viewmodel.StatusViewModel;
+import java.util.ArrayList;
+import java.util.List;
+public class StatusActivity extends AppCompatActivity {
+    private ActivityStatusBinding binding;
+    private StatusViewModel viewmodel;
+    private StudentStatusListAdapter adapter;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityStatusBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        viewmodel = new ViewModelProvider(this).get(StatusViewModel.class);
+        adapter = new StudentStatusListAdapter(new ArrayList<>());
+        binding.studentStatusList.setLayoutManager(new LinearLayoutManager(this));
+        binding.studentStatusList.setAdapter(adapter);
+        binding.button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StatusActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+        viewmodel.getStudents().observe(this, new Observer<List<Student>>() {
+            @Override
+            public void onChanged(List<Student> students) {
+                if (students != null) {
+                    adapter.setStudents(students);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+        viewmodel.getClassAverage().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                if (s != null) {
+                    binding.classAverage.setText("Média da turma: " + s);
+                }
+            }
+        });
+        viewmodel.loadData();
+    }
+}
+
+- StudentListAdapter.java
+[source,java]
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.atividade3.data.model.Student;
+import com.example.atividade3.databinding.StudentsListItemBinding;
+import java.util.List;
+public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.StudentViewHolder> {
+    private List<Student> students;
+    public StudentListAdapter(List<Student> students) {
+        this.students = students;
+    }
+    public List<Student> getStudents() {
+        return students;
+    }
+    public void setStudents(List<Student> students) {
+        this.students = students;
+    }
+    @NonNull
+    @Override
+    public StudentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        StudentsListItemBinding binding = StudentsListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new StudentViewHolder(binding);
+    }
+    @Override
+    public void onBindViewHolder(@NonNull StudentViewHolder holder, int position) {
+        holder.binding.studentName.setText("Nome: " + students.get(position).getName());
+        holder.binding.studentAge.setText("Idade: " + students.get(position).getAge().toString());
+        holder.binding.studentAttendance.setText("Notas: " + students.get(position).getAttendance().toString());
+        holder.binding.studentGrades.setText("Presenças: " + students.get(position).getGrades().toString());
+
+    }
+    @Override
+    public int getItemCount() {
+        return students.size();
+    }
+    public static class StudentViewHolder extends RecyclerView.ViewHolder {
+        StudentsListItemBinding binding;
+        public StudentViewHolder(StudentsListItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+    }
+}
+
+- StudentStatusListAdapter.java
+[source,java]
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.atividade3.data.model.Student;
+import com.example.atividade3.databinding.StudentStatusListItemBinding;
+import java.util.List;
+public class StudentStatusListAdapter extends RecyclerView.Adapter<StudentStatusListAdapter.StudentStatusViewHolder> {
+    private List<Student> students;
+    public StudentStatusListAdapter(List<Student> students) {
+        this.students = students;
+    }
+    public List<Student> getStudents() {
+        return students;
+    }
+    public void setStudents(List<Student> students) {
+        this.students = students;
+    }
+    @NonNull
+    @Override
+    public StudentStatusListAdapter.StudentStatusViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        StudentStatusListItemBinding binding = StudentStatusListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new StudentStatusListAdapter.StudentStatusViewHolder(binding);
+
+    }
+    @Override
+    public void onBindViewHolder(@NonNull StudentStatusListAdapter.StudentStatusViewHolder holder, int position) {
+        holder.binding.studentName.setText("Nome: " + students.get(position).getName());
+        holder.binding.studentAttendance.setText("Presença: " + String.format("%.2f", students.get(position).calculateAttendancePercentage()));
+        holder.binding.studentAge.setText("Nota final: " + String.format("%.2f", students.get(position).calculateAverageGrade()));
+        holder.binding.studentGrades.setText("Status: " + students.get(position).isApproved());
+    }
+    @Override
+    public int getItemCount() {
+        return students.size();
+    }
+    public static class StudentStatusViewHolder extends RecyclerView.ViewHolder {
+        StudentStatusListItemBinding binding;
+        public StudentStatusViewHolder(StudentStatusListItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+    }
+}
+
+- Student.java
+[source,java]
+import java.util.ArrayList;
+import java.util.List;
+public class Student {
+    private String name;
+    private Integer age;
+    private List<Double> grades;
+    private List<Boolean> attendance;
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+        this.grades = new ArrayList<>();
+        this.attendance = new ArrayList<>();
+    }
+    public Integer getAge() {
+        return age;
+    }
+    public String getName() {
+        return name;
+    }
+    public List<Double> getGrades() {
+        return grades;
+    }
+    public List<Boolean> getAttendance() {
+        return attendance;
+    }
+    public double calculateAverageGrade() {
+        double sum = 0.0;
+        for (double grade : grades) {
+            sum += grade;
+        }
+        return sum / grades.size();
+    }
+    public double calculateAttendancePercentage() {
+        int presentCount = 0;
+        for (boolean present : attendance) {
+            if (present) {
+                presentCount++;
+            }
+        }
+        return ((double) presentCount) / attendance.size() * 100;
+    }
+    public void addGrades(List<Double> grades) {
+        this.grades.addAll(grades);
+
+    }
+    public void addAttendance(List<Boolean> attendance) {
+        this.attendance.addAll(attendance);
+    }
+    public String isApproved() {
+        boolean isApproved = calculateAverageGrade() >= 6.0 && calculateAttendancePercentage() >= 75.0;
+        if (isApproved){
+            return "Aprovado";
+        }else{
+            return "Reprovado";
+        }
+    }
+}
+
+- Connection.java
+[source,java]
+import android.util.Log;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+public class Connection {
+    public InputStream sendRequest(String endURL) {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(endURL);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(50000);
+            connection.setReadTimeout(50000);
+            connection.setRequestMethod("GET");
+            connection.connect();
+            return new BufferedInputStream(connection.getInputStream());
+        } catch (IOException e) {
+            Log.e("Connection error", "Error while connecting to the url");
+        }
+        return null;
+    }
+}
+
+- ResponseDto.java
+[source,java]
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
+public class ResponseDto {
+    @SerializedName("students")
+    public List<StudentDto> students;
+}
+
+- StudentDto.java
+[source,java]
+import com.google.gson.annotations.SerializedName;
+import java.util.List;
+public class StudentDto {
+    @SerializedName("nome")
+    public String name;
+    @SerializedName("idade")
+    public int age;
+    @SerializedName("notas")
+    public List<Double> notes;
+    @SerializedName("presenca")
+    public List<Boolean> attendance;
+}
+
+- StudentRepository.java
+[source,java]
+import android.os.Handler;
+import android.os.Looper;
+import com.example.atividade3.data.model.Student;
+import com.example.atividade3.repository.connection.Connection;
+import com.example.atividade3.repository.dto.ResponseDto;
+import com.example.atividade3.repository.dto.StudentDto;
+import com.google.gson.Gson;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+public class StudentRepository {
+    private static StudentRepository instance;
+    private List<Student> students;
+    private final String API_URL = "digite a URL";
+    private ExecutorService executor;
+    private Handler mainHandler;
+    public StudentRepository() {
+        this.executor = Executors.newSingleThreadExecutor();
+        this.mainHandler = new Handler(Looper.getMainLooper());
+    }
+    public static StudentRepository getInstance() {
+        if (instance == null) {
+            instance = new StudentRepository();
+        }
+        return instance;
+    }
+    public interface Callback {
+        void onSuccess(List<Student> items);
+        void onError(String msg);
+    }
+    private void success(Callback c, List<Student> students) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                c.onSuccess(students);
+            }
+        });
+    }
+    private void error(Callback c, String msg) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                c.onError(msg);
+            }
+        });
+    }
+    public void fetchStudents(Callback callback) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Connection connection = new Connection();
+                    InputStreamReader reader = new InputStreamReader(connection.sendRequest(API_URL));
+                    ResponseDto studentsResponse = new Gson().fromJson(reader, ResponseDto.class);
+                    List<Student> students = new ArrayList<>();
+                    for (StudentDto studentDto : studentsResponse.students) {
+                        Student student = new Student(studentDto.name, studentDto.age);
+                        student.addGrades(studentDto.notes);
+                        student.addAttendance(studentDto.attendance);
+                        students.add(student);
+
+                    }
+                    success(callback, students);
+                } catch (Exception e) {
+                    error(callback, "Error while fetching students");
+
+                }
+            }
+        });
+    }
+}
+
+- MainViewModel.java
+[source,java]
+import android.util.Log;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import com.example.atividade3.data.model.Student;
+import com.example.atividade3.repository.StudentRepository;
+import java.util.List;
+public class MainViewModel extends ViewModel {
+    private MutableLiveData<List<Student>> students;
+    private final StudentRepository repository;
+    public MainViewModel() {
+        this.students = new MutableLiveData<>();
+        this.repository = StudentRepository.getInstance();
+    }
+    public MutableLiveData<List<Student>> getStudents() {
+        return students;
+    }
+    public void loadData() {
+        repository.fetchStudents(new StudentRepository.Callback() {
+            @Override
+            public void onSuccess(List<Student> items) {
+                students.setValue(items);
+            }
+            @Override
+            public void onError(String msg) {
+                Log.e("Error", msg);
+            }
+        });
+    }
+}
+
+- StatusViewModel.java
+[source,java]
+import android.util.Log;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import com.example.atividade3.data.model.Student;
+import com.example.atividade3.repository.StudentRepository;
+import java.util.List;
+public class StatusViewModel extends ViewModel {
+    private MutableLiveData<List<Student>> students;
+    private MutableLiveData<String> classAverage;
+    private final StudentRepository repository;
+    public StatusViewModel() {
+        this.repository = StudentRepository.getInstance();
+        this.students = new MutableLiveData<>();
+        this.classAverage = new MutableLiveData<>();
+    }
+    public MutableLiveData<List<Student>> getStudents() {
+        return students;
+    }
+    public MutableLiveData<String> getClassAverage() {
+        return classAverage;
+    }
+    private double calculateAverageGrade() {
+        double sum = 0.0;
+        for (Student s : students.getValue()) {
+            sum += s.calculateAverageGrade();
+        }
+        return sum / students.getValue().size();
+    }
+    public void loadData() {
+        repository.fetchStudents(new StudentRepository.Callback() {
+            @Override
+            public void onSuccess(List<Student> items) {
+                students.setValue(items);
+                classAverage.setValue(String.format("%.2f", calculateAverageGrade()));
+            }
+            @Override
+            public void onError(String msg) {
+                Log.e("Error", msg);
+            }
+        });
+    }
+}
+
 
 
 
