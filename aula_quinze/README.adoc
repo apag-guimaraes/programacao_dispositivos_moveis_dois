@@ -954,7 +954,6 @@ public class StudentListAdapter extends RecyclerView.Adapter<StudentListAdapter.
         holder.binding.studentAge.setText("Idade: " + students.get(position).getAge().toString());
         holder.binding.studentAttendance.setText("Notas: " + students.get(position).getAttendance().toString());
         holder.binding.studentGrades.setText("Presenças: " + students.get(position).getGrades().toString());
-
     }
     @Override
     public int getItemCount() {
