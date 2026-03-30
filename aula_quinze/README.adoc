@@ -820,22 +820,17 @@ public class MainActivity extends AppCompatActivity {
 
 - MainActivity.java
 [source,java]
-package com.example.atividade3.activity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.example.atividade3.adapter.StudentListAdapter;
 import com.example.atividade3.data.model.Student;
 import com.example.atividade3.databinding.ActivityMainBinding;
 import com.example.atividade3.viewmodel.MainViewModel;
-
 import java.util.ArrayList;
 import java.util.List;
 public class MainActivity extends AppCompatActivity {
@@ -1066,7 +1061,6 @@ public class Student {
     }
     public void addGrades(List<Double> grades) {
         this.grades.addAll(grades);
-
     }
     public void addAttendance(List<Boolean> attendance) {
         this.attendance.addAll(attendance);
@@ -1196,7 +1190,6 @@ public class StudentRepository {
                         student.addGrades(studentDto.notes);
                         student.addAttendance(studentDto.attendance);
                         students.add(student);
-
                     }
                     success(callback, students);
                 } catch (Exception e) {
