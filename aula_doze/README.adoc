@@ -757,7 +757,6 @@ public Cursor query(
     } else if (uri.getPath().equals("/pets")) {
         tabela = "pets";
     } else {
-
         throw new IllegalArgumentException(
                 "URI inválida");
     }
