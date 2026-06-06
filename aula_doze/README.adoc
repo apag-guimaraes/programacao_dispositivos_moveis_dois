@@ -490,4 +490,356 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+- Exemplo 02: (JSON + ROOM + CONTENT PROVIDER) 
+
+- JSON
+[source,java]
+[
+  {
+    "nome": "Ana Souza",
+    "pets": [
+      {
+        "nome": "Rex",
+        "especie": "Cachorro",
+        "idade": 5
+      },
+      {
+        "nome": "Mimi",
+        "especie": "Gato",
+        "idade": 2
+      }
+    ]
+  },
+  {
+    "nome": "Carlos Mendes",
+    "pets": [
+      {
+        "nome": "Thor",
+        "especie": "Cachorro",
+        "idade": 3
+      },
+      {
+        "nome": "Luna",
+        "especie": "Cachorro",
+        "idade": 1
+      }
+    ]
+  },
+  {
+    "nome": "Fernanda Costa",
+    "pets": [
+      {
+        "nome": "Nina",
+        "especie": "Gato",
+        "idade": 4
+      },
+      {
+        "nome": "Pingo",
+        "especie": "Coelho",
+        "idade": 2
+      }
+    ]
+  },
+  {
+    "nome": "Igor Pereira",
+    "pets": [
+      {
+        "nome": "Bolt",
+        "especie": "Cachorro",
+        "idade": 6
+      },
+      {
+        "nome": "Mel",
+        "especie": "Gato",
+        "idade": 3
+      },
+      {
+        "nome": "Pipoca",
+        "especie": "Hamster",
+        "idade": 1
+      }
+    ]
+  },
+  {
+    "nome": "Juliana Alves",
+    "pets": [
+      {
+        "nome": "Fred",
+        "especie": "Papagaio",
+        "idade": 8
+      },
+      {
+        "nome": "Bidu",
+        "especie": "Cachorro",
+        "idade": 4
+      }
+    ]
+  }
+]
+
+- Banco ROOM (relacionamento 1:N)
+[source,java]
+@Entity(tableName = "usuarios")
+public class Usuario {
+    @PrimaryKey(autoGenerate = true)
+    private long id;
+    private String nome;
+    public Usuario() {}
+    public Usuario(String nome) {
+        this.nome = nome;
+    }
+    public long getId() {
+        return id;
+    }
+    public void setId(long id) {
+        this.id = id;
+    }
+    public String getNome() {
+        return nome;
+    }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+}//class
+@Entity(
+        tableName = "pets",
+        foreignKeys = @ForeignKey(
+                entity = Usuario.class,
+                parentColumns = "id",
+                childColumns = "usuario_id",
+                onDelete = ForeignKey.CASCADE
+        ),
+        indices = @Index("usuario_id")
+)
+public class Pet {
+    @PrimaryKey(autoGenerate = true)
+    private long id;
+    private String nome;
+    private String especie;
+    private int idade;
+    @ColumnInfo(name = "usuario_id")
+    private long usuarioId;
+    public Pet() {}
+    public long getId() {
+        return id;
+    }
+    public void setId(long id) {
+        this.id = id;
+    }
+    public String getNome() {
+        return nome;
+    }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+    public String getEspecie() {
+        return especie;
+    }
+    public void setEspecie(String especie) {
+        this.especie = especie;
+    }
+    public int getIdade() {
+        return idade;
+    }
+    public void setIdade(int idade) {
+        this.idade = idade;
+    }
+    public long getUsuarioId() {
+        return usuarioId;
+    }
+    public void setUsuarioId(long usuarioId) {
+        this.usuarioId = usuarioId;
+    }
+}//class
+public class UsuarioComPets {
+    @Embedded
+    public Usuario usuario;
+    @Relation(
+            parentColumn = "id",
+            entityColumn = "usuario_id"
+    )
+    public List<Pet> pets;
+}//class
+@Dao
+public interface UsuarioDao {
+    @Insert
+    long inserir(Usuario usuario);
+    @Update
+    void atualizar(Usuario usuario);
+    @Delete
+    void remover(Usuario usuario);
+    @Query("SELECT * FROM usuarios")
+    List<Usuario> listarUsuarios();
+    @Query("SELECT * FROM usuarios WHERE id = :id")
+    Usuario buscarPorId(long id);
+    @Transaction
+    @Query("SELECT * FROM usuarios")
+    List<UsuarioComPets> listarUsuariosComPets();
+}//class
+@Dao
+public interface PetDao {
+    @Insert
+    void inserir(Pet pet);
+    @Insert
+    void inserirTodos(List<Pet> pets);
+    @Update
+    void atualizar(Pet pet);
+    @Delete
+    void remover(Pet pet);
+    @Query("SELECT * FROM pets")
+    List<Pet> listarPets();
+    @Query("SELECT * FROM pets WHERE usuario_id = :usuarioId")
+    List<Pet> listarPetsDoUsuario(long usuarioId);
+}//class
+@Database(
+        entities = {
+                Usuario.class,
+                Pet.class
+        },
+        version = 1,
+        exportSchema = false
+)
+public abstract class AppDatabase extends RoomDatabase {
+    private static AppDatabase INSTANCE;
+    public abstract UsuarioDao usuarioDao();
+    public abstract PetDao petDao();
+    public static synchronized AppDatabase getInstance(
+            Context context) {
+        if (INSTANCE == null) {
+            INSTANCE = Room.databaseBuilder(
+                    context.getApplicationContext(),
+                    AppDatabase.class,
+                    "pets_db"
+            ).build();
+        }
+        return INSTANCE;
+    }
+}//class
+
+- ContentProvider
+[source,java]
+public class PetProvider extends ContentProvider {
+    public static final String AUTHORITY =
+            "com.example.petapp.provider";
+    public static final Uri URI_USUARIOS =
+            Uri.parse(
+                    "content://" +
+                    AUTHORITY +
+                    "/usuarios"
+            );
+    public static final Uri URI_PETS =
+            Uri.parse(
+                    "content://" +
+                    AUTHORITY +
+                    "/pets"
+            );
+    private AppDatabase database;
+    @Override
+    public boolean onCreate() {
+        database =
+                AppDatabase.getInstance(
+                        getContext());
+        return true;
+    }
+@Override
+public Cursor query(
+        Uri uri,
+        String[] projection,
+        String selection,
+        String[] selectionArgs,
+        String sortOrder) {
+    SQLiteDatabase db =
+            database.getOpenHelper()
+                    .getReadableDatabase();
+    String tabela;
+    if (uri.getPath().equals("/usuarios")) {
+        tabela = "usuarios";
+    } else if (uri.getPath().equals("/pets")) {
+        tabela = "pets";
+    } else {
+
+        throw new IllegalArgumentException(
+                "URI inválida");
+    }
+    return db.query(
+            tabela,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            sortOrder
+    );
+}
+@Override
+public Uri insert(
+        Uri uri,
+        ContentValues values) {
+    SQLiteDatabase db =
+            database.getOpenHelper()
+                    .getWritableDatabase();
+    long id;
+    if (uri.getPath().equals("/usuarios")) {
+        id = db.insert(
+                "usuarios",
+                null,
+                values);
+
+    } else {
+        id = db.insert(
+                "pets",
+                null,
+                values);
+    }
+    return ContentUris.withAppendedId(uri, id);
+}
+@Override
+public int delete(
+        Uri uri,
+        String selection,
+        String[] selectionArgs) {
+    SQLiteDatabase db =
+            database.getOpenHelper()
+                    .getWritableDatabase();
+    if (uri.getPath().equals("/usuarios")) {
+        return db.delete(
+                "usuarios",
+                selection,
+                selectionArgs);
+    }
+    return db.delete(
+            "pets",
+            selection,
+            selectionArgs);
+}
+@Override
+public int update(
+        Uri uri,
+        ContentValues values,
+        String selection,
+        String[] selectionArgs) {
+    SQLiteDatabase db =
+            database.getOpenHelper()
+                    .getWritableDatabase();
+    if (uri.getPath().equals("/usuarios")) {
+       return db.update(
+                "usuarios",
+                values,
+                selection,
+                selectionArgs);
+    }
+    return db.update(
+            "pets",
+            values,
+            selection,
+            selectionArgs);
+}
+
+- AndroidManifest.xml
+[source,java]
+<provider
+    android:name=".provider.PetProvider"
+    android:authorities="com.example.petapp.provider"
+    android:exported="true"/>
+
 
