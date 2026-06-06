@@ -490,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
-- Exemplo 02: (JSON + ROOM + CONTENT PROVIDER) 
+- Exemplo 03: (JSON + ROOM + CONTENT PROVIDER) 
 
 - JSON
 [source,java]
