@@ -1826,7 +1826,7 @@ public class StudentStatusAdapter extends RecyclerView.Adapter<StudentStatusAdap
     }
 }
 
-== App rovedor de conteúdo e app cliente
+== App provedor de conteúdo e app cliente
 
 - App Provedor
 - No arquivo AndroidManifest.xml do app provedor, adicione:
