@@ -2420,6 +2420,390 @@ public class MainActivity extends AppCompatActivity {
     }
 }//class
 
+== Exemplo MVVM + REPOSITORY + FACTORY
+
+- No arquivo AndroidManifest.xml, adicione:
+ <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+       android:id="@+id/lista"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- MainActivity.java
+[source,java]
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import java.util.List;
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+    private ListView lista;
+    private ArrayAdapter<Contato> dadosAdapter;
+    private ContatoViewModel viewModel;
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        lista = findViewById(R.id.lista);
+        lista.setOnItemClickListener(this);
+        ContatoViewModelFactory factory = new ContatoViewModelFactory(getApplicationContext());
+        viewModel = new ViewModelProvider(this, factory).get(ContatoViewModel.class);
+        viewModel.getContatos().observe(this, new Observer<List<Contato>>() {
+            @Override
+            public void onChanged(List<Contato> contatos) {
+                dadosAdapter = new ArrayAdapter<>(MainActivity.this,
+                        android.R.layout.simple_list_item_1, contatos);
+                lista.setAdapter(dadosAdapter);
+            }
+        });
+        verificarPermissao();
+    }//
+    private void verificarPermissao() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
+        } else {
+            viewModel.carregarContatos();
+        }
+    }//
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            viewModel.carregarContatos();
+        } else {
+            Toast.makeText(this, "Permissão negada!!!!", Toast.LENGTH_SHORT).show();
+        }
+    }
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Contato item = (Contato) parent.getItemAtPosition(position);
+        Toast.makeText(this, item.toString(), Toast.LENGTH_SHORT).show();
+    }
+}//class
+
+- ContatoViewModelFactory.java
+[source,java]
+import android.content.Context;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+public class ContatoViewModelFactory implements ViewModelProvider.Factory {
+    private ContatoRepository repository;
+    public ContatoViewModelFactory(Context context) {
+        this.repository = new ContatoRepository(context);
+    }
+    @NonNull
+    @Override
+    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+        if(modelClass.isAssignableFrom(ContatoViewModel.class)){
+            return (T) new ContatoViewModel(repository);
+        }
+        throw new IllegalArgumentException("classe desconhecida");
+    }//
+}//class
+
+- ContatoViewModel.java
+[source,java]
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import java.util.List;
+public class ContatoViewModel extends ViewModel {
+    private MutableLiveData<List<Contato>> mContatos;
+    private ContatoRepository repository;
+    public ContatoViewModel(ContatoRepository repository) {
+        this.repository = repository;
+        mContatos = new MutableLiveData<>();
+    }
+    public LiveData<List<Contato>> getContatos() {
+        return mContatos;
+    }
+    public void carregarContatos() {
+        mContatos.setValue(repository.buscarTodos());
+    }
+}//class
+
+- ContatoRepository.java
+[source,java]
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.ContactsContract;
+import java.util.ArrayList;
+import java.util.List;
+public class ContatoRepository {
+    private Context context;
+    public ContatoRepository(Context context) {
+        this.context = context;
+    }
+    public List<Contato> buscarTodos() {
+        ArrayList<Contato> lista = new ArrayList<>();
+        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String[] projection = {
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                ContactsContract.CommonDataKinds.Phone.NUMBER
+        };
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(uri, projection, null, null,
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+        if (cursor != null) {
+            int idIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
+            int nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+            int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+            while (cursor.moveToNext()) {
+                lista.add(new Contato(
+                        cursor.getInt(idIndex),
+                        cursor.getString(nameIndex),
+                        cursor.getString(phoneIndex)
+                ));
+            }
+            cursor.close();
+        }
+        return lista;
+    }
+}
+
+- Contato.java
+[source,java]
+public class Contato {
+    private int id;
+    private String nome, fone;
+    public Contato(int id, String nome, String fone) {
+        this.id = id;
+        this.nome = nome;
+        this.fone = fone;
+    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public String getFone() { return fone; }
+    public void setFone(String fone) { this.fone = fone; }
+    @Override
+    public String toString() {
+        return nome + " - " + fone;
+    }
+}
+
+== Exemplo MVVM + REPOSITORY + ANDROIDVIEWMODEL
+
+- No arquivo AndroidManifest.xml, adicione:
+ <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+- activity_main.xml
+[source,java]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lista"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- MainActivity.java
+[source,java]
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import java.util.List;
+public class MainActivity extends AppCompatActivity implements
+        AdapterView.OnItemClickListener {
+    private ListView lista;
+    private ArrayAdapter<Contato> dadosAdapter;
+    private ContatoViewModel viewModel;
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        lista = findViewById(R.id.lista);
+        lista.setOnItemClickListener(this);
+        viewModel = new ViewModelProvider(this).get(ContatoViewModel.class);
+        viewModel.getContatos().observe(this, new Observer<List<Contato>>() {
+            @Override
+            public void onChanged(List<Contato> contatos) {
+                dadosAdapter = new ArrayAdapter<>(MainActivity.this,
+                        android.R.layout.simple_list_item_1, contatos);
+                lista.setAdapter(dadosAdapter);
+            }
+        });
+        verificarPermissao();
+    }//onCreate
+    private void verificarPermissao() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                checkSelfPermission(Manifest.permission.READ_CONTACTS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
+                    PERMISSIONS_REQUEST_READ_CONTACTS);
+        } else {
+            viewModel.carregarContatos();
+        }
+    }//
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            viewModel.carregarContatos();
+        } else {
+            Toast.makeText(this, "Permissão negada!!!!", Toast.LENGTH_SHORT).show();
+        }
+    }
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Contato item = (Contato) parent.getItemAtPosition(position);
+        Toast.makeText(this, item.toString(), Toast.LENGTH_SHORT).show();
+    }
+}//class
+
+- ContatoViewModel.java
+[source,java]
+import android.app.Application;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import java.util.List;
+public class ContatoViewModel extends AndroidViewModel {
+    private MutableLiveData<List<Contato>> mContatos;
+    private ContatoRepository repository;
+    public ContatoViewModel(@NonNull Application application) {
+        super(application);
+        mContatos = new MutableLiveData<>();
+        this.repository = new ContatoRepository(application);
+    }//
+    public LiveData<List<Contato>> getContatos() {
+        return mContatos;
+    }
+    public void carregarContatos() {
+        List<Contato> lista = repository.buscarTodos();
+        mContatos.setValue(lista);
+    }
+}//class
+
+- ContatoRepository.java
+[source,java]
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.ContactsContract;
+import java.util.ArrayList;
+import java.util.List;
+public class ContatoRepository {
+    private Context context;
+    public ContatoRepository(Context context) {
+        this.context = context;
+    }//
+    public List<Contato> buscarTodos() {
+        ArrayList<Contato> lista = new ArrayList<>();
+        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String[] projection = {
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                ContactsContract.CommonDataKinds.Phone.NUMBER
+        };
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(uri, projection, null,
+                null,
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME +
+                        " ASC");
+        if (cursor != null) {
+            int idIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
+            int nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+            int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+            while (cursor.moveToNext()) {
+                lista.add(new Contato(
+                        cursor.getInt(idIndex),
+                        cursor.getString(nameIndex),
+                        cursor.getString(phoneIndex)
+                ));
+            }//while
+            cursor.close();
+        }//if
+        return lista;
+    }//
+}//
+
+- Contato.java
+[source,java]
+public class Contato {
+    private int id;
+    private String nome, fone;
+    public Contato(int id, String nome, String fone) {
+        this.id = id;
+        this.nome = nome;
+        this.fone = fone;
+    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public String getFone() { return fone; }
+    public void setFone(String fone) { this.fone = fone; }
+    @Override
+    public String toString() {
+        return nome + " - " + fone;
+    }
+}
 
 
 
