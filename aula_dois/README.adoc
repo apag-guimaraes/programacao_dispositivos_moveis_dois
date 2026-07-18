@@ -155,6 +155,77 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+- Calculadora.kt
+[source,kotlin]
+class Calculadora {
+    fun calcular(value1: Double, value2: Double, operator: String): Double {
+        return when (operator) {
+            "+" -> value1 + value2
+            "-" -> value1 - value2
+            "*" -> value1 * value2
+            "/" -> if (value2 == 0.0) Double.NaN else value1 / value2
+            else -> 0.0
+        }
+    }
+}
+
+- CalculadoraViewModel.kt
+[source,kotlin]
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+class CalculadoraViewModel : ViewModel() {
+    private val calculadora = Calculadora()
+    private val _resultado = MutableLiveData<String>("Resultado ...")
+    val resultado: LiveData<String> get() = _resultado
+    fun calcular(n1: Double, n2: Double, op: String) {
+        val calculationResult = calculadora.calcular(n1, n2, op)
+        
+        if (calculationResult.isNaN()) {
+            _resultado.value = "Erro: Divisão por zero"
+        } else {
+            _resultado.value = "Resultado: $calculationResult"
+        }
+    }
+    fun mostrarErroValidacao() {
+        _resultado.value = "Por favor, preencha todos os campos corretamente."
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import com.example.calculadora.databinding.ActivityMainBinding
+class MainActivity : AppCompatActivity() {
+    private val viewModel: CalculadoraViewModel by viewModels()
+    private lateinit var binding: ActivityMainBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
+        binding.buttonCalcular.setOnClickListener {
+            val strN1 = binding.editTextN1.text.toString()
+            val strN2 = binding.editTextN2.text.toString()
+            val op = binding.editTextOperador.text.toString().trim()
+            if (strN1.isEmpty() || strN2.isEmpty() || op.isEmpty()) {
+                viewModel.mostrarErroValidacao()
+                return@setOnClickListener
+            }
+            val n1 = strN1.toDoubleOrNull()
+            val n2 = strN2.toDoubleOrNull()
+            if (n1 != null && n2 != null) {
+                viewModel.calcular(n1, n2, op)
+            } else {
+                viewModel.mostrarErroValidacao()
+            }
+        }
+    }
+}
+
 Exemplo prático 02 (sem DataBinding e com ViewModel):
 
 - activity_main.xml
@@ -252,7 +323,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import androidx.appcopat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 public class MainActivity extends AppCompatActivity {
@@ -286,6 +357,87 @@ public class MainActivity extends AppCompatActivity {
                 viewModel.calculate(n1, n2, op);
             }
         });
+    }
+}
+
+- Calculadora.kt
+[source,kotlin]
+class Calculadora {
+    fun calcular(n1: Double, n2: Double, op: String): Double {
+        return when (op) {
+            "+" -> n1 + n2
+            "-" -> n1 - n2
+            "*" -> n1 * n2
+            "/" -> if (n2 == 0.0) Double.NaN else n1 / n2
+            else -> 0.0
+        }
+    }
+}
+
+- CalculadoraViewModel.kt
+[source,kotlin]
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+class CalculadoraViewModel : ViewModel() {
+    private val modelo = Calculadora()
+    private val _resultado = MutableLiveData<String>()
+    val resultado: LiveData<String> get() = _resultado
+    fun calculate(n1: Double, n2: Double, op: String) {
+        val calculationResult = modelo.calcular(n1, n2, op)
+      
+        if (calculationResult.isNaN()) {
+            _resultado.value = "Resultado: Erro (Divisão por zero)"
+        } else {
+            _resultado.value = "Resultado: $calculationResult"
+        }
+    }
+    fun emitirErroValidacao() {
+        _resultado.value = "Resultado: Preencha todos os campos corretamente."
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private val viewModel: CalculadoraViewModel by viewModels()
+    private lateinit var textViewResultado: TextView
+    private lateinit var editTextN1: EditText
+    private lateinit var editTextN2: EditText
+    private lateinit var editTextOp: EditText
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        textViewResultado = findViewById(R.id.textViewResultado)
+        val buttonCalculadora = findViewById<Button>(R.id.buttonCalculadora)
+        editTextN1 = findViewById(R.id.editTextN1)
+        editTextN2 = findViewById(R.id.editTextN2)
+        editTextOp = findViewById(R.id.editTextOp)
+        viewModel.resultado.observe(this) { result ->
+            textViewResultado.text = result
+        }
+        buttonCalculadora.setOnClickListener {
+            val s1 = editTextN1.text.toString().trim()
+            val s2 = editTextN2.text.toString().trim()
+            val op = editTextOp.text.toString().trim()
+            if (s1.isEmpty() || s2.isEmpty() || op.isEmpty()) {
+                viewModel.emitirErroValidacao()
+                return@setOnClickListener
+            }
+            val n1 = s1.toDoubleOrNull()
+            val n2 = s2.toDoubleOrNull()
+            if (n1 != null && n2 != null) {
+                viewModel.calculate(n1, n2, op)
+            } else {
+                viewModel.emitirErroValidacao()
+            }
+        }
     }
 }
 
@@ -373,11 +525,10 @@ import androidx.lifecycle.ViewModel;
 import java.util.List;
 public class AlunoViewModel extends ViewModel {
     private MutableLiveData<List<Aluno>> alunos;
-    private AlunoRepositorio alunoRepositorio;
     public AlunoViewModel() {
         alunos = new MutableLiveData<>();
         alunoRepositorio = new AlunoRepositorio();
-        alunos.setValue(alunoRepositorio.obterDadosAlunos());
+        alunos.setValue(AlunoRepositorio.obterDadosAlunos());
     }
     public LiveData<List<Aluno>> getAlunos() {
         return alunos;
@@ -390,12 +541,17 @@ public class AlunoViewModel extends ViewModel {
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
     <ListView
-        android:id="@+id/listViewAlunos"
+        android:id="@+id/listViewBolos"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 </LinearLayout>
 
 - item_aluno.xml (View)
@@ -453,6 +609,88 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+- Aluno.kt
+[source,kotlin]
+data class Aluno(var nome: String, var nota: Int)
+
+- AlunoRepositorio.kt
+[source,kotlin]
+class AlunoRepositorio {
+    companion object {
+        fun obterDadosAlunos(): List<Aluno> {
+            return arrayListOf(
+                Aluno("Ana", 6),
+                Aluno("Rodrigo", 8),
+                Aluno("Paulo", 7)
+            )
+        }
+    }
+}
+
+- AlunoAdapter.kt
+[source,kotlin]
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.TextView
+class AlunoAdapter(context: Context, alunos: List<Aluno>) : ArrayAdapter<Aluno>(context, 0, alunos) {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        var itemView = convertView
+        val aluno = getItem(position)
+        if (itemView == null) {
+            itemView = LayoutInflater.from(context).inflate(R.layout.item_aluno, parent, false)
+        }
+        val textViewNome = itemView!!.findViewById<TextView>(R.id.textViewNome)
+        val textViewNota = itemView.findViewById<TextView>(R.id.textViewNota)
+        aluno?.let {
+            textViewNome.text = it.nome
+            textViewNota.text = "Nota: ${it.nota}"
+        }
+        return itemView
+    }
+}
+
+- AlunoViewModel.kt
+[source,kotlin]
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+class AlunoViewModel : ViewModel() {
+    private val _alunos = MutableLiveData<List<Aluno>>()
+    val alunos: LiveData<List<Aluno>> get() = _alunos
+
+    init {
+        _alunos.value = AlunoRepositorio.obterDadosAlunos()
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.widget.ListView
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private val alunoViewModel: AlunoViewModel by viewModels()
+    private lateinit var listViewAlunos: ListView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        listViewAlunos = findViewById(R.id.listViewAlunos)
+        val adapter = AlunoAdapter(this, arrayListOf())
+        listViewAlunos.adapter = adapter
+        alunoViewModel.alunos.observe(this) { listaDeAlunos ->
+            adapter.clear()
+            if (listaDeAlunos != null) {
+                adapter.addAll(listaDeAlunos)
+            }
+            adapter.notifyDataSetChanged()
+        }
+    }
+}
+
 Exemplo prático 04:
 
 - Bolo.java
@@ -493,7 +731,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import java.util.List;
 public class BoloViewModel extends ViewModel {
-    private MutableLiveData<List<Bolo>> bolos = new MutableLiveData<>();
+    private final MutableLiveData<List<Bolo>> bolos = new MutableLiveData<>();
     public BoloViewModel() {
         loadBolos();
     }
@@ -644,7 +882,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Bolo> bolos) {
                 adapter.clear();
-                adapter.addAll(bolos);
+                if (bolos != null) {
+                    adapter.addAll(bolos);
+                }
                 adapter.notifyDataSetChanged();
             }
         });
@@ -664,9 +904,127 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+- Bolo.kt
+[source,kotlin]
+data class Bolo(val nome: String, val receita: String)
 
+- BoloRepositorio.kt
+[source,kotlin]
+class BoloRepositorio {
+    companion object {
+        fun getBolos(): List<Bolo> {
+            return listOf(
+                Bolo("Bolo de Fubá", "Receita: Fubá, leite, ovos..."),
+                Bolo("Bolo de Chocolate", "Receita: Chocolate, leite, ovos..."),
+                Bolo("Bolo de Mandioca", "Receita: Mandioca, leite, ovos...")
+            )
+        }
+    }
+}
 
+- BoloViewModel.kt
+[source,kotlin]
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+class BoloViewModel : ViewModel() {
+    private val _bolos = MutableLiveData<List<Bolo>>()
+    val bolos: LiveData<List<Bolo>> get() = _bolos
+    init {
+        loadBolos()
+    }
+    private fun loadBolos() {
+        _bolos.value = BoloRepositorio.getBolos()
+    }
+}
 
+- BoloAdapter.kt
+[source,kotlin]
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.TextView
+class BoloAdapter(context: Context, bolos: List<Bolo>) : ArrayAdapter<Bolo>(context, 0, bolos) {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        var itemView = convertView
+        val bolo = getItem(position)
+        if (itemView == null) {
+            itemView = LayoutInflater.from(context).inflate(R.layout.item_bolo, parent, false)
+        }
+        val textViewNome = itemView!!.findViewById<TextView>(R.id.textViewNome)
+        bolo?.let {
+            textViewNome.text = it.nome
+        }
+        return itemView
+    }
+}
 
+- ReceitaFragment.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+class ReceitaFragment : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater, 
+        container: ViewGroup?, 
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_receita, container, false)
+        val textViewReceita = view.findViewById<TextView>(R.id.textViewReceita)
+        arguments?.getString(ARG_RECEITA)?.let { receita ->
+            textViewReceita.text = receita
+        }
+        return view
+    }
+    companion object {
+        private const val ARG_RECEITA = "receita"
+        fun newInstance(receita: String): ReceitaFragment {
+            return ReceitaFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_RECEITA, receita)
+                }
+            }
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.widget.ListView
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private val boloViewModel: BoloViewModel by viewModels()
+    private lateinit var listViewBolos: ListView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        listViewBolos = findViewById(R.id.listViewBolos)
+        val adapter = BoloAdapter(this, arrayListOf())
+        listViewBolos.adapter = adapter
+        boloViewModel.bolos.observe(this) { listaDeBolos ->
+            adapter.clear()
+            listaDeBolos?.let { adapter.addAll(it) }
+            adapter.notifyDataSetChanged()
+        }
+        listViewBolos.setOnItemClickListener { _, _, position, _ ->
+            val bolo = adapter.getItem(position)
+            if (bolo != null) {
+                val fragment = ReceitaFragment.newInstance(bolo.receita)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+    }
+}
 
 
