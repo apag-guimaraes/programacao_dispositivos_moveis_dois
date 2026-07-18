@@ -777,7 +777,7 @@ A classe AsyncTask foi descontinuada, segue a versão abaixo usando a classe Exe
 
 - Arquivo Gradle: implementation("com.google.code.gson:gson:2.11.0")
 
-- Versão sem VIEWMODEL
+-- Versão sem VIEWMODEL
 
 - Item.java
 [source,java]
@@ -835,7 +835,6 @@ public class Conexao {
             return new BufferedInputStream(conexao.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
             if (conexao != null) {
                 conexao.disconnect();
             }
@@ -853,11 +852,9 @@ import java.io.InputStreamReader;
 public class Conversao {
     public String converter(InputStream inputStream) {
         if (inputStream == null) return null;
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder stringBuilder = new StringBuilder();
-        String conteudo;
-        try {
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
+            String conteudo;
             while ((conteudo = bufferedReader.readLine()) != null) {
                 stringBuilder.append(conteudo).append("\n");
             }
@@ -938,6 +935,11 @@ public class Repositorio {
             }
         });
     }//
+ 	public void shutdown() {
+        if (executor != null) {
+            executor.shutdownNow(); // Cancela tarefas pendentes ao fechar a tela
+        }
+    }
 }//class
 
 - activity_main.xml
@@ -967,41 +969,50 @@ import android.widget.ListView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
-public class MainActivity extends AppCompatActivity{
-        private ListView listView;
-        private ArrayAdapter<String> adapter;
-        private List<String> lista;
-        private Repositorio repositorio;
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
-            listView = findViewById(R.id.listViewDados);
-            lista = new ArrayList<>();
-            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, lista);
-            listView.setAdapter(adapter);
-            repositorio = new Repositorio();
-            carregarDados();
-        }
-        private void carregarDados() {
-            Toast.makeText(this, "Download começando...", Toast.LENGTH_SHORT).show();
-            repositorio.obterDados(new Repositorio.Callback() {
-                @Override
-                public void sucesso(List<String> itens) {
-                    lista.clear();
-                    lista.addAll(itens);
+public class MainActivity extends AppCompatActivity {
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
+    private Repositorio repositorio;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        listView = findViewById(R.id.listViewDados);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
+        listView.setAdapter(adapter);
+        repositorio = new Repositorio();
+        carregarDados();
+    }
+    private void carregarDados() {
+        Toast.makeText(this, "Download começando...", Toast.LENGTH_SHORT).show();
+        repositorio.obterDados(new Repositorio.Callback() {
+            @Override
+            public void sucesso(List<String> itens) {
+                if (!isFinishing()) { // Verifica se a tela ainda existe
+                    adapter.clear();
+                    adapter.addAll(itens);
                     adapter.notifyDataSetChanged();
                     Toast.makeText(MainActivity.this, "Dados carregados (" + itens.size() + ")", Toast.LENGTH_SHORT).show();
                 }
-                @Override
-                public void erro(String message) {
+            }
+            @Override
+            public void erro(String message) {
+                if (!isFinishing()) {
                     Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
                 }
-            });
+            }
+        });
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (repositorio != null) {
+            repositorio.shutdown(); // Evita o vazamento de memória da Thread 
         }
+    }
 }
 
-- Versão com VIEWMODEL
+-- Versão com VIEWMODEL
 
 - Conexao.java
 [source,java]
@@ -1206,11 +1217,8 @@ public class MainViewModel extends ViewModel {
 - MainActivity.java
 [source,java]
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -1220,25 +1228,24 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private ListView listView;
     private ArrayAdapter<String> adapter;
-    private List<String> dados = new ArrayList<>();
     private MainViewModel viewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         listView = findViewById(R.id.listViewDados);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dados);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
         listView.setAdapter(adapter);
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         viewModel.getLista().observe(this, new Observer<List<String>>() {
             @Override
             public void onChanged(List<String> lista) {
                 if (lista != null) {
-                    dados.clear();
-                    dados.addAll(lista);
+                    adapter.clear();
+                    adapter.addAll(lista);
                     adapter.notifyDataSetChanged();
                     Toast.makeText(MainActivity.this,
-                                    "Carregados: " + dados.size(),
+                                    "Carregados: " + lista.size(),
                                     Toast.LENGTH_SHORT)
                             .show();
                 }
@@ -1255,11 +1262,188 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        viewModel.carregarDados();
+        // Evita chamadas duplicadas ao rotacionar a tela: só carrega se a lista atual estiver vazia
+        if (viewModel.getLista().getValue() == null) {
+            viewModel.carregarDados();
+        }
     }
 }
 
-- Referências: As classes Conexao e Conversao foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m). Acesso em: 21 de ago. 2025.
+- Referências: As classes Conexao.java e Conversa.java foram adaptadas do site Stack Overflow (https://stackoverflow.com/questions/58889465/json-parsing-error-value-jsonstr-of-type-java-lang-string-cannot-be-converted-t) realizada pelo usuário Saad ( https://stackoverflow.com/users/7741722/saad) e respondida por Mike M. (https://stackoverflow.com/users/2850651/mike-m). Acesso em: 21 de ago. 2025.
+
+- Conexao.kt
+[source,kotlin]
+import java.io.BufferedInputStream
+import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
+class Conexao {
+    fun obterRespostaHTTP(end: String): InputStream? {
+        return try {
+            val url = URL(end)
+            val conexao = (url.openConnection() as HttpURLConnection).apply {
+                connectTimeout = 50000
+                readTimeout = 50000
+                requestMethod = "GET"
+            }
+            conexao.connect()
+            BufferedInputStream(conexao.inputStream)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+}
+
+- Conversao.kt
+[source,kotlin]
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+class Conversao {
+    fun converter(inputStream: InputStream?): String? {
+        if (inputStream == null) return null
+        val bufferedReader = BufferedReader(InputStreamReader(inputStream))
+        val stringBuilder = StringBuilder()
+        try {
+            var conteudo: String?
+            while (bufferedReader.readLine().also { conteudo = it } != null) {
+                stringBuilder.append(conteudo).append("\n")
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return stringBuilder.toString()
+    }
+}
+
+- Item.kt
+[source,kotlin]
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+data class Item(
+    @SerializedName("userId") @Expose val userId: Int?,
+    @SerializedName("id") @Expose val id: Int?,
+    @SerializedName("title") @Expose val title: String?,
+    @SerializedName("body") @Expose val body: String?
+) {
+    override fun toString(): String {
+        return "Item(userId=$userId, id=$id, title='$title', body='$body')"
+    }
+}
+
+- Repositorio.kt
+[source,kotlin]
+import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+class Repositorio {
+    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
+    interface Callback {
+        fun sucesso(items: List<String>)
+        fun erro(mensagem: String)
+    }
+    fun obterDados(c: Callback) {
+        executor.execute {
+            try {
+                val conexao = Conexao()
+                val inputStream = conexao.obterRespostaHTTP(URL)
+                val conversao = Conversao()
+                val jsonString = conversao.converter(inputStream)
+                if (jsonString.isNullOrEmpty()) {
+                    c.erro("Resposta vazia")
+                    return@execute
+                }
+                Log.i("JSON", "Recebido $jsonString")
+                val gson = Gson()
+                val type = object : TypeToken<List<Item>>() {}.type
+                val dados: List<Item>? = gson.fromJson(jsonString, type)
+                val itens = arrayListOf<String>()
+                dados?.forEach { item ->
+                    itens.add(item.toString())
+                }
+                c.sucesso(itens)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                c.erro("Erro ao baixar dados: ${e.message}")
+            }
+        }
+    }
+    fun shutdown() {
+        executor.shutdown()
+    }
+    companion object {
+        private const val URL = "https://jsonplaceholder.typicode.com/posts"
+    }
+}
+
+- MainViewModel.kt
+[source,kotlin]
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+class MainViewModel : ViewModel() {
+    private val repositorio = Repositorio()
+    private val _lista = MutableLiveData<List<String>>()
+    val lista: LiveData<List<String>> get() = _lista
+    private val _mensagem = MutableLiveData<String>()
+    val mensagem: LiveData<String> get() = _mensagem
+    fun carregarDados() {
+        repositorio.obterDados(object : Repositorio.Callback {
+            override fun sucesso(items: List<String>) {
+                _lista.postValue(items)
+            }
+            override fun erro(mensagem: String) {
+                _mensagem.postValue(mensagem)
+            }
+        })
+    }
+    override fun onCleared() {
+        super.onCleared()
+        repositorio.shutdown()
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private val viewModel: MainViewModel by viewModels()
+    private lateinit var listView: ListView
+    private lateinit var adapter: ArrayAdapter<String>
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        listView = findViewById(R.id.listViewDados)
+        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayListOf())
+        listView.adapter = adapter
+        viewModel.lista.observe(this) { listaDeItens ->
+            listaDeItens?.let {
+                adapter.clear()
+                adapter.addAll(it)
+                adapter.notifyDataSetChanged()
+                Toast.makeText(this, "Carregados: ${it.size}", Toast.LENGTH_SHORT).show()
+            }
+        }
+        viewModel.mensagem.observe(this) { erro ->
+            erro?.let {
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            }
+        }
+        if (viewModel.lista.value == null) {
+            viewModel.carregarDados()
+        }
+    }
+}
 
  - Exemplos práticos (API JSON SERVER)
 
