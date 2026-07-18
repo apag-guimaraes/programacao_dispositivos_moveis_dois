@@ -11,20 +11,6 @@
 //make slides
 //make ebook
 
-//Estilo do Sumário
-:toc2: 
-//após os : insere o texto que deseja ser visível
-:toc-title: Sumário
-:figure-caption: Figura
-//numerar titulos
-:numbered:
-:source-highlighter: highlightjs
-:icons: font
-:chapter-label:
-:doctype: book
-:lang: pt-BR
-//3+| mesclar linha tabela
-
 = Navigation Drawer
 
 O Navigation Drawer é um componente que permite construir um menu lateral que desliza no sentido esquerda para a direita. É possível criar um Navigation Drawer do zero, mas atualmente, é disponibilizado o template pronto do Navigation Drawer quando você cria um projeto no Android Studio. Dessa forma, o trabalho fica compreendido em entender as funções de vários elementos que o compõe. Isto pode ser visto logo a seguir nos exemplos práticos.
