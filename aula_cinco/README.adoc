@@ -121,7 +121,10 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.view.View;
 import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
     private static final int CODIGO_SOLICITACAO = 1;
@@ -148,19 +151,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void chamarActivity() {
-        Intent i = new Intent(getApplicationContext(), SegundaActivity.class);
+        Intent i = new Intent(this, SegundaActivity.class);
         startActivity(i);
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        
         if (requestCode == CODIGO_SOLICITACAO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Usuário aceitou a permissão
                 chamarActivity();
             } else {
-                PermissaoDialogFragment dialog = new PermissaoDialogFragment();
-                dialog.show(getSupportFragmentManager(), "PermissaoDialog");
+                // O usuário recusou uma vez
+                boolean mostrarExplicacao = ActivityCompat.shouldShowRequestPermissionRationale(this, PERMISSAO);
+                if (mostrarExplicacao) {
+                    // Caso 1: O usuário apenas clicou em "Negar". 
+                    // Ele ainda pode receber o popup do sistema de novo no futuro.
+                    // Mostramos o seu dialog explicando o motivo.
+                    PermissaoDialogFragment dialog = new PermissaoDialogFragment();
+                    dialog.show(getSupportFragmentManager(), "PermissaoDialog");
+                } else {
+                    finish(); //ou finishAffinity() ou finishAndRemoveTask(); 
+                }
             }
         }
     }
@@ -231,6 +245,120 @@ public class SegundaActivity extends AppCompatActivity {
     }
 }
 
+- PermissaoDialogFragment.kt
+[source,kotlin]
+import android.app.Dialog
+import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+class PermissaoDialogFragment : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AlertDialog.Builder(requireContext())
+            .setTitle("Permissão Necessária")
+            .setMessage("A permissão da câmera é necessária para tirar fotos.")
+            .setPositiveButton("Fechar") { _, _ ->
+                requireActivity().finish()
+            }
+            .create()
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.example.seuprojeto.databinding.ActivityMainBinding 
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    companion object {
+        private const val CODIGO_SOLICITACAO = 1
+        private const val PERMISSAO = Manifest.permission.CAMERA
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.buttonHello.setOnClickListener {
+            solicitarPermissao()
+        }
+    }
+    private fun solicitarPermissao() {
+        val temPermissao = ContextCompat.checkSelfPermission(this, PERMISSAO)
+        if (temPermissao != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(PERMISSAO), CODIGO_SOLICITACAO)
+        } else {
+            chamarActivity()
+        }
+    }
+    private fun chamarActivity() {
+        // Sintaxe concisa do Kotlin para Intents (SegundaActivity::class.java)
+        val intent = Intent(this, SegundaActivity::class.java)
+        startActivity(intent)
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CODIGO_SOLICITACAO) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                chamarActivity()
+            } else {
+                val mostrarExplicacao = ActivityCompat.shouldShowRequestPermissionRationale(this, PERMISSAO)
+                if (mostrarExplicacao) {
+                    val dialog = PermissaoDialogFragment()
+                    dialog.show(getSupportFragmentManager(), "PermissaoDialog")
+                } else {
+                    finishAndRemoveTask()
+                }
+            }
+        }
+    }
+}
+
+- SegundaActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.graphics.Bitmap
+import android.os.Build
+import android.os.Bundle
+import android.provider.MediaStore
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import com.example.seuprojeto.databinding.ActivitySegundaBinding 
+class SegundaActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySegundaBinding
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val data: Intent? = result.data
+            val foto: Bitmap? = if (Build.VERSION.SDK_INT >= 33) {
+                data?.getParcelableExtra("data", Bitmap::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                data?.getParcelableExtra("data") as? Bitmap
+            }
+            foto?.let {
+                binding.imageViewFoto.setImageBitmap(it)
+            }
+        }
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivitySegundaBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraLauncher.launch(intent)
+    }
+}
+
 Exemplo 02:
 
 - No arquivo AndroidManifest.xml acrescente: 
@@ -239,7 +367,7 @@ Exemplo 02:
         android:required="false" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
-- PermissionDialogPermission.java
+- PermissionDialogFragment.java
 [source,java]
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -258,13 +386,12 @@ public class PermissionDialogFragment extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss(); // Apenas fecha o alerta, o usuário pode tentar novamente
+                        dialog.dismiss(); // Apenas fecha o alerta para o usuário 
                     }
                 })
                 .create();
     }
 }
-
 - activity_main.xml
 [source,.xml]
 <?xml version="1.0" encoding="utf-8"?>
@@ -290,6 +417,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View; 
 import android.widget.Button;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -338,10 +466,112 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Caso o usuário aceite
                 fazerLigacao();
+            } else { 
+                // CORRIGIDO: Todo este bloco agora está adequadamente dentro do 'else'
+                // O usuário recusou a permissão.
+                boolean mostrarExplicacao = ActivityCompat.shouldShowRequestPermissionRationale(this, PERMISSAO);
+                if (mostrarExplicacao) {
+                    // Caso 1: O usuário apenas clicou em "Negar" na primeira vez. 
+                    // Mudado o nome para bater exatamente com a classe abaixo:
+                    PermissionDialogFragment dialog = new PermissionDialogFragment();
+                    dialog.show(getSupportFragmentManager(), "PermissaoDialog");
+                } else {
+                    // Caso 2: Negou permanentemente pela segunda vez.
+                    finishAndRemoveTask(); 
+                }
+            }
+        }
+    }
+}
+
+- PermissionDialogFragment.kt
+[source,kotlin]
+import android.app.Dialog
+import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+class PermissionDialogFragment : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AlertDialog.Builder(requireContext())
+            .setTitle("Permissão Necessária")
+            .setMessage("A permissão para realizar chamadas é essencial para o funcionamento deste app.")
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss() // Apenas fecha o alerta para o usuário tentar clicar em ligar de novo
+            }
+            .create()
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.example.seuprojeto.databinding.ActivityMainBinding // Substitua pelo pacote correto do seu app
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    companion object {
+        private const val PERMISSAO = Manifest.permission.CALL_PHONE
+        private const val REQUEST_PERMISSION = 100
+        private const val TELEFONE_FIXO = "tel:+55DDNUMBER"
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.btnChamada.setOnClickListener {
+            verificarPermissao()
+        }
+    }
+    private void verificarPermissao() {
+        val granted = ContextCompat.checkSelfPermission(this, PERMISSAO)
+        if (granted == PackageManager.PERMISSION_GRANTED) {
+            fazerLigacao()
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(PERMISSAO),
+                REQUEST_PERMISSION
+            )
+        }
+    }
+    private void fazerLigacao() {
+        try {
+            val intent = Intent(Intent.ACTION_CALL, Uri.parse(TELEFONE_FIXO))
+            startActivity(intent)
+        } catch (e: SecurityException) {
+            Toast.makeText(this, "Permissão negada para ligação.", Toast.LENGTH_SHORT).show()
+        }
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Caso o usuário aceite
+                fazerLigacao()
             } else {
-                PermissionDialogFragment dialog = new PermissionDialogFragment();
-                dialog.show(getSupportFragmentManager(), "dialog_permission");
+                // O usuário recusou a permissão
+                val mostrarExplicacao = ActivityCompat.shouldShowRequestPermissionRationale(this, PERMISSAO)
+                if (mostrarExplicacao) {
+                    // Caso 1: O usuário apenas clicou em "Negar" na primeira vez
+                    val dialog = PermissionDialogFragment()
+                    dialog.show(supportFragmentManager, "PermissaoDialog")
+                } else {
+                    // Caso 2: Negou permanentemente (Não perguntar novamente)
+                    finishAndRemoveTask()
+                }
             }
         }
     }
