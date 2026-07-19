@@ -9,146 +9,6 @@ As notificações podem ser simples, expandidas, ter a capacidade de responder a
 
 Exemplo 01 (notificação simples, ActivityCompat.shouldShowRequestPermissionRationale):
 
-- No arquivo AndroidManifest.xml acrescente <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Gerar Notificação"
-        android:onClick="gerar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-- NotificationHelper.java
-[source,java]
-import android.Manifest;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-public class NotificationHelper {
-    private static final String CANAL_ID = "2";  
-    private static final int NOTIFICACAO_ID = 1; 
-    public static void criarCanal(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence nome = "canal1";
-            String descricao = "descrição do canal 1";
-            int importancia = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel canal = new NotificationChannel(CANAL_ID, nome, importancia);
-            canal.setDescription(descricao);
-            NotificationManager nm = context.getSystemService(NotificationManager.class);
-            nm.createNotificationChannel(canal);
-        }
-    }
-    public static void gerarNotificacao(Context context, String titulo, String conteudo) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
-                        != PackageManager.PERMISSION_GRANTED) {
-            return; 
-        }
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CANAL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
-                .setContentTitle(titulo)
-                .setContentText(conteudo)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        NotificationManagerCompat nm = NotificationManagerCompat.from(context);
-        nm.notify(NOTIFICACAO_ID, builder.build());
-    }
-}
-
-- PermissionHelper.java
-[source,java]
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import androidx.core.app.ActivityCompat;
-public class PermissionHelper {
-    public static final int REQUEST_NOTIFICACAO = 101;
-    public static boolean temPermissaoNotificacao(Activity activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return ActivityCompat.checkSelfPermission(activity,
-                    Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
-        }
-        return true; 
-    }
-    public static void pedirPermissaoNotificacao(Activity activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (!temPermissaoNotificacao(activity)) {
-                ActivityCompat.requestPermissions(activity,
-                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                        REQUEST_NOTIFICACAO);
-            }
-        }
-    }
-}
-
-- MainActivity.java
-[source,java]
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Toast;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-public class MainActivity extends AppCompatActivity {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        NotificationHelper.criarCanal(this);
-        PermissionHelper.pedirPermissaoNotificacao(this);
-    }
-    public void gerar(View view) {
-        if (PermissionHelper.temPermissaoNotificacao(this)) {
-            NotificationHelper.gerarNotificacao(this,
-                    "Título de Teste",
-                    "Esta é a minha notificação :)");
-        } else {
-            Toast.makeText(this,
-                    "Ative a permissão!!!",
-                    Toast.LENGTH_LONG).show();
-        }
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PermissionHelper.REQUEST_CODE_NOTIFICACAO) {
-            if (grantResults.length > 0 &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this,
-                        "Permissão concedida",
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this,
-                        "Permissão negada",
-                        Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-}
-
-Exemplo 02 (notificação simples, ActivityCompat.shouldShowRequestPermissionRationale):
-
 - activity_main.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
@@ -162,45 +22,82 @@ Exemplo 02 (notificação simples, ActivityCompat.shouldShowRequestPermissionRat
         android:id="@+id/btnGerarNotificacao"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Gerar Notificação de Teste"
-        android:onClick="gerar" />
+        android:text="Gerar Notificação de Teste" />
 </LinearLayout>
 
 - MainActivity.java
 [source,java]
+import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import com.seu.pacote.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
+    public static final int REQUEST_CODE_NOTIFICACAO = 101;
+    private ActivityMainBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         NotificationHelper.criarCanal(this);
+        binding.btnGerarNotificacao.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verificarEPedirPermissao();
+            }
+        });
     }
-    public void gerar(View view) {
-        if (PermissionHelper.temPermissaoNotificacao(this)) {
-            NotificationHelper.gerarNotificacao(this, "Título de Teste", "Esta é a minha notificação :)");
-            Toast.makeText(this, "Notificação enviada!", Toast.LENGTH_SHORT).show();
-        } else {
-            PermissionHelper.solicitarPermissaoNotificacao(this);
+    private void verificarEPedirPermissao() {
+        // Se já possui a permissão, executa a ação direto
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
+                == PackageManager.PERMISSION_GRANTED) {
+            enviarNotificacaoDeTeste();
+        } 
+        // Caso contrário, faz a solicitação direta ao sistema (Primeira tentativa)
+        else {
+            dispararSolicitacaoSistema();
+        }
+    }
+    public void dispararSolicitacaoSistema() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                    this, 
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, 
+                    REQUEST_CODE_NOTIFICACAO
+            );
         }
     }
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PermissionHelper.REQUEST_NOTIFICACAO) {
+        if (requestCode == REQUEST_CODE_NOTIFICACAO) {
+            // Se o usuário aceitou a permissão
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Permissão concedida!", Toast.LENGTH_SHORT).show();
-                NotificationHelper.gerarNotificacao(this, "Título de Teste", "Esta é a minha notificação :)");
-            } else {
-                Toast.makeText(this, "Permissão negada. Não será possível mostrar notificações.", Toast.LENGTH_LONG).show();
+                enviarNotificacaoDeTeste();
+            } 
+            // Se negou, verificamos se devemos mostrar a justificativa (Rationale)
+            else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+                // CORREÇÃO: Chamando o nome consistente da classe do DialogFragment
+                RationaleDialogFragment dialog = RationaleDialogFragment.newInstance();
+                dialog.show(getSupportFragmentManager(), "rationale_dialog");
+            } 
+            // Se negou e marcou "Não perguntar novamente"
+            else {
+                Toast.makeText(this, "Permissão negada permanentemente. Ative nas configurações do aparelho.", Toast.LENGTH_LONG).show();
             }
         }
+    }
+    private void enviarNotificacaoDeTeste() {
+        NotificationHelper.gerarNotificacao(this, "Título de Teste", "Esta é a minha notificação :)");
+        Toast.makeText(this, "Notificação enviada!", Toast.LENGTH_SHORT).show();
     }
 }
 
@@ -226,7 +123,9 @@ public class NotificationHelper {
             NotificationChannel canal = new NotificationChannel(CANAL_ID, nome, importancia);
             canal.setDescription(descricao);
             NotificationManager nm = context.getSystemService(NotificationManager.class);
-            nm.createNotificationChannel(canal);
+            if (nm != null) {
+                nm.createNotificationChannel(canal);
+            }
         }
     }
     public static void gerarNotificacao(Context context, String titulo, String conteudo) {
@@ -246,98 +145,178 @@ public class NotificationHelper {
     }
 }
 
-- PermissionHelper.java
+ - RationaleDialogFragment .java
 [source,java]
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-public class PermissionHelper {
-    public static final int REQUEST_NOTIFICACAO = 101;
-    public static boolean temPermissaoNotificacao(Activity activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return ActivityCompat.checkSelfPermission(activity,
-                    Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
-        }
-        return true;
-    }
-    public static void solicitarPermissaoNotificacao(Activity activity) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || temPermissaoNotificacao(activity)) {
-            return;
-        }
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.POST_NOTIFICATIONS)) {
-            if (activity instanceof AppCompatActivity) {
-                RationalePermissionDialogFragment dialog = RationalePermissionDialogFragment.newInstance(
-                        REQUEST_NOTIFICACAO, Manifest.permission.POST_NOTIFICATIONS);
-                dialog.show(((AppCompatActivity) activity).getSupportFragmentManager(), "dialog");
-            }
-        } else {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_NOTIFICACAO);
-        }
-    }
-}
-
- - RationalePermissionDialogFragment.java
-[source,java]
-import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
-public class RationalePermissionDialogFragment extends DialogFragment {
-    private static final String ARG_REQUEST_CODE = "request_code";
-    private static final String ARG_PERMISSION = "permission";
-    public static RationalePermissionDialogFragment newInstance(int requestCode, String permission) {
-        RationalePermissionDialogFragment fragment = new RationalePermissionDialogFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_REQUEST_CODE, requestCode);
-        args.putString(ARG_PERMISSION, permission);
-        fragment.setArguments(args);
-        return fragment;
+public class RationaleDialogFragment extends DialogFragment {
+    public static RationaleDialogFragment newInstance() {
+        return new RationaleDialogFragment();
     }
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        String permission;
-        if (getArguments() != null) {
-            permission = getArguments().getString(ARG_PERMISSION);
-        } else {
-            permission = Manifest.permission.POST_NOTIFICATIONS;
-        }
-        int requestCode;
-        if (getArguments() != null) {
-            requestCode = getArguments().getInt(ARG_REQUEST_CODE);
-        } else {
-            requestCode = PermissionHelper.REQUEST_NOTIFICACAO;
-        }
         return new AlertDialog.Builder(requireContext())
-                .setTitle("Permissão de Notificações")
-                .setMessage("Precisamos da sua permissão para mostrar notificações de teste e progresso. Sem ela, você não verá as mensagens.")
-                .setPositiveButton("Permitir", new DialogInterface.OnClickListener() {
+                .setTitle("Por que precisamos disso?")
+                .setMessage("As notificações são usadas para mostrar o andamento dos seus testes e alertas importantes do app. Sem elas, você pode perder avisos do sistema.")
+                .setPositiveButton("Entendi", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions(requireActivity(),
-                                new String[]{permission},
-                                requestCode);
+                        dialog.dismiss();
                     }
                 })
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(requireContext(),
-                                "Sem permissão, notificações não serão exibidas.",
-                                Toast.LENGTH_LONG).show();
-                    }
-                })
-                .setCancelable(false)
+                .setCancelable(true) 
                 .create();
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.seu.pacote.databinding.ActivityMainBinding
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        NotificationHelper.criarCanal(this)
+        binding.btnGerarNotificacao.setOnClickListener {
+            verificarEPedirPermissao()
+        }
+    }
+    private fun verificarEPedirPermissao() {
+        // Dispositivos abaixo do Android 13 não precisam pedir permissão em runtime
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            enviarNotificacaoDeTeste()
+            return
+        }
+        // Se já possui a permissão, executa a ação direto
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
+            == PackageManager.PERMISSION_GRANTED) {
+            enviarNotificacaoDeTeste()
+        } else {
+            // Caso contrário, faz a solicitação direta ao sistema (Primeira tentativa)
+            dispararSolicitacaoSistema()
+        }
+    }
+    fun dispararSolicitacaoSistema() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                REQUEST_CODE_NOTIFICACAO
+            )
+        }
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_NOTIFICACAO) {
+            // Se o usuário aceitou a permissão
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permissão concedida!", Toast.LENGTH_SHORT).show()
+                enviarNotificacaoDeTeste()
+            } 
+            // Se negou, verificamos se devemos mostrar a justificativa (Rationale)
+            else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+                val dialog = RationaleDialogFragment.newInstance()
+                dialog.show(supportFragmentManager, "rationale_dialog")
+            } 
+            // Se negou e marcou "Não perguntar novamente"
+            else {
+                Toast.makeText(this, "Permissão negada permanentemente. Ative nas configurações do aparelho.", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+    private fun enviarNotificacaoDeTeste() {
+        NotificationHelper.gerarNotificacao(this, "Título de Teste", "Esta é a minha notificação :)")
+        Toast.makeText(this, "Notificação enviada!", Toast.LENGTH_SHORT).show()
+    }
+    companion object {
+        const val REQUEST_CODE_NOTIFICACAO = 101
+    }
+}
+
+- RationaleDialogFragment.kt
+[source,kotlin]
+import android.app.Dialog
+import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+class RationaleDialogFragment : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AlertDialog.Builder(requireContext())
+            .setTitle("Por que precisamos disso?")
+            .setMessage("As notificações são usadas para mostrar o andamento dos seus testes e alertas importantes do app. Sem elas, você pode perder avisos do sistema.")
+            .setPositiveButton("Entendi") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(true)
+            .create()
+    }
+    companion object {
+        fun newInstance(): RationaleDialogFragment {
+            return RationaleDialogFragment()
+        }
+    }
+}
+
+- NotificationHelper.kt
+[source,kotlin]
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+object NotificationHelper {
+    private const val CANAL_ID = "canal_teste_01"
+    private const val NOTIFICACAO_ID = 1001
+    fun criarCanal(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val nome = "Canal de Teste"
+            val descricao = "Canal para notificações de teste do app"
+            val importancia = NotificationManager.IMPORTANCE_DEFAULT
+            val canal = NotificationChannel(CANAL_ID, nome, importancia).apply {
+                this.description = descricao
+            }
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            nm?.createNotificationChannel(canal)
+        }
+    }
+    fun gerarNotificacao(context: Context, titulo: String, conteudo: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
+        val builder = NotificationCompat.Builder(context, CANAL_ID)
+            .setSmallIcon(android.R.drawable.ic_menu_info_details)
+            .setContentTitle(titulo)
+            .setContentText(conteudo)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+        val nm = NotificationManagerCompat.from(context)
+        nm.notify(NOTIFICACAO_ID, builder.build())
     }
 }
 
@@ -345,7 +324,7 @@ Antes de criar e emitir uma notificação, é necessário criar um canal. Confor
 
 - Referência do texto entre aspas: GOOGLE DEVELOPERS. Criar uma notificação. Disponível em: https://developer.android.com/training/notify-user/build-notification?hl=pt-br. Acesso em: 27 ago 2025.
 
-Exemplo 03 (notificação expansível):
+Exemplo 02 (notificação expansível):
 
 - No arquivo AndroidManifest.xml acrescente <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -364,24 +343,97 @@ Exemplo 03 (notificação expansível):
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Gerar Notificação"
-        android:onClick="gerar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
+- MainActivity.java
+[source,java]
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import com.seu.pacote.databinding.ActivityMainBinding;
+public class MainActivity extends AppCompatActivity {
+    public static final int REQUEST_CODE_NOTIFICACAO = 101;
+    private ActivityMainBinding binding;
+    private NotificationHelper notificationHelper;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        notificationHelper = new NotificationHelper(this);
+        binding.buttonGerar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verificarEPedirPermissao();
+            }
+        });
+    }
+    private void verificarEPedirPermissao() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            enviarNotificacaoDeTeste();
+            return;
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
+                == PackageManager.PERMISSION_GRANTED) {
+            enviarNotificacaoDeTeste();
+        } else {
+            dispararSolicitacaoSistema();
+        }
+    }
+    public void dispararSolicitacaoSistema() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                    this, 
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, 
+                    REQUEST_CODE_NOTIFICACAO
+            );
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_NOTIFICACAO) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permissão concedida!", Toast.LENGTH_SHORT).show();
+                enviarNotificacaoDeTeste();
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+                RationaleDialogFragment dialog = RationaleDialogFragment.newInstance();
+                dialog.show(getSupportFragmentManager(), "rationale_dialog");
+            } else {
+                Toast.makeText(this, "Permissão negada permanentemente. Ative nas configurações.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    private void enviarNotificacaoDeTeste() {
+        notificationHelper.gerarNotificacao("Título de Teste", "Esta é a minha notificação :)");
+        Toast.makeText(this, "Notificação enviada!", Toast.LENGTH_SHORT).show();
+    }
+}
+
 - NotificationHelper.java
 [source,java]
-import android.annotation.SuppressLint;
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 public class NotificationHelper {
@@ -391,14 +443,18 @@ public class NotificationHelper {
     public NotificationHelper(Context context) {
         this.context = context;
     }
-    @SuppressLint("MissingPermission")
     public void gerarNotificacao(String titulo, String conteudo) {
+        // Validação de segurança exigida pela API 33+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         criarCanal();
+        // Configuração do clique na notificação para abrir a SegundaActivity
         Intent i = new Intent(context, SegundaActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pi = PendingIntent.getActivity(context, 0, i,
-              PendingIntent.FLAG_IMMUTABLE);
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.sunflower);
+        PendingIntent pi = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CANAL_ID)
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle(titulo)
@@ -406,9 +462,11 @@ public class NotificationHelper {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pi)
                 .setAutoCancel(true)
-                .setLargeIcon(bitmap)
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText("Texto longo de teste\nteste teste\nteste teste teste"));
+        // Descomente as linhas abaixo se tiver uma imagem "sunflower" salva na pasta drawable
+        // Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.sunflower);
+        // builder.setLargeIcon(bitmap);
         NotificationManagerCompat nm = NotificationManagerCompat.from(context);
         nm.notify(NOTIFICACAO_ID, builder.build());
     }
@@ -417,95 +475,49 @@ public class NotificationHelper {
             CharSequence nome = "Canal Notificação";
             String descricao = "Canal para notificações padrão";
             int importancia = NotificationManager.IMPORTANCE_DEFAULT;
+            
             NotificationChannel canal = new NotificationChannel(CANAL_ID, nome, importancia);
             canal.setDescription(descricao);
+            
             NotificationManager nm = context.getSystemService(NotificationManager.class);
-            nm.createNotificationChannel(canal);
-        }
-    }
-}
-
-- PermissionHelper.java
-[source,java]
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-public class PermissionHelper {
-    private AppCompatActivity activity;
-    public PermissionHelper(AppCompatActivity activity) {
-        this.activity = activity;
-    }
-    public boolean temPermissaoNotificacao() {
-        return ContextCompat.checkSelfPermission(activity,
-                Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
-    }
-    public void solicitarPermissao(int requestCode) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
-                Manifest.permission.POST_NOTIFICATIONS)) {
-            Toast.makeText(activity,
-                    "A permissão é necessária." ,
-                    Toast.LENGTH_LONG).show();
-        }
-        ActivityCompat.requestPermissions(
-                activity,
-                new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                requestCode
-        );
-    }
-}
-
-- MainActivity.java
-[source,java]
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.widget.Button;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-public class MainActivity extends AppCompatActivity {
-    private static final int REQUEST_NOTIFICACAO = 100;
-    private PermissionHelper permissionHelper;
-    private NotificationHelper notificationHelper;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        permissionHelper = new PermissionHelper(this);
-        notificationHelper = new NotificationHelper(this);
-        Button btn = findViewById(R.id.buttonGerar);
-       btn.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        if (permissionHelper.temPermissaoNotificacao()) {
-            notificationHelper.gerarNotificacao(
-                    "Título teste",
-                    "Conteúdo teste"
-            );
-        } else {
-            permissionHelper.solicitarPermissao(REQUEST_NOTIFICACAO);
-        }
-    }
-});
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_NOTIFICACAO) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                notificationHelper.gerarNotificacao(
-                        "Permissão concedida!",
-                        "Agora você pode receber notificações."
-                );
+            if (nm != null) {
+                nm.createNotificationChannel(canal);
             }
         }
     }
 }
 
-- activity_segunda.xml
+- RationaleDialogFragment.java
+[source,java]
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+public class RationaleDialogFragment extends DialogFragment {
+    public static RationaleDialogFragment newInstance() {
+        return new RationaleDialogFragment();
+    }
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        return new AlertDialog.Builder(requireContext())
+                .setTitle("Por que precisamos disso?")
+                .setMessage("As notificações são usadas para mostrar o andamento dos seus testes e alertas importantes do app. Sem elas, você pode perder avisos do sistema.")
+                .setPositiveButton("Entendi", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setCancelable(true) 
+                .create();
+    }
+}
+
+- segunda_activity.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -517,6 +529,7 @@ public class MainActivity extends AppCompatActivity {
     android:layout_margin="20dp"
     tools:context=".SegundaActivity">
     <TextView
+        android:id="@+id/textMensagem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -526,182 +539,182 @@ public class MainActivity extends AppCompatActivity {
 - SegundaActivity.java
 [source,java]
 import android.os.Bundle;
-import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import com.seu.pacote.databinding.ActivitySegundaBinding;
 public class SegundaActivity extends AppCompatActivity {
+    private ActivitySegundaBinding binding;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_segunda);
+        binding = ActivitySegundaBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        // Se quiser testar o binding acessando o TextView:
+        // binding.textMensagem.setText("Chegamos pela Notificação!");
     }
 }
 
 Observe que neste exemplo, a notificação mostra uma mensagem. Quando o usuário clicar na notificação, será chamada uma outra Activity que apresenta a mensagem "Hello World". Esta atividade não pertence ao fluxo normal do aplicativo, por isso foi usada a flag Intent.FLAG_ACTIVITY_NEW_TASK ou Intent.FLAG_ACTIVITY_CLEAR_TASK.
 
-Exemplo 04 (Notificação com progress bar):
-
-- No arquivo AndroidManifest.xml acrescente <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/editTextPalavra"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Gerar notificação!"
-        android:id="@+id/buttonSalvar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</LinearLayout>
-
-- MainActivity.java
-[source,java]
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
-import android.provider.Settings;
-import android.util.Log;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
-public class MainActivity extends AppCompatActivity {
-    private static final int REQUEST_NOTIFICACAO = 100;
-    private static final String CHANNEL_ID = "gravar_dado_channel";
-    private static final int NOTIFICATION_ID = 1;
-    private EditText editTextPalavra;
-    private Button buttonSalvar;
-    @Override
-    protected void onCreate(android.os.Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        editTextPalavra = findViewById(R.id.editTextPalavra);
-        buttonSalvar = findViewById(R.id.buttonSalvar);
-        criarCanalNotificacao();
-       buttonSalvar.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
+- MainActivity.kt
+[source,kt]
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.seu.pacote.databinding.ActivityMainBinding
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var notificationHelper: NotificationHelper
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        notificationHelper = NotificationHelper(this)
+        binding.buttonGerar.setOnClickListener {
+            verificarEPedirPermissao()
+        }
+    }
+    private fun verificarEPedirPermissao() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            enviarNotificacaoDeTeste()
+            return
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
+            == PackageManager.PERMISSION_GRANTED) {
+            enviarNotificacaoDeTeste()
+        } else {
+            dispararSolicitacaoSistema()
+        }
+    }
+    private fun dispararSolicitacaoSistema() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            verificarPermissao();
-        } else {
-            gerarNotificacaoComProgresso();
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                REQUEST_CODE_NOTIFICACAO
+            )
         }
     }
-});
-    }
-    public void verificarPermissao(){
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            gerarNotificacaoComProgresso();
-        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
-            Toast.makeText(this,
-                    "A permissão é necessária ....",
-                    Toast.LENGTH_LONG).show();
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                    REQUEST_NOTIFICACAO);
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                    REQUEST_NOTIFICACAO);
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_NOTIFICACAO) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permissão concedida!", Toast.LENGTH_SHORT).show()
+                enviarNotificacaoDeTeste()
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+                RationaleDialogFragment.newInstance().show(supportFragmentManager, "rationale_dialog")
+            } else {
+                Toast.makeText(this, "Permissão negada permanentemente. Ative nas configurações.", Toast.LENGTH_LONG).show()
+            }
         }
     }
-    private boolean salvarFrase() {
-        String frase = editTextPalavra.getText().toString().trim();
-        SharedPreferences prefs = getSharedPreferences("dado", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("frase", frase);
-        return editor.commit();
+    private fun enviarNotificacaoDeTeste() {
+        notificationHelper.gerarNotificacao("Título de Teste", "Esta é a minha notificação :)")
+        Toast.makeText(this, "Notificação enviada!", Toast.LENGTH_SHORT).show()
     }
-    private void criarCanalNotificacao() {
+    companion object {
+        const val REQUEST_CODE_NOTIFICACAO = 101
+    }
+}
+
+- NotificationHelper.kt
+[source,kt]
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+class NotificationHelper(private val context: Context) {
+    companion object {
+        const val CANAL_ID = "canal_notificacao"
+        const val NOTIFICACAO_ID = 1
+    }
+    fun gerarNotificacao(titulo: String, conteudo: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) 
+            != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
+        criarCanal()
+        val intent = Intent(context, SegundaActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            context, 0, intent, PendingIntent.FLAG_IMMUTABLE
+        )
+        val builder = NotificationCompat.Builder(context, CANAL_ID)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(titulo)
+            .setContentText(conteudo)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText("Texto longo de teste\nteste teste\nteste teste teste"))
+        val nm = NotificationManagerCompat.from(context)
+        nm.notify(NOTIFICACAO_ID, builder.build())
+    }
+    private fun criarCanal() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence nome = "Gravando Dado";
-            String descricao = "Notificação mostrando progresso de gravação";
-            int importancia = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel canal = new NotificationChannel(CHANNEL_ID, nome, importancia);
-            canal.setDescription(descricao);
-            NotificationManager nm = getSystemService(NotificationManager.class);
-            nm.createNotificationChannel(canal);
-        }
-    }
-    @SuppressLint("MissingPermission")
-    private void gerarNotificacaoComProgresso() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Gravando dado")
-                .setContentText("Processando...")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
-        int PROGRESS_MAX = 100;
-        new Thread(() -> {
-            for (int PROGRESS_CURRENT = 0; PROGRESS_CURRENT <= PROGRESS_MAX; PROGRESS_CURRENT += 20) {
-                builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false);
-                notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    Log.d("TAG", " thread sleep failure");
-                }
+            val canal = NotificationChannel(
+                CANAL_ID, 
+                "Canal Notificação", 
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Canal para notificações padrão"
             }
-            if (salvarFrase()) {
-                builder.setContentText("Gravação concluída")
-                        .setProgress(0, 0, false)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText("Dado salvo!!"));
-                notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
-            } else {
-                builder.setContentText("Falha ao salvar")
-                        .setProgress(0, 0, false)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText("Tente novamente"));
-                notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
-            }
-        }).start();
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_NOTIFICACAO) {
-            if (grantResults.length > 0 && grantResults[0] ==  PackageManager.PERMISSION_GRANTED
-                    ) {
-                gerarNotificacaoComProgresso();
-            } else {
-                Toast.makeText(this,
-                        "Permissão negada",
-                        Toast.LENGTH_LONG).show();
-            }
+            val nm = context.getSystemService(NotificationManager::class.java)
+            nm?.createNotificationChannel(canal)
         }
     }
 }
 
-Exemplo 05 (notificação personalizada):
+- RationaleDialogFragment.kt
+[source,kotlin]
+import android.app.Dialog
+import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+class RationaleDialogFragment : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AlertDialog.Builder(requireContext())
+            .setTitle("Por que precisamos disso?")
+            .setMessage("As notificações são usadas para mostrar o andamento dos seus testes e alertas importantes do app. Sem elas, você pode perder avisos do sistema.")
+            .setPositiveButton("Entendi") { dialog, _ -> dialog.dismiss() }
+            .setCancelable(true)
+            .create()
+    }
+    companion object {
+        fun newInstance() = RationaleDialogFragment()
+    }
+}
+
+- SegundaActivity.kt
+[source,kt]
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.seu.pacote.databinding.ActivitySegundaBinding
+class SegundaActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySegundaBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivitySegundaBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+}
+
+Exemplo 03 (notificação personalizada):
 
 - No arquivo AndroidManifest.xml acrescente <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -752,94 +765,232 @@ Exemplo 05 (notificação personalizada):
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
-- MainActivity.java
+- NotificationHelper.java
 [source,java]
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.os.Build;
+import android.widget.RemoteViews;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+public class NotificationHelper {
+    private static final String CHANNEL_ID = "2";
+    private static final int NOTIFICACAO_ID = 1;
+    private final Context context;
+    public NotificationHelper(Context context) {
+        this.context = context;
+    }
+    public void gerarNotificacao(String titulo, String conteudo) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        criarCanal();
+        RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.notification_layout);
+        notificationLayout.setTextViewText(R.id.notification_title, titulo);
+        notificationLayout.setTextViewText(R.id.notification_conteudo, conteudo);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .setCustomContentView(notificationLayout)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
+        NotificationManagerCompat nm = NotificationManagerCompat.from(context);
+        nm.notify(NOTIFICACAO_ID, builder.build());
+    }
+    private void criarCanal() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel canal = new NotificationChannel(CHANNEL_ID, "canal1", NotificationManager.IMPORTANCE_DEFAULT);
+            canal.setDescription("Descrição do canal 1");
+            NotificationManager nm = context.getSystemService(NotificationManager.class);
+            if (nm != null) nm.createNotificationChannel(canal);
+        }
+    }
+}
+
+- MainActivity.java
+[source,java]
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.widget.Button;
-import android.widget.RemoteViews;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import com.seu.pacote.databinding.ActivityMainBinding; // Ajuste para seu package
 public class MainActivity extends AppCompatActivity {
-    private static final String CHANNEL_ID = "2";
-    private static final int REQUEST_NOTIFICACAO = 100;
-    private int notificationId = 1;
+    public static final int REQUEST_NOTIFICACAO = 100;
+    private ActivityMainBinding binding;
+    private NotificationHelper notificationHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        criarCanalNotificacao();
-        Button buttonGerar = findViewById(R.id.buttonGerar);
-        buttonGerar.setOnClickListener(v -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                        == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                    gerarNotificacao();
-                } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
-                    Toast.makeText(this, "Permissão necessária!", Toast.LENGTH_LONG).show();
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                            REQUEST_NOTIFICACAO);
-                } else {
-                    // Primeira vez ou sistema bloqueou pop-up
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                            REQUEST_NOTIFICACAO);
-                }
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        notificationHelper = new NotificationHelper(this);
+        binding.buttonGerar.setOnClickListener(v -> verificarPermissaoENotificar());
+    }
+    private void verificarPermissaoENotificar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
+                    == PackageManager.PERMISSION_GRANTED) {
+                notificationHelper.gerarNotificacao("Título", "Conteúdo personalizado");
             } else {
-                gerarNotificacao();
+                ActivityCompat.requestPermissions(this, 
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_NOTIFICACAO);
             }
-        });
-    }
-    @SuppressLint("MissingPermission")
-    private void gerarNotificacao() {
-        RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.notification_layout);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                .setCustomContentView(notificationLayout)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
-        nm.notify(notificationId, builder.build());
-    }
-    private void criarCanalNotificacao() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence nome = "canal1";
-            String descricao = "Descrição do canal 1";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel canal = new NotificationChannel(CHANNEL_ID, nome, importance);
-            canal.setDescription(descricao);
-            NotificationManager nm = getSystemService(NotificationManager.class);
-            nm.createNotificationChannel(canal);
+        } else {
+            notificationHelper.gerarNotificacao("Título", "Conteúdo personalizado");
         }
     }
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults){
         if (requestCode == REQUEST_NOTIFICACAO) {
-            if (grantResults.length > 0 && grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED) {
-                gerarNotificacao();
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                notificationHelper.gerarNotificacao("Título", "Conteúdo personalizado");
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+                // Usuário negou, mas não marcou "não perguntar novamente"
+                RationaleDialogFragment.newInstance().show(getSupportFragmentManager(), "rationale");
             } else {
-                Toast.makeText(this,
-                        "Permissão negada.",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Permissão negada permanentemente.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+}
+
+- NotificationHelper.kt
+[source,kotlin]
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import android.widget.RemoteViews
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+class NotificationHelper(private val context: Context) {
+    companion object {
+        const val CHANNEL_ID = "2"
+        const val NOTIFICACAO_ID = 1
+    }
+    fun gerarNotificacao(titulo: String, conteudo: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) 
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        criarCanal()
+        val notificationLayout = RemoteViews(context.packageName, R.layout.notification_layout).apply {
+            setTextViewText(R.id.notification_title, titulo)
+            setTextViewText(R.id.notification_conteudo, conteudo)
+        }
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setCustomContentView(notificationLayout)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+        NotificationManagerCompat.from(context).notify(NOTIFICACAO_ID, builder.build())
+    }
+    private fun criarCanal() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val canal = NotificationChannel(CHANNEL_ID, "canal1", NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = "Descrição do canal 1"
+            }
+            val nm = context.getSystemService(NotificationManager::class.java)
+            nm?.createNotificationChannel(canal)
+        }
+    }
+}
+
+- RationaleDialogFragment.kt
+[source,kotlin]
+import android.app.Dialog
+import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+class RationaleDialogFragment : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AlertDialog.Builder(requireContext())
+            .setTitle("Permissão Necessária")
+            .setMessage("Para receber notificações personalizadas, precisamos da sua autorização.")
+            .setPositiveButton("Entendi") { dialog, _ -> dialog.dismiss() }
+            .create()
+    }
+    companion object {
+        fun newInstance() = RationaleDialogFragment()
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.seu.pacote.databinding.ActivityMainBinding
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var notificationHelper: NotificationHelper
+    companion object {
+        const val REQUEST_NOTIFICACAO = 100
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        notificationHelper = NotificationHelper(this)
+        binding.buttonGerar.setOnClickListener {
+            verificarPermissaoENotificar()
+        }
+    }
+    private fun verificarPermissaoENotificar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                notificationHelper.gerarNotificacao("Título", "Conteúdo personalizado")
+            } else {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    REQUEST_NOTIFICACAO
+                )
+            }
+        } else {
+            notificationHelper.gerarNotificacao("Título", "Conteúdo personalizado")
+        }
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        
+        if (requestCode == REQUEST_NOTIFICACAO) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                notificationHelper.gerarNotificacao("Título", "Conteúdo personalizado")
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)) {
+                // Usuário negou uma vez
+                RationaleDialogFragment.newInstance().show(supportFragmentManager, "rationale")
+            } else {
+                Toast.makeText(this, "Permissão negada permanentemente.", Toast.LENGTH_LONG).show()
             }
         }
     }
