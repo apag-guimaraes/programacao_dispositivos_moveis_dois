@@ -32,8 +32,7 @@ Exemplo 01 (POST):
         android:id="@+id/buttonClicar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="CLICK"
-        android:onClick="clicar" />
+        android:text="CLICK" />
 </LinearLayout>
 
 - MainActivity.java
@@ -41,51 +40,92 @@ Exemplo 01 (POST):
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import com.seu.pacote.databinding.ActivityMainBinding; // Ajuste para o seu package
 import java.util.Random;
 public class MainActivity extends AppCompatActivity {
-    private TextView textViewNumber;
-    private Button buttonClicar;
+    private ActivityMainBinding binding;
     private Handler handler;
-    private Integer numberG;
+    private int numberG; 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        textViewNumber = findViewById(R.id.textViewNumber);
-        buttonClicar = findViewById(R.id.buttonClicar);
-        handler = new Handler(getMainLooper());
+        // Infla o layout usando ViewBinding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        handler = new Handler(Looper.getMainLooper());
+        // Define o clique via código
+        binding.buttonClicar.setOnClickListener(v -> iniciarProcessamento());
     }
-    public void clicar(View view) {
-        if (view.getId() == R.id.buttonClicar) {
-            buttonClicar.setEnabled(false);
-            Log.i("Main", "Thread atual: " + Thread.currentThread());
-            Random random = new Random();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (int i = 0; i < 10; i++) {
-                        Log.i("Thread", "Thread em execução: " + Thread.currentThread());
-                        numberG = random.nextInt(21); 
-                        try {
-                            Thread.sleep(2000); 
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.i("Post", "Thread que atualiza UI: " + Thread.currentThread());
-                                textViewNumber.setText(String.valueOf(numberG));
-                            }
-                        });
-                    }
+    private void iniciarProcessamento() {
+        binding.buttonClicar.setEnabled(false);
+        Log.i("Main", "Thread atual: " + Thread.currentThread());
+        Random random = new Random();
+        new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
+                Log.i("Thread", "Thread em execução: " + Thread.currentThread());
+                numberG = random.nextInt(21); 
+                try {
+                    Thread.sleep(2000); 
+                } catch (InterruptedException e) {
+                    Log.e("Thread", "Erro: " + e.getMessage());
                 }
-            }).start();
+                handler.post(() -> {
+                    Log.i("Post", "Thread que atualiza UI: " + Thread.currentThread());
+                    binding.textViewNumber.setText(String.valueOf(numberG));
+                });
+            }
+            handler.post(() -> binding.buttonClicar.setEnabled(true));
+            
+        }).start();
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import com.seu.pacote.databinding.ActivityMainBinding // Ajuste para o seu package
+import kotlin.random.Random
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private val handler = Handler(Looper.getMainLooper())
+    private var numberG: Int = 0
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Inflar o layout com ViewBinding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.buttonClicar.setOnClickListener {
+            iniciarProcessamento()
         }
+    }
+    private fun iniciarProcessamento() {
+        binding.buttonClicar.isEnabled = false
+        Log.i("Main", "Thread atual: ${Thread.currentThread().name}")
+        // Iniciar thread em background
+        Thread {
+            for (i in 0 until 10) {
+                Log.i("Thread", "Thread em execução: ${Thread.currentThread().name}")
+                numberG = Random.nextInt(21)
+                try {
+                    Thread.sleep(2000)
+                } catch (e: InterruptedException) {
+                    Log.e("Thread", "Erro: ${e.message}")
+                }
+                handler.post {
+                    Log.i("Post", "Thread que atualiza UI: ${Thread.currentThread().name}")
+                    binding.textViewNumber.text = numberG.toString()
+                }
+            }
+            handler.post {
+                binding.buttonClicar.isEnabled = true
+            }
+        }.start()
     }
 }
 
@@ -113,8 +153,7 @@ Exemplo 02 (MSG):
         android:id="@+id/buttonClicar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="CLICAR"
-        android:onClick="clicar" />
+        android:text="CLICAR" />  
 </LinearLayout>
 
 - MainActivity.java
@@ -126,51 +165,112 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import com.seu.pacote.databinding.ActivityMainBinding; // Ajuste para o seu package
 import java.util.Random;
 public class MainActivity extends AppCompatActivity {
-    private TextView textViewNumber;
-    private Button buttonClicar;
+    private ActivityMainBinding binding;
     private Handler handler;
     private static final String TAG = "Thread-MAIN";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        textViewNumber = findViewById(R.id.textViewNumber);
-        buttonClicar = findViewById(R.id.buttonClicar);
+        // Inicializa o ViewBinding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        // Inicializa o Handler
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
-                textViewNumber.setText(String.valueOf(msg.arg1));
+                // Acesso via binding
+                binding.textViewNumber.setText(String.valueOf(msg.arg1));
                 Log.i(TAG, "UI atualizada na thread: " + Thread.currentThread());
             }
         };
+        // Define o clique de forma programática
+        binding.buttonClicar.setOnClickListener(v -> clicar());
     }
-    public void clicar(View view) {
-        buttonClicar.setEnabled(false);
+    private void clicar() {
+        binding.buttonClicar.setEnabled(false);
         new Thread(() -> {
             Random random = new Random();
             for (int i = 0; i < 10; i++) {
-                int num = random.nextInt(21); 
+                int num = random.nextInt(21);
+                // Envia a mensagem para o Handler
                 Message msg = handler.obtainMessage();
                 msg.arg1 = num;
                 handler.sendMessage(msg);
                 try {
-                    Thread.sleep(2000); 
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
+            handler.post(() -> binding.buttonClicar.setEnabled(true));
         }).start();
     }
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // Remove mensagens pendentes para evitar memory leaks
         handler.removeCallbacksAndMessages(null);
     }
 }
 
-
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import com.seu.pacote.databinding.ActivityMainBinding // Ajuste para o seu package
+import kotlin.random.Random
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var handler: Handler
+    companion object {
+        private const val TAG = "Thread-MAIN"
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Inicializa o ViewBinding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        // Inicializa o Handler
+        handler = object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message) {
+                // Acesso via binding
+                binding.textViewNumber.text = msg.arg1.toString()
+                Log.i(TAG, "UI atualizada na thread: ${Thread.currentThread()}")
+            }
+        }
+        // Define o clique de forma programática
+        binding.buttonClicar.setOnClickListener { clicar() }
+    }
+    private fun clicar() {
+        binding.buttonClicar.isEnabled = false
+        Thread {
+            val random = Random(System.currentTimeMillis())
+            for (i in 0 until 10) {
+                val num = random.nextInt(21)
+                // Envia a mensagem para o Handler
+                val msg = handler.obtainMessage()
+                msg.arg1 = num
+                handler.sendMessage(msg)
+                try {
+                    Thread.sleep(2000)
+                } catch (e: InterruptedException) {
+                    Thread.currentThread().interrupt()
+                }
+            }
+            // Reabilita o botão na thread principal
+            handler.post { binding.buttonClicar.isEnabled = true }
+        }.start()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        // Remove mensagens pendentes para evitar memory leaks
+        handler.removeCallbacksAndMessages(null)
+    }
+}
