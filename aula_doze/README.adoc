@@ -72,88 +72,210 @@ public class Contato {
 
 - MainActivity.java
 [source,java]
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import com.example.seuprojeto.databinding.ActivityMainBinding; // Ajuste seu package
 import java.util.ArrayList;
-public class MainActivity extends AppCompatActivity
-        implements AdapterView.OnItemClickListener {
-    private ListView lista;
-    private ArrayAdapter<Contato> dadosAdapter;
-    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+public class MainActivity extends AppCompatActivity implements PermissionRationaleDialog.Listener {
+    private ActivityMainBinding binding;
+    private static final int REQ_CODE = 100;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        lista = findViewById(R.id.lista);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                checkSelfPermission(Manifest.permission.READ_CONTACTS)
-                        != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
-                    PERMISSIONS_REQUEST_READ_CONTACTS);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        verificarPermissao();
+    }
+    private void verificarPermissao() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                solicitar();
         } else {
             carregarContatos();
         }
     }
+    private void solicitar() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, REQ_CODE);
+    }
     private void carregarContatos() {
-        ArrayList<Contato> contatos = obterDados();
-        dadosAdapter = new ArrayAdapter<>(MainActivity.this,
-                android.R.layout.simple_list_item_1, contatos);
-        lista.setAdapter(dadosAdapter);
-        lista.setOnItemClickListener(this);
-    }
-    public ArrayList<Contato> obterDados() {
-        ArrayList<Contato> dados = new ArrayList<>();
-        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-        String[] projection = {
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER
-        };
-        ContentResolver resolver = getContentResolver();
-        Cursor cursor = resolver.query(uri, projection, null, null,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-        if (cursor != null) {
-            int idIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
-            int nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
-            int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(idIndex);
-                String nome = cursor.getString(nameIndex);
-                String fone = cursor.getString(phoneIndex);
-                dados.add(new Contato(id, nome, fone));
+        ArrayList<Contato> contatos = new ArrayList<>();
+        try (Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, 
+                null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC")) {
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+                    String nome = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                    String fone = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    contatos.add(new Contato(id, nome, fone));
+                }
             }
-            cursor.close();
         }
-        return dados;
+        ArrayAdapter<Contato> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, contatos);
+        binding.lista.setAdapter(adapter);
     }
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Contato item = (Contato) parent.getItemAtPosition(position);
-        Toast.makeText(MainActivity.this, item.toString(), Toast.LENGTH_SHORT).show();
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
-            if (grantResults.length > 0 &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == REQ_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 carregarContatos();
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
+                new PermissionRationaleDialog().show(getSupportFragmentManager(), "dialog");
             } else {
-                Toast.makeText(this, "Permissão negada!!!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permissão negada permanentemente.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+}
+
+- PermissionRationaleDialog.java
+[source,java]
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+public class PermissionRationaleDialog extends DialogFragment {
+    public interface Listener { void onOkClicked(); }
+    private Listener listener;
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof Listener) listener = (Listener) context;
+    }
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        return new AlertDialog.Builder(requireContext())
+                .setTitle("Permissão Necessária")
+                .setMessage("Precisamos acessar seus contatos para exibir a lista. Por favor, conceda a permissão.")
+                .setPositiveButton("OK", (d, w) -> { if (listener != null) listener.onOkClicked(); })
+                .setNegativeButton("Cancelar", null)
+                .create();
+    }
+}
+
+- Contato.kt
+[source,kotlin]
+data class Contato(
+    var id: Int,
+    var nome: String,
+    var fone: String
+) {
+    override fun toString(): String {
+        return "$nome\n$fone"
+    }
+}
+
+- PermissionRationaleDialog.kt
+[source,kotlin]
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.Context
+import android.os.Bundle
+import androidx.fragment.app.DialogFragment
+class PermissionRationaleDialog : DialogFragment() {
+    interface Listener {
+        fun onOkClicked()
+    }
+    private var listener: Listener? = null
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is Listener) {
+            listener = context
+        }
+    }
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AlertDialog.Builder(requireContext())
+            .setTitle("Permissão Necessária")
+            .setMessage("Precisamos acessar seus contatos para exibir a lista. Por favor, conceda a permissão.")
+            .setPositiveButton("OK") { _, _ -> listener?.onOkClicked() }
+            .setNegativeButton("Cancelar", null)
+            .create()
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.provider.ContactsContract
+import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import com.example.seuprojeto.databinding.ActivityMainBinding // Ajuste seu package
+import java.util.ArrayList
+class MainActivity : AppCompatActivity(), PermissionRationaleDialog.Listener {
+    private lateinit var binding: ActivityMainBinding
+    private val reqCode = 100
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        verificarPermissao()
+    }
+    private fun verificarPermissao() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            // Verifica se deve mostrar a justificativa antes de pedir
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
+                PermissionRationaleDialog().show(supportFragmentManager, "dialog")
+            } else {
+                solicitar()
+            }
+        } else {
+            carregarContatos()
+        }
+    }
+    private fun solicitar() {
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS), reqCode)
+    }
+    private fun carregarContatos() {
+        val contatos = ArrayList<Contato>()
+        val projection = arrayOf(
+            ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+            ContactsContract.CommonDataKinds.Phone.NUMBER
+        )
+        contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            projection, null, null,
+            "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} ASC"
+        )?.use { cursor ->
+            val idIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.CONTACT_ID)
+            val nameIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val phoneIndex = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            while (cursor.moveToNext()) {
+                contatos.add(
+                    Contato(
+                        cursor.getInt(idIndex),
+                        cursor.getString(nameIndex),
+                        cursor.getString(phoneIndex)
+                    )
+                )
+            }
+        }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, contatos)
+        binding.lista.adapter = adapter
+    }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == reqCode) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                carregarContatos()
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
+                PermissionRationaleDialog().show(supportFragmentManager, "dialog")
+            } else {
+                Toast.makeText(this, "Permissão negada permanentemente.", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -334,64 +456,30 @@ public class DadosProvider extends ContentProvider {
 
 - MainActivity.java
 [source,java]
-import androidx.appcompat.app.AppCompatActivity;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
-import java.util.Random;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-    private ListView lista;
+    private ActivityMainBinding binding; // Nome gerado automaticamente
     private SimpleCursorAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Button btnAdicionar = findViewById(R.id.btnAdicionar);
-        Button btnMostrar = findViewById(R.id.btnMostrar);
-        lista = findViewById(R.id.lista);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         String[] colunas = new String[]{DadosProvider.NOME, DadosProvider.TELEFONE};
         int[] views = new int[]{android.R.id.text1, android.R.id.text2};
-        adapter = new SimpleCursorAdapter(
-                this,
-                android.R.layout.simple_list_item_2,
-                null,
-                colunas,
-                views,
-                0
-        );
-        lista.setAdapter(adapter);
-        btnAdicionar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ContentValues values = new ContentValues();
-                values.put(DadosProvider.NOME, "Contato " + new Random().nextInt(100));
-                values.put(DadosProvider.TELEFONE, "9999-" + new Random().nextInt(9999));
-                Uri uri = getContentResolver().insert(DadosProvider.CONTENT_URI, values);
-                Log.i(TAG, "Inserido em: " + uri);
-            }
+        adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, null, colunas, views, 0);
+        binding.lista.setAdapter(adapter);
+        binding.btnAdicionar.setOnClickListener(v -> {
+            ContentValues values = new ContentValues();
+            values.put(DadosProvider.NOME, "Contato " + new Random().nextInt(100));
+            values.put(DadosProvider.TELEFONE, "9999-" + new Random().nextInt(9999));
+            Uri uri = getContentResolver().insert(DadosProvider.CONTENT_URI, values);
+            Log.i(TAG, "Inserido em: " + uri);
         });
-        btnMostrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                atualizarLista();
-            }
-        });
+        binding.btnMostrar.setOnClickListener(v -> atualizarLista());
     }
     private void atualizarLista() {
-        Cursor cursor = getContentResolver().query(
-                DadosProvider.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
+        Cursor cursor = getContentResolver().query(DadosProvider.CONTENT_URI, null, null, null, null);
         adapter.changeCursor(cursor);
     }
     @Override
@@ -399,6 +487,111 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (adapter != null && adapter.getCursor() != null) {
             adapter.getCursor().close();
+        }
+    }
+}
+
+- DadosProvider.kt
+[source,kotlin]
+import android.content.*
+import android.database.Cursor
+import android.database.SQLException
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import android.database.sqlite.SQLiteQueryBuilder
+import android.net.Uri
+import android.util.Log
+class DadosProvider : ContentProvider() {
+    private lateinit var banco: SQLiteDatabase
+    companion object {
+        private const val BANCO_VERSAO = 1
+        private const val BANCO_NOME = "meu_banco.db"
+        const val BANCO_TABELA = "contato"
+        const val ID = "_id"
+        const val NOME = "nome"
+        const val TELEFONE = "telefone"
+        const val AUTHORITY = "nomeDaAutoridade"
+        const val PATH = "dados"
+        val CONTENT_URI: Uri = Uri.parse("content://$AUTHORITY/$PATH")
+        private const val CODIGO_URI_TODOS = 1
+        private val URI_MATCHER = UriMatcher(UriMatcher.NO_MATCH).apply {
+            addURI(AUTHORITY, PATH, CODIGO_URI_TODOS)
+        }
+    }
+    override fun onCreate(): Boolean {
+        val helper = BancoHelper(context!!)
+        banco = helper.writableDatabase
+        return banco != null
+    }
+    override fun query(uri: Uri, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?, sortOrder: String?): Cursor? {
+        val sqb = SQLiteQueryBuilder().apply { tables = BANCO_TABELA }
+        return sqb.query(banco, projection, selection, selectionArgs, null, null, sortOrder)?.apply {
+            setNotificationUri(context?.contentResolver, uri)
+        }
+    }
+    override fun getType(uri: Uri): String? = when (URI_MATCHER.match(uri)) {
+        CODIGO_URI_TODOS -> "vnd.android.cursor.dir/vnd.$AUTHORITY.$PATH"
+        else -> throw IllegalArgumentException("URI inválida: $uri")
+    }
+    override fun insert(uri: Uri, values: ContentValues?): Uri? {
+        val id = banco.insert(BANCO_TABELA, null, values)
+        if (id > 0) {
+            val uriID = ContentUris.withAppendedId(CONTENT_URI, id)
+            context?.contentResolver?.notifyChange(uriID, null)
+            return uriID
+        }
+        throw SQLException("Erro ao inserir em $uri")
+    }
+    override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
+        val count = if (URI_MATCHER.match(uri) == CODIGO_URI_TODOS) {
+            banco.delete(BANCO_TABELA, selection, selectionArgs)
+        } else throw IllegalArgumentException("URI inválida")
+        context?.contentResolver?.notifyChange(uri, null)
+        return count
+    }
+    override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<String>?): Int {
+        val count = if (URI_MATCHER.match(uri) == CODIGO_URI_TODOS) {
+            banco.update(BANCO_TABELA, values, selection, selectionArgs)
+        } else throw IllegalArgumentException("URI inválida")
+        context?.contentResolver?.notifyChange(uri, null)
+        return count
+    }
+    private class BancoHelper(context: Context) : SQLiteOpenHelper(context, BANCO_NOME, null, BANCO_VERSAO) {
+        override fun onCreate(db: SQLiteDatabase) {
+            db.execSQL("CREATE TABLE $BANCO_TABELA ($ID INTEGER PRIMARY KEY AUTOINCREMENT, $NOME TEXT, $TELEFONE TEXT)")
+        }
+        override fun onUpgrade(db: SQLiteDatabase, oldV: Int, newV: Int) {
+            db.execSQL("DROP TABLE IF EXISTS $BANCO_TABELA")
+            onCreate(db)
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var adapter: SimpleCursorAdapter
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val colunas = arrayOf(DadosProvider.NOME, DadosProvider.TELEFONE)
+        val views = intArrayOf(android.R.id.text1, android.R.id.text2)
+        adapter = SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, null, colunas, views, 0)
+        binding.lista.adapter = adapter
+        binding.btnAdicionar.setOnClickListener {
+            val values = ContentValues().apply {
+                put(DadosProvider.NOME, "Contato ${Random().nextInt(100)}")
+                put(DadosProvider.TELEFONE, "9999-${Random().nextInt(9999)}")
+            }
+            contentResolver.insert(DadosProvider.CONTENT_URI, values)
+        }
+        binding.btnMostrar.setOnClickListener { atualizarLista() }
+    }
+    private fun atualizarLista() {
+        contentResolver.query(DadosProvider.CONTENT_URI, null, null, null, null)?.let {
+            adapter.changeCursor(it)
         }
     }
 }
@@ -434,51 +627,24 @@ AppCliente
 
 - MainActivity.java
 [source,java]
-import androidx.appcompat.app.AppCompatActivity;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 public class MainActivity extends AppCompatActivity {
-    private ListView lista;
+    private ActivityMainBinding binding; // Nome gerado automaticamente
     private SimpleCursorAdapter adapter;
     private static final String AUTHORITY = "nomeDaAutoridade";
-    private static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/contatos");
+    private static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/dados"); 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Button btnMostrar = findViewById(R.id.btnMostrar);
-        lista = findViewById(R.id.lista);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         String[] colunas = new String[]{"nome", "telefone"};
         int[] views = new int[]{android.R.id.text1, android.R.id.text2};
-        adapter = new SimpleCursorAdapter(
-                this,
-                android.R.layout.simple_list_item_2,
-                null,
-                colunas,
-                views,
-                0
-        );
-        lista.setAdapter(adapter);
-        btnMostrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                atualizarLista();
-            }
-        });
+        adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, null, colunas, views, 0);
+        binding.lista.setAdapter(adapter);
+        binding.btnMostrar.setOnClickListener(v -> atualizarLista());
     }
     private void atualizarLista() {
-        Cursor cursor = getContentResolver().query(
-                CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
+        Cursor cursor = getContentResolver().query(CONTENT_URI, null, null, null, null);
         adapter.changeCursor(cursor);
     }
     @Override
@@ -486,6 +652,32 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (adapter != null && adapter.getCursor() != null) {
             adapter.getCursor().close();
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var adapter: SimpleCursorAdapter
+    companion object {
+        private const val AUTHORITY = "nomeDaAutoridade"
+        val CONTENT_URI: Uri = Uri.parse("content://$AUTHORITY/dados")
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val colunas = arrayOf("nome", "telefone")
+        val views = intArrayOf(android.R.id.text1, android.R.id.text2)
+        adapter = SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, null, colunas, views, 0)
+        binding.lista.adapter = adapter
+        binding.btnMostrar.setOnClickListener { atualizarLista() }
+    }
+    private fun atualizarLista() {
+        contentResolver.query(CONTENT_URI, null, null, null, null)?.let {
+            adapter.changeCursor(it)
         }
     }
 }
