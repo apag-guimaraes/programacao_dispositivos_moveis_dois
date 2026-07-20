@@ -718,6 +718,215 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+- InformacoesContato.kt
+[source,kotlin]
+import java.io.Serializable
+class InformacoesContato : Serializable {
+    var id: Int = 0
+    var nome: String? = null
+    var telefone: String? = null
+    var email: String? = null
+}
+
+- Coenxao.kt
+[source,kotlin]
+import java.io.BufferedInputStream
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
+class Conexao {
+    fun obterRespostaHTTP(endURL: String): InputStream? {
+        return try {
+            val url = URL(endURL)
+            val conexao = url.openConnection() as HttpURLConnection
+            conexao.connectTimeout = 50000
+            conexao.readTimeout = 50000
+            conexao.requestMethod = "GET"
+            conexao.connect()
+            BufferedInputStream(conexao.inputStream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+}
+
+- Adicionais.kt
+[source,kotlin]
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import javax.annotation.processing.Generated
+@Generated("jsonschema2pojo")
+data class Adicionais(
+    @SerializedName("id")
+    @Expose
+    var id: Int? = null,
+    @SerializedName("email")
+    @Expose
+    var email: String? = null
+)
+
+- Agenda.kt
+[source,kotlin]
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import javax.annotation.processing.Generated
+@Generated("jsonschema2pojo")
+data class Agenda(
+    @SerializedName("id")
+    @Expose
+    var id: Int? = null,
+    @SerializedName("nome")
+    @Expose
+    var nome: String? = null,
+    @SerializedName("telefone")
+    @Expose
+    var telefone: String? = null
+)
+
+- Professores.kt
+[source,kotlin]
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import javax.annotation.processing.Generated
+@Generated("jsonschema2pojo")
+data class Professores(
+    @SerializedName("agenda")
+    @Expose
+    var agenda: List<Agenda>? = null,
+    @SerializedName("adicionais")
+    @Expose
+    var adicionais: List<Adicionais>? = null
+)
+
+- Conversao.kt
+[source,kotlin]
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+class Conversao {
+    fun converter(inputStream: InputStream?): String? {
+        if (inputStream == null) return null
+        return inputStream.bufferedReader().use { it.readText() }
+    }
+}
+
+- MainViewModel.kt
+[source,kotlin]
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.example.appgsonhttp_01.model.InformacoesContato
+class MainViewModel : ViewModel() {
+    private val _listaContatos = MutableLiveData<List<InformacoesContato>>()
+    val listaContatos: LiveData<List<InformacoesContato>> get() = _listaContatos
+    private val _mensagemErro = MutableLiveData<String>()
+    val mensagemErro: LiveData<String> get() = _mensagemErro
+    private val repositorio = Repositorio()
+    fun carregarDadosDoRepositorio() {
+        repositorio.obterDados(object : Repositorio.Callback {
+            override fun sucesso(lista: List<InformacoesContato>) {
+                _listaContatos.value = lista
+            }
+            override fun erro(mensagem: String) {
+                _mensagemErro.value = mensagem
+            }
+        })
+    }
+}
+
+- ContatoAdapter.kt
+[source,kotlin]
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import androidx.databinding.DataBindingUtil
+import com.example.appgsonhttp_01.R
+import com.example.appgsonhttp_01.databinding.ItemContatoBinding
+import com.example.appgsonhttp_01.model.InformacoesContato
+class ContatoAdapter(context: Context, contatos: List<InformacoesContato>) : 
+    ArrayAdapter<InformacoesContato>(context, 0, contatos) {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        val binding: ItemContatoBinding
+        val view: View
+        if (convertView == null) {
+            binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.item_contato, parent, false)
+            view = binding.root
+            view.tag = binding
+        } else {
+            binding = convertView.tag as ItemContatoBinding
+            view = convertView
+        }
+        getItem(position)?.let { contato ->
+            binding.contato = contato
+            binding.executePendingBindings()
+        }
+        return view
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import com.example.appgsonhttp_01.R
+import com.example.appgsonhttp_01.databinding.ActivityMainBinding
+import com.example.appgsonhttp_01.model.InformacoesContato
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var adapter: ContatoAdapter
+    private val lista = mutableListOf<InformacoesContato>()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        adapter = ContatoAdapter(this, lista)
+        binding.listViewDados.adapter = adapter
+        binding.listViewDados.setOnItemClickListener { _, _, position, _ ->
+            val contato = lista[position]
+            val intent = Intent(this, RelatorioActivity::class.java).apply {
+                putExtra("nome", contato.nome)
+                putExtra("email", contato.email)
+                putExtra("telefone", contato.telefone)
+            }
+            startActivity(intent)
+        }
+        binding.btObterDados.setOnClickListener { viewModel.carregarDadosDoRepositorio() }
+        viewModel.listaContatos.observe(this) { contatos ->
+            lista.clear()
+            lista.addAll(contatos)
+            adapter.notifyDataSetChanged()
+        }
+    }
+}
+
+- RelatorioActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import com.example.appgsonhttp_01.R
+import com.example.appgsonhttp_01.databinding.ActivityRelatorioBinding
+class RelatorioActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val binding: ActivityRelatorioBinding = DataBindingUtil.setContentView(this, R.layout.activity_relatorio)
+        binding.lifecycleOwner = this
+        val viewModel = ViewModelProvider(this)[RelatorioViewModel::class.java]
+        binding.viewModel = viewModel
+        val nome = intent.getStringExtra("nome")
+        val email = intent.getStringExtra("email")
+        val telefone = intent.getStringExtra("telefone")
+        viewModel.pegarInformacoes(nome ?: "", email ?: "", telefone ?: "")
+    }
+}
+
 == AppHttp com ViewModel
 
 - activity_main.xml
@@ -1332,6 +1541,202 @@ public class StatusViewModel extends ViewModel {
                 Log.e("Error", msg);
             }
         });
+    }
+}
+
+- Student.kt
+[source,kotlin]
+class Student(val name: String, val age: Int) {
+    private val grades = mutableListOf<Double>()
+    private val attendance = mutableListOf<Boolean>()
+    fun getGrades(): List<Double> = grades
+    fun getAttendance(): List<Boolean> = attendance
+    fun calculateAverageGrade(): Double = if (grades.isNotEmpty()) grades.average() else 0.0
+    fun calculateAttendancePercentage(): Double = if (attendance.isNotEmpty()) {
+        (attendance.count { it }.toDouble() / attendance.size) * 100
+    } else 0.0
+    fun addGrades(newGrades: List<Double>) = grades.addAll(newGrades)
+    fun addAttendance(newAttendance: List<Boolean>) = attendance.addAll(newAttendance)
+    fun isApproved(): String = if (calculateAverageGrade() >= 6.0 && calculateAttendancePercentage() >= 75.0) {
+        "Aprovado"
+    } else "Reprovado"
+}
+
+- StudentDto.kt
+[source,kotlin]
+import com.google.gson.annotations.SerializedName
+data class StudentDto(
+    @SerializedName("nome") val name: String,
+    @SerializedName("idade") val age: Int,
+    @SerializedName("notas") val notes: List<Double>,
+    @SerializedName("presenca") val attendance: List<Boolean>
+)
+data class ResponseDto(
+    @SerializedName("students") val students: List<StudentDto>
+)
+
+- Connection.kt
+[source,kotlin]
+import android.util.Log
+import java.io.BufferedInputStream
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
+class Connection {
+    fun sendRequest(endURL: String): InputStream? {
+        return try {
+            val url = URL(endURL)
+            val connection = url.openConnection() as HttpURLConnection
+            connection.apply {
+                connectTimeout = 50000
+                readTimeout = 50000
+                requestMethod = "GET"
+                connect()
+            }
+            BufferedInputStream(connection.inputStream)
+        } catch (e: Exception) {
+            Log.e("Connection error", "Error while connecting to the url", e)
+            null
+        }
+    }
+}
+
+- StudentRepository.kt
+[source,kotlin]
+import android.os.Handler
+import android.os.Looper
+import com.example.atividade3.data.model.Student
+import com.google.gson.Gson
+import java.io.InputStreamReader
+import java.util.concurrent.Executors
+class StudentRepository private constructor() {
+    private val executor = Executors.newSingleThreadExecutor()
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val apiUrl = "digite a URL"
+    interface Callback {
+        fun onSuccess(items: List<Student>)
+        fun onError(msg: String)
+    }
+    fun fetchStudents(callback: Callback) {
+        executor.execute {
+            try {
+                val connection = Connection()
+                val stream = connection.sendRequest(apiUrl) ?: throw Exception("Stream is null")
+                val response = Gson().fromJson(InputStreamReader(stream), ResponseDto::class.java)
+                val students = response.students.map { dto ->
+                    Student(dto.name, dto.age).apply {
+                        addGrades(dto.notes)
+                        addAttendance(dto.attendance)
+                    }
+                }
+                mainHandler.post { callback.onSuccess(students) }
+            } catch (e: Exception) {
+                mainHandler.post { callback.onError("Error while fetching students") }
+            }
+        }
+    }
+    companion object {
+        private var instance: StudentRepository? = null
+        fun getInstance(): StudentRepository = instance ?: synchronized(this) {
+            instance ?: StudentRepository().also { instance = it }
+        }
+    }
+}
+
+- MainViewModel.kt
+[source,kotlin]
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.example.atividade3.data.model.Student
+import com.example.atividade3.repository.StudentRepository
+class MainViewModel : ViewModel() {
+    val students = MutableLiveData<List<Student>>()
+    private val repository = StudentRepository.getInstance()
+    fun loadData() {
+        repository.fetchStudents(object : StudentRepository.Callback {
+            override fun onSuccess(items: List<Student>) { students.value = items }
+            override fun onError(msg: String) { /* Log.e */ }
+        })
+    }
+}
+
+- MainViewModel.kt
+[source,kotlin]
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.example.atividade3.data.model.Student
+import com.example.atividade3.repository.StudentRepository
+class MainViewModel : ViewModel() {
+    val students = MutableLiveData<List<Student>>()
+    private val repository = StudentRepository.getInstance()
+    fun loadData() {
+        repository.fetchStudents(object : StudentRepository.Callback {
+            override fun onSuccess(items: List<Student>) { students.value = items }
+            override fun onError(msg: String) { /* Log.e */ }
+        })
+    }
+}
+
+- StatusViewModel.kt
+[source,kotlin]
+class StatusViewModel : ViewModel() {
+    val students = MutableLiveData<List<Student>>()
+    val classAverage = MutableLiveData<String>()
+    private val repository = StudentRepository.getInstance()
+    private fun calculateAverageGrade(): Double {
+        val list = students.value ?: return 0.0
+        return list.map { it.calculateAverageGrade() }.average()
+    }
+    fun loadData() {
+        repository.fetchStudents(object : StudentRepository.Callback {
+            override fun onSuccess(items: List<Student>) {
+                students.value = items
+                classAverage.value = String.format("%.2f", calculateAverageGrade())
+            }
+            override fun onError(msg: String) { /* Log.e */ }
+        })
+    }
+}
+
+- StudentListAdapter.kt
+[source,kotlin]
+class StudentListAdapter(private var students: List<Student>) : RecyclerView.Adapter<StudentListAdapter.ViewHolder>() {
+    class ViewHolder(val binding: StudentsListItemBinding) : RecyclerView.ViewHolder(binding.root)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = 
+        ViewHolder(StudentsListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val s = students[position]
+        holder.binding.apply {
+            studentName.text = "Nome: ${s.name}"
+            studentAge.text = "Idade: ${s.age}"
+            studentAttendance.text = "Notas: ${s.getGrades()}"
+            studentGrades.text = "Presenças: ${s.getAttendance()}"
+        }
+    }
+    override fun getItemCount() = students.size
+    fun setStudents(list: List<Student>) { this.students = list }
+}
+
+- MainActivity.kt
+[source,kotlin]
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private val viewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
+    private val adapter = StudentListAdapter(emptyList())
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.studentList.layoutManager = LinearLayoutManager(this)
+        binding.studentList.adapter = adapter
+        binding.button.setOnClickListener {
+            startActivity(Intent(this, StatusActivity::class.java))
+        }
+        viewModel.students.observe(this) { students ->
+            adapter.setStudents(students)
+            adapter.notifyDataSetChanged()
+        }
+        viewModel.loadData()
     }
 }
 
