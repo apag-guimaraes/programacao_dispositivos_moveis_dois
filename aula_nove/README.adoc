@@ -38,14 +38,18 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import com.seu.pacote.databinding.ActivityMainBinding; 
 import java.util.Calendar;
 public class MainActivity extends AppCompatActivity {
+    private ActivityMainBinding binding;
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        // Inflar layout com ViewBinding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
     @Override
     protected void onStart() {
@@ -59,14 +63,22 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             flags |= PendingIntent.FLAG_IMMUTABLE;
         }
-        pendingIntent = PendingIntent.getBroadcast(this, 0,
-                intent, flags);
+        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, flags);
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, 20);
         calendar.set(Calendar.MINUTE, 38);
-        alarmManager.set(AlarmManager.RTC_WAKEUP,
-                calendar.getTimeInMillis() + 2000, pendingIntent);
+        calendar.set(Calendar.SECOND, 0);
+        // Verifica se o horário já passou hoje; se passou, agenda para amanhã
+        if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        if (alarmManager != null) {
+            alarmManager.set(
+                AlarmManager.RTC_WAKEUP, 
+                calendar.getTimeInMillis(), 
+                pendingIntent
+            );
+        }
     }
 }
 
@@ -84,6 +96,54 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
     }
 }
 
+- MainActivity.kt
+[source,kotlin]
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.seu.pacote.databinding.ActivityMainBinding
+import java.util.Calendar
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Inflar o layout usando ViewBinding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+    override fun onStart() {
+        super.onStart()
+        disparar()
+    }
+    private fun disparar() {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, MyBroadcastReceiver::class.java)
+        var flags = PendingIntent.FLAG_UPDATE_CURRENT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            flags = flags or PendingIntent.FLAG_IMMUTABLE
+        }
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, flags)
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 20)
+            set(Calendar.MINUTE, 38)
+            set(Calendar.SECOND, 0)
+        }
+        // Se o horário já passou, agenda para o próximo dia
+        if (calendar.timeInMillis <= System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        // Uso do método set() conforme recomendado para não-exatidão
+        alarmManager.set(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            pendingIntent
+        )
+    }
+}
 Exemplo 02:
 
 - No arquivo AndroidManifest.xml acrescente a tag <receiver android:name=".MyBroadcastReceiver"/>
@@ -112,16 +172,15 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-    <TextView
-        android:id="@+id/textViewHello"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:onClick="disparar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+   <TextView
+    android:id="@+id/textViewHello"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Hello World!"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 - MainActivity.java
@@ -134,44 +193,93 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
+import com.seu.pacote.databinding.ActivityMainBinding; 
 import java.util.Random;
 public class MainActivity extends AppCompatActivity {
-    private AlarmManager alarmManager;
-    private PendingIntent pendingIntent;
-    private Integer numeroGerado;
+    private ActivityMainBinding binding;
+    private int numeroGerado;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        TextView textViewHello = findViewById(R.id.textViewHello);
+        // Inicializando o ViewBinding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         numeroGerado = gerarNumero();
-        Log.d("TAG",numeroGerado.toString());
+        Log.d("TAG", String.valueOf(numeroGerado));
         Toast.makeText(this, "Número sorteado: " + numeroGerado, Toast.LENGTH_SHORT).show();
+        // Configurando o clique via código (melhor prática)
+        binding.textViewHello.setOnClickListener(v -> disparar());
     }
     private int gerarNumero() {
-        Random random = new Random();
-        return random.nextInt(10);
+        return new Random().nextInt(10);
     }
-    public void disparar(View view) {
-        if (view.getId() == R.id.textViewHello) {
-            Toast.makeText(this, "Clicado!", Toast.LENGTH_SHORT).show();
-            alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            Intent i = new Intent(this, MyBroadcastReceiver.class);
-            i.putExtra("numeroGerado", numeroGerado);
-            int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                flags |= PendingIntent.FLAG_IMMUTABLE;
-            }
-            pendingIntent = PendingIntent.getBroadcast(this, 0, i, flags);
+    private void disparar() {
+        Toast.makeText(this, "Agendado para 1 minuto!", Toast.LENGTH_SHORT).show();
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent i = new Intent(this, MyBroadcastReceiver.class);
+        i.putExtra("numeroGerado", numeroGerado);
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            flags |= PendingIntent.FLAG_IMMUTABLE;
+        }
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, i, flags);
+        if (alarmManager != null) {
             alarmManager.set(
                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + 60 * 1000,
+                    SystemClock.elapsedRealtime() + (60 * 1000), // 60 segundos
                     pendingIntent
             );
         }
     }
 }
 
+-
+[source,kotlin]
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.os.SystemClock
+import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.seu.pacote.databinding.ActivityMainBinding // Ajuste para o seu package
+import kotlin.random.Random
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private var numeroGerado: Int = 0
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        numeroGerado = gerarNumero()
+        Log.d("TAG", numeroGerado.toString())
+        Toast.makeText(this, "Número sorteado: $numeroGerado", Toast.LENGTH_SHORT).show()
+        binding.textViewHello.setOnClickListener {
+            disparar()
+        }
+    }
+    private fun gerarNumero(): Int {
+        return Random.nextInt(10)
+    }
+    private fun disparar() {
+        Toast.makeText(this, "Agendado para 1 minuto!", Toast.LENGTH_SHORT).show()
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, MyBroadcastReceiver::class.java).apply {
+            putExtra("numeroGerado", numeroGerado)
+        }
+        var flags = PendingIntent.FLAG_UPDATE_CURRENT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            flags = flags or PendingIntent.FLAG_IMMUTABLE
+        }
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, flags)
+        alarmManager.set(
+            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            SystemClock.elapsedRealtime() + (60 * 1000),
+            pendingIntent
+        )
+    }
+}
