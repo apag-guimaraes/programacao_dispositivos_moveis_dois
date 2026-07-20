@@ -26,7 +26,6 @@ Exemplos práticos:
    <Button
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:onClick="clicar"
        android:text="Date"
        android:id="@+id/buttonDate"/>
    <TextView
@@ -36,39 +35,56 @@ Exemplos práticos:
        android:id="@+id/textViewDate"/>
 </LinearLayout>
 
-- link:um/MainActivity.java
+- MainActivity.java
 [source,java]
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.TextView;
+import com.example.seuprojeto.databinding.ActivityMainBinding; // Ajuste para o seu package
 public class MainActivity extends AppCompatActivity {
-   private Button buttonDate;
-   private TextView textViewDate;
-   private DatePicker datePicker;
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
-       setContentView(R.layout.activity_main);
-       datePicker=findViewById(R.id.datePicker);
-       buttonDate=findViewById(R.id.buttonDate);
-       textViewDate=findViewById(R.id.textViewDate);
-   }
-   private String obterData(){
-       int dia=0,mes=0,ano=0;
-       String date="";
-       dia=datePicker.getDayOfMonth();
-       mes=datePicker.getMonth()+1;
-       ano=datePicker.getYear();
-       date=dia+"/"+mes+"/"+ano;
-       return date;
-   }
-   public void clicar(View view) {
-       textViewDate.setText(obterData());
-   }
-}//class
+    private ActivityMainBinding binding;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Inicializa o ViewBinding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        // Define o evento de clique via listener
+        binding.buttonDate.setOnClickListener(v -> {
+            binding.textViewDate.setText(obterData());
+        });
+    }
+    private String obterData() {
+        int dia = binding.datePicker.getDayOfMonth();
+        int mes = binding.datePicker.getMonth() + 1;
+        int ano = binding.datePicker.getYear();
+        return dia + "/" + mes + "/" + ano;
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.example.seuprojeto.databinding.ActivityMainBinding // Ajuste para o seu package
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Inicializa o binding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        // Define o listener de clique
+        binding.buttonDate.setOnClickListener {
+            binding.textViewDate.text = obterData()
+        }
+    }
+    private fun obterData(): String {
+        val dia = binding.datePicker.dayOfMonth
+        val mes = binding.datePicker.month + 1
+        val ano = binding.datePicker.year
+        return "$dia/$mes/$ano"
+    }
+}
 
 == Date Picker Dialog
 
@@ -92,7 +108,6 @@ Exemplos práticos:
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:text="Date"
-       android:onClick="clicar"
        android:id="@+id/textViewDate"/>
 </LinearLayout>
 
@@ -101,36 +116,68 @@ Exemplos práticos:
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.TextView;
+import com.example.seuprojeto.databinding.ActivityMainBinding; // Ajuste o seu package
 import java.util.Calendar;
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
-   private TextView textViewDate;
-   private DatePickerDialog datePickerDialog;
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
-       setContentView(R.layout.activity_main);
-       textViewDate=findViewById(R.id.textViewDate);
-   }
-   public void clicar(View view) {
-       if(view.getId() == R.id.textViewDate){
-           Calendar calendar = Calendar.getInstance();
-           int dia = calendar.get(Calendar.DAY_OF_MONTH);
-           int mes = calendar.get(Calendar.MONTH)+1;
-           int ano = calendar.get(Calendar.YEAR);
-           datePickerDialog = new DatePickerDialog(MainActivity.this, this, ano,mes,dia);
-           datePickerDialog.show();
-       }
-   }
-   @Override
-   public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-       String date = day+"/"+month+"/"+year;
-       textViewDate.setText(date);
-   }
-}//class
+    private ActivityMainBinding binding;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Inicializa o ViewBinding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        // Define o listener de clique via ViewBinding
+        binding.textViewDate.setOnClickListener(v -> exibirDatePicker());
+    }
+    private void exibirDatePicker() {
+        Calendar calendar = Calendar.getInstance();
+        int ano = calendar.get(Calendar.YEAR);
+        int mes = calendar.get(Calendar.MONTH); // Mês no Calendar começa em 0
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+        // O DatePickerDialog espera o mês de 0-11
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, this, ano, mes, dia);
+        datePickerDialog.show();
+    }
+    @Override
+    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+        // Ajuste o mês para exibição (somando 1)
+        String date = day + "/" + (month + 1) + "/" + year;
+        binding.textViewDate.setText(date);
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.app.DatePickerDialog
+import android.os.Bundle
+import android.widget.DatePicker
+import androidx.appcompat.app.AppCompatActivity
+import com.example.seuprojeto.databinding.ActivityMainBinding // Ajuste o seu package
+import java.util.Calendar
+class MainActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
+    private lateinit var binding: ActivityMainBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.textViewDate.setOnClickListener {
+            exibirDatePicker()
+        }
+    }
+    private fun exibirDatePicker() {
+        val calendar = Calendar.getInstance()
+        val ano = calendar.get(Calendar.YEAR)
+        val mes = calendar.get(Calendar.MONTH)
+        val dia = calendar.get(Calendar.DAY_OF_MONTH)
+        DatePickerDialog(this, this, ano, mes, dia).show()
+    }
+    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+        // Mês no Calendar/DatePicker é 0-indexed (Janeiro = 0), por isso somamos 1
+        val date = "$dayOfMonth/${month + 1}/$year"
+        binding.textViewDate.text = date
+    }
+}
 
 == Time Picker
 
@@ -159,51 +206,86 @@ Exemplos práticos:
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:text="CLICK"
-       android:onClick="clicar"
        android:id="@+id/button"/>
 </LinearLayout>
 
 - MainActivity.java
 [source,java]
 import androidx.appcompat.app.AppCompatActivity;
-import android.app.DatePickerDialog;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
-import java.util.Calendar;
-public class MainActivity extends AppCompatActivity  {
-   private TimePicker timePicker;
-   private Button button;
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
-       setContentView(R.layout.activity_main);
-       timePicker = findViewById(R.id.timePicker);
-       timePicker.setIs24HourView(true);
-       button = findViewById(R.id.button);
-   }//onCreate
-   private void obter(){
-       int hora =0,minuto=0;
-       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-           hora = timePicker.getHour();
-           minuto = timePicker.getMinute();
-       }else{
-           hora = timePicker.getCurrentHour();
-           minuto = timePicker.getCurrentMinute();
-       }
-       String tempo = hora+":"+minuto;
-       Toast.makeText(getApplicationContext(),tempo,Toast.LENGTH_SHORT).show();
-   }
-   public void clicar(View view) {
-      obter();
-   }//method
-}//class
+import com.example.seuprojeto.databinding.ActivityMainBinding; // Ajuste para o seu package
+public class MainActivity extends AppCompatActivity {
+    private ActivityMainBinding binding;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Inicializa o ViewBinding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        // Configuração do TimePicker
+        binding.timePicker.setIs24HourView(true);
+        // Adiciona o listener de clique via ViewBinding
+        binding.button.setOnClickListener(v -> obter());
+    }
+    private void obter() {
+        int hora, minuto;
+        // Verifica a versão da API para escolher o método correto
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            hora = binding.timePicker.getHour();
+            minuto = binding.timePicker.getMinute();
+        } else {
+            // Métodos obsoletos para versões anteriores à API 23
+            hora = binding.timePicker.getCurrentHour();
+            minuto = binding.timePicker.getCurrentMinute();
+        }
+        // Formatação simples (para exibir 09:05 ao invés de 9:5, opcional)
+        String tempo = String.format("%02d:%02d", hora, minuto);
+        Toast.makeText(this, tempo, Toast.LENGTH_SHORT).show();
+    }
+}
 
+- MainActivity.kt
+[source,kotlin]
+import android.os.Build
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.seuprojeto.databinding.ActivityMainBinding // Ajuste o seu package
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Inicializa o ViewBinding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        // Configuração do TimePicker
+        binding.timePicker.setIs24HourView(true)
+        // Adiciona o listener de clique
+        binding.button.setOnClickListener {
+            obter()
+        }
+    }
+    private fun obter() {
+        val hora: Int
+        val minuto: Int
+        // Em Kotlin, o if pode ser usado como uma expressão para retornar valores
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            hora = binding.timePicker.hour
+            minuto = binding.timePicker.minute
+        } else {
+            // Métodos legados usados em versões anteriores à API 23
+            @Suppress("DEPRECATION")
+            hora = binding.timePicker.currentHour
+            @Suppress("DEPRECATION")
+            minuto = binding.timePicker.currentMinute
+        }
+        // Formatação usando String Templates e padronização para 2 dígitos
+        val tempo = "%02d:%02d".format(hora, minuto)
+        Toast.makeText(this, tempo, Toast.LENGTH_SHORT).show()
+    }
+}
 
 == Time Picker Dialog
 
@@ -227,7 +309,6 @@ Exemplos práticos:
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="CLICK"
-        android:onClick="clicar"
         android:id="@+id/button"/>
 </LinearLayout>
 
@@ -236,23 +317,19 @@ Exemplos práticos:
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
+import com.example.seuprojeto.databinding.ActivityMainBinding; // Ajuste o seu package
 import java.util.Calendar;
 public class MainActivity extends AppCompatActivity {
-    private Button button;
+    private ActivityMainBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        button = findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                abrirTimePicker();
-            }
-        });
+        // Inicializa o ViewBinding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        // Define o listener de clique usando ViewBinding
+        binding.button.setOnClickListener(v -> abrirTimePicker());
     }
     private void abrirTimePicker() {
         Calendar calendar = Calendar.getInstance();
@@ -260,18 +337,55 @@ public class MainActivity extends AppCompatActivity {
         int minutoAtual = calendar.get(Calendar.MINUTE);
         TimePickerDialog dialog = new TimePickerDialog(
                 this,
-                new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(android.widget.TimePicker view, int horaSelecionada, int minutoSelecionado) {
-                        String tempo = String.format("%2d:%2d", horaSelecionada, minutoSelecionado);
-                        Toast.makeText(getApplicationContext(), "Hora escolhida: " + tempo, Toast.LENGTH_SHORT).show();
-                    }
+                (view, horaSelecionada, minutoSelecionado) -> {
+                    // %02d garante dois dígitos (ex: 09:05)
+                    String tempo = String.format("%02d:%02d", horaSelecionada, minutoSelecionado);
+                    Toast.makeText(this, "Hora escolhida: " + tempo, Toast.LENGTH_SHORT).show();
                 },
                 horaAtual,
                 minutoAtual,
-                true 
+                true // formato 24 horas
         );
         dialog.show();
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.app.TimePickerDialog
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.seuprojeto.databinding.ActivityMainBinding // Ajuste o seu package
+import java.util.Calendar
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Inicializa o ViewBinding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        // Define o listener de clique
+        binding.button.setOnClickListener {
+            abrirTimePicker()
+        }
+    }
+    private fun abrirTimePicker() {
+        val calendar = Calendar.getInstance()
+        val horaAtual = calendar.get(Calendar.HOUR_OF_DAY)
+        val minutoAtual = calendar.get(Calendar.MINUTE)
+        val dialog = TimePickerDialog(
+            this,
+            { _, horaSelecionada, minutoSelecionado ->
+                // Formatação: %02d garante preenchimento com zero à esquerda
+                val tempo = "%02d:%02d".format(horaSelecionada, minutoSelecionado)
+                Toast.makeText(this, "Hora escolhida: $tempo", Toast.LENGTH_SHORT).show()
+            },
+            horaAtual,
+            minutoAtual,
+            true // Formato 24 horas
+        )
+        dialog.show()
     }
 }
 
@@ -328,34 +442,63 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import com.example.seuprojeto.databinding.ActivityMainBinding; // Importe a classe de binding gerada
 public class MainActivity extends AppCompatActivity {
-    private EditText editNumero, editMensagem;
-    private Button buttonSms;
+    private ActivityMainBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        editNumero = findViewById(R.id.editNumero);
-        editMensagem = findViewById(R.id.editMensagem);
-        buttonSms = findViewById(R.id.buttonSms);
-        buttonSms.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                enviarSms();
-            }
-        });
+        // Inicializa o binding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        // Define o listener usando o objeto binding
+        binding.buttonSms.setOnClickListener(v -> enviarSms());
     }
     private void enviarSms() {
-        String numero = editNumero.getText().toString().trim();
-        String mensagem = editMensagem.getText().toString().trim();
-        Uri uri = Uri.parse("smsto:" + numero);
-        Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
-        intent.putExtra("sms_body", mensagem);
-        startActivity(intent);
+        String numero = binding.editNumero.getText().toString().trim();
+        String mensagem = binding.editMensagem.getText().toString().trim();
+        if (!numero.isEmpty()) {
+            Uri uri = Uri.parse("smsto:" + numero);
+            Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
+            intent.putExtra("sms_body", mensagem);
+            startActivity(intent);
+        } else {
+            binding.editNumero.setError("Número é obrigatório");
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.example.seuprojeto.databinding.ActivityMainBinding // Ajuste para o seu package
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Inicializa o binding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        // Listener de clique configurado com a sintaxe lambda do Kotlin
+        binding.buttonSms.setOnClickListener {
+            enviarSms()
+        }
+    }
+    private fun enviarSms() {
+        val numero = binding.editNumero.text.toString().trim()
+        val mensagem = binding.editMensagem.text.toString().trim()
+        if (numero.isNotEmpty()) {
+            val uri = Uri.parse("smsto:$numero")
+            val intent = Intent(Intent.ACTION_SENDTO, uri).apply {
+                putExtra("sms_body", mensagem)
+            }
+            startActivity(intent)
+        } else {
+            binding.editNumero.error = "Número é obrigatório"
+        }
     }
 }
 
@@ -379,7 +522,6 @@ Exemplos práticos(Adaptado de: https://faq.whatsapp.com/android/im-an-android-d
        android:layout_height="wrap_content"
        android:text="CLICK"
        android:id="@+id/buttonWhatsApp"
-       android:onClick="clicar"
        app:layout_constraintBottom_toBottomOf="parent"
        app:layout_constraintLeft_toLeftOf="parent"
        app:layout_constraintRight_toRightOf="parent"
@@ -393,32 +535,72 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
+import com.example.seuprojeto.databinding.ActivityMainBinding; // Ajuste para o seu package
 public class MainActivity extends AppCompatActivity {
-    private Button buttonWA;
+    private ActivityMainBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        buttonWA = findViewById(R.id.buttonWhatsApp);
+        // Inicializa o ViewBinding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        // Define o evento de clique diretamente pelo binding
+        binding.buttonWhatsApp.setOnClickListener(v -> abrirWhatsApp());
     }
-    public void clicar(View v) {
-        if (v.getId() == R.id.buttonWhatsApp) {
-            String texto = "Hello World";
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_TEXT, texto);
-            intent.setPackage("com.whatsapp");
-            try {
-                startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(this, "WhatsApp não instalado, abrindo Play Store", Toast.LENGTH_SHORT).show();
-                Intent playStoreIntent = new Intent(Intent.ACTION_VIEW);
-                playStoreIntent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.whatsapp"));
-                startActivity(playStoreIntent);
+    private void abrirWhatsApp() {
+        String texto = "Hello World";
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, texto);
+        intent.setPackage("com.whatsapp");
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "WhatsApp não instalado, abrindo Play Store", Toast.LENGTH_SHORT).show();
+            Intent playStoreIntent = new Intent(Intent.ACTION_VIEW);
+            playStoreIntent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.whatsapp"));
+            startActivity(playStoreIntent);
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.seuprojeto.databinding.ActivityMainBinding // Ajuste para o seu package
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Inicializa o ViewBinding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        // Define o evento de clique usando uma lambda
+        binding.buttonWhatsApp.setOnClickListener {
+            abrirWhatsApp()
+        }
+    }
+    private fun abrirWhatsApp() {
+        val texto = "Hello World"
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, texto)
+            setPackage("com.whatsapp")
+        }
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, "WhatsApp não instalado, abrindo Play Store", Toast.LENGTH_SHORT).show()
+            val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("https://play.google.com/store/apps/details?id=com.whatsapp")
             }
+            startActivity(playStoreIntent)
         }
     }
 }
