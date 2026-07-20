@@ -625,7 +625,6 @@ Exemplos práticos:
        android:layout_height="wrap_content"
        android:text="CLICK"
        android:id="@+id/buttonGmail"
-       android:onClick="clicar"
        app:layout_constraintBottom_toBottomOf="parent"
        app:layout_constraintLeft_toLeftOf="parent"
        app:layout_constraintRight_toRightOf="parent"
@@ -639,36 +638,78 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
+import com.example.seuprojeto.databinding.ActivityMainBinding; // Ajuste para o seu package
 public class MainActivity extends AppCompatActivity {
-    private Button buttonGmail;
+    private ActivityMainBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        buttonGmail = findViewById(R.id.buttonGmail);
+        // Inicializa o ViewBinding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        // Define o evento de clique via listener programático
+        binding.buttonGmail.setOnClickListener(v -> abrirGmail());
     }
-    public void clicar(View v) {
-        if (v.getId() == R.id.buttonGmail) {
-            String[] email = {"email@gmail.com"}; 
-            String subject = "MyTitle";
-            String text = "MyText";
-            Intent intent = new Intent(Intent.ACTION_SENDTO);
-            intent.setData(Uri.parse("mailto:")); 
-            intent.putExtra(Intent.EXTRA_EMAIL, email);
-            intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-            intent.putExtra(Intent.EXTRA_TEXT, text);
-            intent.setPackage("com.google.android.gm"); 
-            try {
-                startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(this, "Gmail não instalado, abrindo Play Store", Toast.LENGTH_SHORT).show();
-                Intent playStoreIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.gm"));
-                startActivity(playStoreIntent);
+    private void abrirGmail() {
+        String[] email = {"email@gmail.com"};
+        String subject = "MyTitle";
+        String text = "MyText";
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:"));
+        intent.putExtra(Intent.EXTRA_EMAIL, email);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+        intent.setPackage("com.google.android.gm");
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "Gmail não instalado, abrindo Play Store", Toast.LENGTH_SHORT).show();
+            Intent playStoreIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.gm"));
+            startActivity(playStoreIntent);
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.seuprojeto.databinding.ActivityMainBinding // Ajuste para o seu package
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.buttonGmail.setOnClickListener {
+            abrirGmail()
+        }
+    }
+    private fun abrirGmail() {
+        val email = arrayOf("email@gmail.com")
+        val subject = "MyTitle"
+        val text = "MyText"
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:")
+            putExtra(Intent.EXTRA_EMAIL, email)
+            putExtra(Intent.EXTRA_SUBJECT, subject)
+            putExtra(Intent.EXTRA_TEXT, text)
+            setPackage("com.google.android.gm")
+        }
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, "Gmail não instalado, abrindo Play Store", Toast.LENGTH_SHORT).show()
+            val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.gm")
             }
+            startActivity(playStoreIntent)
         }
     }
 }
@@ -709,7 +750,6 @@ Playing a video in VideoView in Anroid. Disponível em:<https://stackoverflow.co
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:id="@+id/buttonProximo"
-       android:onClick="clicar"
        android:text="próximo"/>
 </LinearLayout>
 
@@ -718,27 +758,21 @@ Playing a video in VideoView in Anroid. Disponível em:<https://stackoverflow.co
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import com.example.seuprojeto.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
-   private Button button;
-   private EditText editText;
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
-       setContentView(R.layout.activity_main);
-       button = findViewById(R.id.buttonProximo);
-       editText = findViewById(R.id.editTextNome);
-   }//onCreate
-   public void clicar(View view) {
-       if(view.getId() == R.id.buttonProximo){
-           String nome = editText.getText().toString();
-           Intent intent = new Intent(getApplicationContext(),Activity2.class);
-           intent.putExtra("nome",nome);
-           startActivity(intent);
-       }
-   }//clicar
+    private ActivityMainBinding binding;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        binding.buttonProximo.setOnClickListener(v -> {
+            String nome = binding.editTextNome.getText().toString();
+            Intent intent = new Intent(this, Activity2.class);
+            intent.putExtra("nome", nome);
+            startActivity(intent);
+        });
+    }
 }
 
 - activity_segunda.xml
@@ -764,7 +798,6 @@ public class MainActivity extends AppCompatActivity {
            android:layout_width="0dp"
            android:layout_weight="1"
            android:layout_height="wrap_content"
-           android:onClick="click"
            android:text="play"
            android:id="@+id/buttonPlay"
            />
@@ -772,7 +805,6 @@ public class MainActivity extends AppCompatActivity {
            android:layout_width="0dp"
            android:layout_weight="1"
            android:layout_height="wrap_content"
-           android:onClick="click"
            android:text="pause"
            android:id="@+id/buttonPause"
            />
@@ -780,7 +812,6 @@ public class MainActivity extends AppCompatActivity {
            android:layout_width="0dp"
            android:layout_weight="1"
            android:layout_height="wrap_content"
-           android:onClick="click"
            android:text="stop"
            android:id="@+id/buttonStop"
            />
@@ -795,72 +826,136 @@ import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
-import android.widget.VideoView;
+import com.example.seuprojeto.databinding.ActivitySegundaBinding;
 import java.util.Locale;
-public class Activity2 extends AppCompatActivity implements
-       TextToSpeech.OnInitListener {   //interface para fornecer o método de suporte
-   private VideoView videoView;
-   private Button buttonPlay,buttonPause, buttonStop;
-   private Uri uri;
-   private TextToSpeech textToSpeech;
-   private String msg;
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
-       setContentView(R.layout.activity_2);
-       String nome = getIntent().getStringExtra("nome");
-       msg = nome+" seu vídeo está pronto";
-       textToSpeech =  new TextToSpeech(getApplicationContext(),this);
-       videoView = findViewById(R.id.videoView);
-       buttonPlay = findViewById(R.id.buttonPlay);
-       buttonPause = findViewById(R.id.buttonPause);
-       buttonStop = findViewById(R.id.buttonStop);
-       uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video);   //local de onde se encontra o recurso
-       videoView.setVideoURI(uri);  //configura o recurso no VideoView
-   }//onCreate
-   public void click(View view){
-       if(view.getId() == R.id.buttonPlay){
-           int duracao = videoView.getDuration();
-           Toast.makeText(getApplicationContext(),"Tempo total: "+duracao, Toast.LENGTH_SHORT).show();
-           videoView.start();  //começa o vídeo
-       }
-       if(view.getId() == R.id.buttonPause){
-           videoView.pause();
-           int posicao = videoView.getCurrentPosition();  //obtém a posição atual do vídeo
-           Toast.makeText(getApplicationContext(),"Tempo atual: "+posicao, Toast.LENGTH_SHORT).show();
-       }
-       if(view.getId() == R.id.buttonStop){
-           videoView.stopPlayback();  //para o vídeo
-           Toast.makeText(getApplicationContext(),"Vídeo não pode ser mais reproduzido ", Toast.LENGTH_SHORT).show();
-           finish();
-       }
-   }//click
-   @Override
-   public void onInit(int i) {
-       if(i == TextToSpeech.SUCCESS){
-           Locale locale = new Locale("pt","br");  //define o idioma
-           int result = textToSpeech.setLanguage(locale);  //define o idioma no TextToSpeech
-           textToSpeech.setSpeechRate(0.5f);  //define a velocidade da fala
-           if(result == TextToSpeech.LANG_MISSING_DATA ||
-           result == TextToSpeech.LANG_NOT_SUPPORTED){   //verifica se existe suporte ao idioma
-               Log.e("problemasI","problemas com o idioma");
-           }else{
-               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){  //verifica as versões do Android
-                   textToSpeech.speak(msg,TextToSpeech.QUEUE_FLUSH,  //passa a mensagem para o método. Os textos passados aqui serão pronunciados.
-                           null,null);
-               }else{
-                   textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH,
-                           null); //passa a mensagem para o método. Os textos passados aqui serão pronunciados.
-               }
-           }
-       }else{
-           Log.e("problemasT","problemas com o textToSpeech");
-       }
-   }//onInit
-}//class
+public class Activity2 extends AppCompatActivity implements TextToSpeech.OnInitListener {
+    private ActivitySegundaBinding binding;
+    private TextToSpeech textToSpeech;
+    private String msg;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivitySegundaBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        String nome = getIntent().getStringExtra("nome");
+        msg = (nome != null ? nome : "Usuário") + " seu vídeo está pronto";
+        textToSpeech = new TextToSpeech(this, this);
+        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video);
+        binding.videoView.setVideoURI(uri);
+        // Configuração dos listeners
+        binding.buttonPlay.setOnClickListener(v -> {
+            Toast.makeText(this, "Tempo total: " + binding.videoView.getDuration(), Toast.LENGTH_SHORT).show();
+            binding.videoView.start();
+        });
+        binding.buttonPause.setOnClickListener(v -> {
+            binding.videoView.pause();
+            Toast.makeText(this, "Tempo atual: " + binding.videoView.getCurrentPosition(), Toast.LENGTH_SHORT).show();
+        });
+        binding.buttonStop.setOnClickListener(v -> {
+            binding.videoView.stopPlayback();
+            Toast.makeText(this, "Vídeo não pode ser mais reproduzido", Toast.LENGTH_SHORT).show();
+            finish();
+        });
+    }
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = textToSpeech.setLanguage(new Locale("pt", "BR"));
+            textToSpeech.setSpeechRate(0.5f);
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "Idioma não suportado");
+            } else {
+                textToSpeech.speak(msg, TextToSpeech.QUEUE_FLUSH, null, "ID_MSG");
+            }
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+        super.onDestroy();
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.example.seuprojeto.databinding.ActivityMainBinding
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.buttonProximo.setOnClickListener {
+            val nome = binding.editTextNome.text.toString()
+            val intent = Intent(this, Activity2::class.java).apply {
+                putExtra("nome", nome)
+            }
+            startActivity(intent)
+        }
+    }
+}
+
+- SegundaActivity.kt
+[source,kotlin]
+import android.net.Uri
+import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.seuprojeto.databinding.ActivitySegundaBinding // Ajuste conforme seu arquivo gerado
+import java.util.Locale
+class Activity2 : AppCompatActivity(), TextToSpeech.OnInitListener {
+    private lateinit var binding: ActivitySegundaBinding
+    private var textToSpeech: TextToSpeech? = null
+    private var msg: String = ""
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivitySegundaBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val nome = intent.getStringExtra("nome") ?: "Usuário"
+        msg = "$nome seu vídeo está pronto"
+        textToSpeech = TextToSpeech(this, this)
+        val uri = Uri.parse("android.resource://$packageName/${R.raw.video}")
+        binding.videoView.setVideoURI(uri)
+        binding.buttonPlay.setOnClickListener {
+            Toast.makeText(this, "Tempo total: ${binding.videoView.duration}", Toast.LENGTH_SHORT).show()
+            binding.videoView.start()
+        }
+        binding.buttonPause.setOnClickListener {
+            binding.videoView.pause()
+            Toast.makeText(this, "Tempo atual: ${binding.videoView.currentPosition}", Toast.LENGTH_SHORT).show()
+        }
+        binding.buttonStop.setOnClickListener {
+            binding.videoView.stopPlayback()
+            Toast.makeText(this, "Vídeo não pode ser mais reproduzido", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+    }
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val result = textToSpeech?.setLanguage(Locale("pt", "BR"))
+            textToSpeech?.setSpeechRate(0.5f)
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "Idioma não suportado")
+            } else {
+                textToSpeech?.speak(msg, TextToSpeech.QUEUE_FLUSH, null, "ID_MSG")
+            }
+        }
+    }
+    override fun onDestroy() {
+        textToSpeech?.stop()
+        textToSpeech?.shutdown()
+        super.onDestroy()
+    }
+}
 
 - criar uma pasta chamada raw no projeto, o vídeo deve estar armazenado dentro desta pasta.
 
