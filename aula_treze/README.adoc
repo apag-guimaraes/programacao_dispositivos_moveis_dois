@@ -961,7 +961,267 @@ class Activity2 : AppCompatActivity(), TextToSpeech.OnInitListener {
 
 == Gravar áudio
 
-No Android é possível gravar áudio com o uso da classe AudioRecord e AudioTrack. O repositório disponível em: https://github.com/dolbyio-samples/media-sample-android-recording-local-files fornece exemplos práticos de como usar estas classes em projetos Android. Os perfis dos contribuidores no projeto: https://github.com/alaboy3, https://github.com/j12y e https://github.com/mjren23).  
+No Android é possível gravar áudio com o uso da classe AudioRecord e AudioTrack. O repositório disponível em: https://github.com/dolbyio-samples/media-sample-android-recording-local-files fornece exemplos práticos de como usar estas classes em projetos Android. Os perfis dos contribuidores no projeto: https://github.com/alaboy3, https://github.com/j12y e https://github.com/mjren23). O exemplo a seguir foi retirado repositório supracitado e adaptado.
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <Button
+        android:id="@+id/record_mediarecorder"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/play_mediaplayer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:layout_marginHorizontal="70dp"
+        android:text="@string/record_mediarecorder"/>
+    <Button
+        android:id="@+id/play_mediaplayer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="70dp"
+        android:text="@string/play_mediaplayer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/record_mediarecorder" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- PermissionDialogFragment.java 
+[source,java]
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+public class PermissionDialogFragment extends DialogFragment {
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        return new AlertDialog.Builder(requireContext())
+                .setTitle("Permissão Necessária")
+                .setMessage("Precisamos da sua permissão para gravar áudio e salvar o arquivo.")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // Re-solicita a permissão
+                    requireActivity().requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 200);
+                })
+                .create();
+    }
+}
+
+- MainActivity.java
+[source,java]
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
+import android.os.Bundle;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import com.example.gravarreproduziraudio.databinding.ActivityMainBinding;
+import java.io.File;
+import java.io.IOException;
+public class MainActivity extends AppCompatActivity {
+    private ActivityMainBinding binding;
+    private MediaRecorder mediaRecorder;
+    private MediaPlayer mediaPlayer;
+    private boolean isRecording = false;
+    private boolean isPlaying = false;
+    private String fileName;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        fileName = getFilesDir().getPath() + "/testfile.3gp";
+        binding.recordMediarecorder.setOnClickListener(v -> toggleRecording());
+        binding.playMediaplayer.setOnClickListener(v -> togglePlaying());
+        checkPermission();
+    }
+    private void checkPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 200);
+        }
+    }
+    private void toggleRecording() {
+        if (!isRecording) {
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mediaRecorder.setOutputFile(fileName);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_WB);
+            try {
+                mediaRecorder.prepare();
+                mediaRecorder.start();
+                isRecording = true;
+                binding.recordMediarecorder.setText("Parar Gravação");
+            } catch (IOException e) { e.printStackTrace(); }
+        } else {
+            mediaRecorder.stop();
+            mediaRecorder.release();
+            mediaRecorder = null;
+            isRecording = false;
+            binding.recordMediarecorder.setText("Gravar");
+        }
+    }
+    private void togglePlaying() {
+        if (!isPlaying) {
+            mediaPlayer = new MediaPlayer();
+            try {
+                mediaPlayer.setDataSource(fileName);
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+                isPlaying = true;
+                binding.playMediaplayer.setText("Parar Reprodução");
+                mediaPlayer.setOnCompletionListener(mp -> {
+                    isPlaying = false;
+                    binding.playMediaplayer.setText("Reproduzir");
+                });
+            } catch (IOException e) { e.printStackTrace(); }
+        } else {
+            mediaPlayer.release();
+            mediaPlayer = null;
+            isPlaying = false;
+            binding.playMediaplayer.setText("Reproduzir");
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 200) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permissão concedida!", Toast.LENGTH_SHORT).show();
+            } else {
+                // Lógica de explicação com DialogFragment
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
+                    new PermissionDialogFragment().show(getSupportFragmentManager(), "perm_dialog");
+                } else {
+                    Toast.makeText(this, "Permissão negada permanentemente.", Toast.LENGTH_LONG).show();
+                    binding.recordMediarecorder.setEnabled(false);
+                }
+            }
+        }
+    }
+}
+
+- PermissionDialogFragment.kt
+[source,kotlin]
+import android.app.AlertDialog
+import android.app.Dialog
+import android.os.Bundle
+import androidx.fragment.app.DialogFragment
+import android.Manifest
+class PermissionDialogFragment : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AlertDialog.Builder(requireContext())
+            .setTitle("Permissão Necessária")
+            .setMessage("Precisamos da sua permissão para gravar áudio.")
+            .setPositiveButton("OK") { _, _ ->
+                requireActivity().requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 200)
+            }
+            .create()
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.Manifest
+import android.content.pm.PackageManager
+import android.media.MediaPlayer
+import android.media.MediaRecorder
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import com.example.gravarreproduziraudio.databinding.ActivityMainBinding
+import java.io.IOException
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private var mediaRecorder: MediaRecorder? = null
+    private var mediaPlayer: MediaPlayer? = null
+    private var isRecording = false
+    private var isPlaying = false
+    private val fileName by lazy { "${filesDir.path}/testfile.3gp" }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.recordMediarecorder.setOnClickListener { toggleRecording() }
+        binding.playMediaplayer.setOnClickListener { togglePlaying() }
+        checkPermission()
+    }
+    private fun checkPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 200)
+        }
+    }
+    private fun toggleRecording() {
+        if (!isRecording) {
+            mediaRecorder = MediaRecorder().apply {
+                setAudioSource(MediaRecorder.AudioSource.MIC)
+                setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+                setOutputFile(fileName)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_WB)
+                prepare()
+                start()
+            }
+            isRecording = true
+            binding.recordMediarecorder.text = "Parar Gravação"
+        } else {
+            mediaRecorder?.apply {
+                stop()
+                release()
+            }
+            mediaRecorder = null
+            isRecording = false
+            binding.recordMediarecorder.text = "Gravar"
+        }
+    }
+    private fun togglePlaying() {
+        if (!isPlaying) {
+            mediaPlayer = MediaPlayer().apply {
+                setDataSource(fileName)
+                prepare()
+                start()
+                setOnCompletionListener {
+                    isPlaying = false
+                    binding.playMediaplayer.text = "Reproduzir"
+                }
+            }
+            isPlaying = true
+            binding.playMediaplayer.text = "Parar Reprodução"
+        } else {
+            mediaPlayer?.release()
+            mediaPlayer = null
+            isPlaying = false
+            binding.playMediaplayer.text = "Reproduzir"
+        }
+    }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 200) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permissão concedida!", Toast.LENGTH_SHORT).show()
+            } else {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
+                    PermissionDialogFragment().show(supportFragmentManager, "perm_dialog")
+                } else {
+                    Toast.makeText(this, "Permissão negada permanentemente.", Toast.LENGTH_LONG).show()
+                    binding.recordMediarecorder.isEnabled = false
+                }
+            }
+        }
+    }
+}
 
 == Android Accessibility Suite / Android Studio Profiles / Novidades
 
