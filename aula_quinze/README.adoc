@@ -123,6 +123,64 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+- CalculadoraIMC.kt
+[source,kotlin]
+object CalculadoraIMC {
+    fun calcular(peso: Double, altura: Double): Double {
+        return peso / (altura * altura)
+    }
+    fun getTipo(imc: Double): String {
+        return when {
+            imc < 18.5 -> "Abaixo do peso"
+            imc <= 24.9 -> "Peso normal"
+            imc <= 29.9 -> "Sobrepeso"
+            imc <= 34.9 -> "Obesidade Grau I"
+            imc <= 39.9 -> "Obesidade Grau II"
+            else -> "Obesidade Grau III (mórbida)"
+        }
+    }
+}
+
+- CalculadoraIMCViewModel.kt
+[source,kotlin]
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+class CalculadoraIMCViewModel : ViewModel() {
+    val resultado = MutableLiveData<String>()
+    val tipo = MutableLiveData<String>()
+    fun calcular(peso: Double, altura: Double) {
+        val imc = CalculadoraIMC.calcular(peso, altura)
+        resultado.value = imc.toString()
+        tipo.value = CalculadoraIMC.getTipo(imc)
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import com.ktl.mvvm_calculadoraimc.databinding.ActivityMainBinding
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var vm: CalculadoraIMCViewModel
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        vm = ViewModelProvider(this)[CalculadoraIMCViewModel::class.java]
+        binding.vm = vm
+        binding.lifecycleOwner = this
+        binding.buttonCalcular.setOnClickListener {
+            val peso = binding.editTextPeso.text.toString().toDoubleOrNull() ?: 0.0
+            val altura = binding.editTextAltura.text.toString().toDoubleOrNull() ?: 0.0
+            if (peso > 0 && altura > 0) {
+                vm.calcular(peso, altura)
+            }
+        }
+    }
+}
+
 == App GsonHttp com MVVM e DataBinding
 
 - activity_main.xml
